@@ -7,7 +7,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../core/constants/theme';
 import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
 import { ShoppingListScreen } from '../features/shopping/screens/ShoppingListScreen';
-import { RecipesScreen } from '../features/recipes/screens/RecipesScreen';
+import { EnhancedRecipesScreen } from '../features/recipes/screens/EnhancedRecipesScreen';
+import { RecipeDetailScreen } from '../features/recipes/screens/RecipeDetailScreen';
+import { RecipeFormScreen } from '../features/recipes/screens/RecipeFormScreen';
 import { ReceiptCaptureWrapper } from '../features/receipt/screens/ReceiptCaptureWrapper';
 import { ReceiptFixQueueScreen } from '../features/receipt/screens/ReceiptFixQueueScreen';
 
@@ -39,6 +41,19 @@ const TabIcon: React.FC<{ focused: boolean; icon: string; label: string }> = ({ 
       {label}
     </Text>
   </View>
+);
+
+// Recipe Stack Navigator
+const RecipeStack = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerShown: false,
+    }}
+  >
+    <Stack.Screen name="RecipeList" component={EnhancedRecipesScreen} />
+    <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
+    <Stack.Screen name="RecipeForm" component={RecipeFormScreen} />
+  </Stack.Navigator>
 );
 
 // Receipt Stack Navigator
@@ -109,7 +124,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Recipes"
-        component={RecipesScreen}
+        component={RecipeStack}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon="🍴" label="Recipes" />

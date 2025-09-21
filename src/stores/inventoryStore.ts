@@ -8,7 +8,7 @@ export interface InventoryItem {
   quantity: number;
   unit: string;
   category: string;
-  location: 'Fridge' | 'Freezer' | 'Pantry';
+  location: 'fridge' | 'freezer' | 'pantry';
   expirationDate?: string;
   notes?: string;
   createdAt: string;
@@ -41,9 +41,78 @@ interface InventoryState {
 }
 
 export const useInventoryStore = create<InventoryState>()(
-  persist(
+  // Temporarily disable persistence to use fresh data
+  // persist(
     (set, get) => ({
-      items: [],
+      items: [
+        // Sample inventory items - 6 items with realistic expiration dates
+        {
+          id: '1',
+          name: 'Milk',
+          quantity: 1,
+          unit: 'gallon',
+          category: 'Dairy',
+          location: 'fridge',
+          expirationDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // Expired 2 days ago
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          name: 'Yogurt',
+          quantity: 3,
+          unit: 'cups',
+          category: 'Dairy',
+          location: 'fridge',
+          expirationDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // Expired 5 days ago
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '3',
+          name: 'Chicken Breast',
+          quantity: 2,
+          unit: 'lbs',
+          category: 'Meat',
+          location: 'freezer',
+          expirationDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // Expired 1 day ago
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '4',
+          name: 'Lettuce',
+          quantity: 1,
+          unit: 'head',
+          category: 'Vegetables',
+          location: 'fridge',
+          expirationDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // Expired 3 days ago
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '5',
+          name: 'Pasta',
+          quantity: 2,
+          unit: 'boxes',
+          category: 'Grains',
+          location: 'pantry',
+          expirationDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 6 months
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '6',
+          name: 'Olive Oil',
+          quantity: 1,
+          unit: 'bottle',
+          category: 'Oils',
+          location: 'pantry',
+          expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 1 year
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+      ],
       searchQuery: '',
       selectedCategory: null,
       selectedLocation: null,
@@ -165,10 +234,10 @@ export const useInventoryStore = create<InventoryState>()(
       getLowStockItems: (threshold = 2) => {
         return get().items.filter((item) => item.quantity <= threshold);
       },
-    }),
-    {
-      name: 'pantry-inventory-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    })
+    // {
+    //   name: 'pantry-inventory-storage',
+    //   storage: createJSONStorage(() => AsyncStorage),
+    // }
+  // )
 );

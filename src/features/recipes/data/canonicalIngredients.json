@@ -1,0 +1,1730 @@
+{
+  "chicken_breast": {
+    "id": "chicken_breast",
+    "displayName": "Chicken Breast",
+    "category": "meat",
+    "density": 1.03,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "chicken breasts",
+      "boneless chicken breast",
+      "skinless chicken breast",
+      "chicken cutlet",
+      "chicken filet",
+      "chicken fillet"
+    ]
+  },
+  "chicken_thigh": {
+    "id": "chicken_thigh",
+    "displayName": "Chicken Thigh",
+    "category": "meat",
+    "density": 1.02,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "chicken thighs",
+      "boneless chicken thigh",
+      "bone-in chicken thigh"
+    ]
+  },
+  "ground_beef": {
+    "id": "ground_beef",
+    "displayName": "Ground Beef",
+    "category": "meat",
+    "density": 0.95,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "beef mince",
+      "minced beef",
+      "hamburger meat",
+      "ground chuck",
+      "lean ground beef"
+    ]
+  },
+  "beef_steak": {
+    "id": "beef_steak",
+    "displayName": "Beef Steak",
+    "category": "meat",
+    "density": 1.05,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "steak",
+      "sirloin",
+      "ribeye",
+      "filet mignon",
+      "ny strip",
+      "t-bone"
+    ]
+  },
+  "pork_chop": {
+    "id": "pork_chop",
+    "displayName": "Pork Chop",
+    "category": "meat",
+    "density": 1.01,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "pork chops",
+      "bone-in pork chop",
+      "boneless pork chop",
+      "pork loin chop"
+    ]
+  },
+  "bacon": {
+    "id": "bacon",
+    "displayName": "Bacon",
+    "category": "meat",
+    "density": 0.92,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "bacon strips",
+      "bacon slices",
+      "crispy bacon",
+      "turkey bacon"
+    ]
+  },
+  "sausage": {
+    "id": "sausage",
+    "displayName": "Sausage",
+    "category": "meat",
+    "density": 0.98,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "italian sausage",
+      "breakfast sausage",
+      "pork sausage",
+      "sausage links",
+      "bratwurst"
+    ]
+  },
+  "ground_turkey": {
+    "id": "ground_turkey",
+    "displayName": "Ground Turkey",
+    "category": "meat",
+    "density": 0.96,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "turkey mince",
+      "minced turkey",
+      "lean ground turkey"
+    ]
+  },
+  "ham": {
+    "id": "ham",
+    "displayName": "Ham",
+    "category": "meat",
+    "density": 1.02,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "sliced ham",
+      "deli ham",
+      "honey ham",
+      "smoked ham"
+    ]
+  },
+  "lamb": {
+    "id": "lamb",
+    "displayName": "Lamb",
+    "category": "meat",
+    "density": 1.04,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "lamb chops",
+      "lamb shank",
+      "ground lamb",
+      "lamb shoulder"
+    ]
+  },
+  "salmon": {
+    "id": "salmon",
+    "displayName": "Salmon",
+    "category": "fish",
+    "density": 0.98,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "salmon fillet",
+      "salmon filet",
+      "atlantic salmon",
+      "fresh salmon"
+    ]
+  },
+  "tuna": {
+    "id": "tuna",
+    "displayName": "Tuna",
+    "category": "fish",
+    "density": 1.03,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "tuna steak",
+      "ahi tuna",
+      "yellowfin tuna",
+      "canned tuna",
+      "tuna fish"
+    ]
+  },
+  "shrimp": {
+    "id": "shrimp",
+    "displayName": "Shrimp",
+    "category": "fish",
+    "density": 0.99,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "prawns",
+      "jumbo shrimp",
+      "cocktail shrimp",
+      "frozen shrimp"
+    ]
+  },
+  "cod": {
+    "id": "cod",
+    "displayName": "Cod",
+    "category": "fish",
+    "density": 0.98,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "cod fillet",
+      "cod filet",
+      "atlantic cod",
+      "pacific cod"
+    ]
+  },
+  "tilapia": {
+    "id": "tilapia",
+    "displayName": "Tilapia",
+    "category": "fish",
+    "density": 0.96,
+    "densityGroup": "meat",
+    "safeConversions": true,
+    "aliases": [
+      "tilapia fillet",
+      "tilapia filet",
+      "fresh tilapia"
+    ]
+  },
+  "tomato": {
+    "id": "tomato",
+    "displayName": "Tomato",
+    "category": "produce",
+    "density": 0.95,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "tomatoes",
+      "fresh tomato",
+      "roma tomato",
+      "cherry tomatoes",
+      "grape tomatoes"
+    ]
+  },
+  "onion": {
+    "id": "onion",
+    "displayName": "Onion",
+    "category": "produce",
+    "density": 0.89,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "onions",
+      "yellow onion",
+      "white onion",
+      "sweet onion",
+      "vidalia onion"
+    ]
+  },
+  "garlic": {
+    "id": "garlic",
+    "displayName": "Garlic",
+    "category": "produce",
+    "density": 0.67,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "garlic cloves",
+      "garlic clove",
+      "fresh garlic",
+      "minced garlic"
+    ]
+  },
+  "carrot": {
+    "id": "carrot",
+    "displayName": "Carrot",
+    "category": "produce",
+    "density": 0.87,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "carrots",
+      "baby carrots",
+      "carrot sticks",
+      "shredded carrot"
+    ]
+  },
+  "celery": {
+    "id": "celery",
+    "displayName": "Celery",
+    "category": "produce",
+    "density": 0.64,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "celery stalks",
+      "celery stalk",
+      "celery sticks",
+      "celery ribs"
+    ]
+  },
+  "bell_pepper": {
+    "id": "bell_pepper",
+    "displayName": "Bell Pepper",
+    "category": "produce",
+    "density": 0.92,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "bell peppers",
+      "red pepper",
+      "green pepper",
+      "yellow pepper",
+      "sweet pepper",
+      "capsicum"
+    ]
+  },
+  "broccoli": {
+    "id": "broccoli",
+    "displayName": "Broccoli",
+    "category": "produce",
+    "density": 0.34,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "broccoli florets",
+      "broccoli crowns",
+      "fresh broccoli",
+      "broccoli heads"
+    ]
+  },
+  "spinach": {
+    "id": "spinach",
+    "displayName": "Spinach",
+    "category": "produce",
+    "density": 0.23,
+    "densityGroup": "leafy",
+    "safeConversions": false,
+    "aliases": [
+      "baby spinach",
+      "spinach leaves",
+      "fresh spinach",
+      "frozen spinach"
+    ]
+  },
+  "lettuce": {
+    "id": "lettuce",
+    "displayName": "Lettuce",
+    "category": "produce",
+    "density": 0.36,
+    "densityGroup": "leafy",
+    "safeConversions": false,
+    "aliases": [
+      "romaine lettuce",
+      "iceberg lettuce",
+      "butter lettuce",
+      "leaf lettuce",
+      "salad greens"
+    ]
+  },
+  "cucumber": {
+    "id": "cucumber",
+    "displayName": "Cucumber",
+    "category": "produce",
+    "density": 0.96,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "cucumbers",
+      "english cucumber",
+      "persian cucumber",
+      "sliced cucumber"
+    ]
+  },
+  "potato": {
+    "id": "potato",
+    "displayName": "Potato",
+    "category": "produce",
+    "density": 0.82,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "potatoes",
+      "russet potato",
+      "yukon gold",
+      "red potato",
+      "white potato"
+    ]
+  },
+  "sweet_potato": {
+    "id": "sweet_potato",
+    "displayName": "Sweet Potato",
+    "category": "produce",
+    "density": 0.86,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "sweet potatoes",
+      "yam",
+      "yams",
+      "orange sweet potato"
+    ]
+  },
+  "mushroom": {
+    "id": "mushroom",
+    "displayName": "Mushroom",
+    "category": "produce",
+    "density": 0.92,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "mushrooms",
+      "button mushroom",
+      "portobello",
+      "cremini mushroom",
+      "shiitake"
+    ]
+  },
+  "zucchini": {
+    "id": "zucchini",
+    "displayName": "Zucchini",
+    "category": "produce",
+    "density": 0.95,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "zucchinis",
+      "courgette",
+      "summer squash",
+      "green squash"
+    ]
+  },
+  "corn": {
+    "id": "corn",
+    "displayName": "Corn",
+    "category": "produce",
+    "density": 0.72,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "corn kernels",
+      "sweet corn",
+      "corn on the cob",
+      "frozen corn",
+      "canned corn"
+    ]
+  },
+  "lemon": {
+    "id": "lemon",
+    "displayName": "Lemon",
+    "category": "produce",
+    "density": 1.03,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "lemons",
+      "lemon juice",
+      "fresh lemon",
+      "lemon wedge"
+    ]
+  },
+  "lime": {
+    "id": "lime",
+    "displayName": "Lime",
+    "category": "produce",
+    "density": 1.03,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "limes",
+      "lime juice",
+      "fresh lime",
+      "key lime"
+    ]
+  },
+  "apple": {
+    "id": "apple",
+    "displayName": "Apple",
+    "category": "produce",
+    "density": 0.84,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "apples",
+      "granny smith",
+      "red delicious",
+      "gala apple",
+      "honeycrisp"
+    ]
+  },
+  "banana": {
+    "id": "banana",
+    "displayName": "Banana",
+    "category": "produce",
+    "density": 0.95,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "bananas",
+      "ripe banana",
+      "mashed banana",
+      "banana slices"
+    ]
+  },
+  "strawberry": {
+    "id": "strawberry",
+    "displayName": "Strawberry",
+    "category": "produce",
+    "density": 0.92,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "strawberries",
+      "fresh strawberries",
+      "sliced strawberries",
+      "frozen strawberries"
+    ]
+  },
+  "blueberry": {
+    "id": "blueberry",
+    "displayName": "Blueberry",
+    "category": "produce",
+    "density": 0.63,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "blueberries",
+      "fresh blueberries",
+      "frozen blueberries"
+    ]
+  },
+  "orange": {
+    "id": "orange",
+    "displayName": "Orange",
+    "category": "produce",
+    "density": 0.86,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "oranges",
+      "navel orange",
+      "valencia orange",
+      "orange juice"
+    ]
+  },
+  "grapes": {
+    "id": "grapes",
+    "displayName": "Grapes",
+    "category": "produce",
+    "density": 0.69,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "grape",
+      "red grapes",
+      "green grapes",
+      "seedless grapes"
+    ]
+  },
+  "pineapple": {
+    "id": "pineapple",
+    "displayName": "Pineapple",
+    "category": "produce",
+    "density": 0.85,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "fresh pineapple",
+      "pineapple chunks",
+      "canned pineapple"
+    ]
+  },
+  "avocado": {
+    "id": "avocado",
+    "displayName": "Avocado",
+    "category": "produce",
+    "density": 0.92,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "avocados",
+      "haas avocado",
+      "ripe avocado",
+      "mashed avocado"
+    ]
+  },
+  "basil": {
+    "id": "basil",
+    "displayName": "Basil",
+    "category": "herbs",
+    "density": 0.23,
+    "densityGroup": "herbs",
+    "safeConversions": false,
+    "aliases": [
+      "fresh basil",
+      "basil leaves",
+      "sweet basil",
+      "thai basil"
+    ]
+  },
+  "cilantro": {
+    "id": "cilantro",
+    "displayName": "Cilantro",
+    "category": "herbs",
+    "density": 0.22,
+    "densityGroup": "herbs",
+    "safeConversions": false,
+    "aliases": [
+      "coriander leaves",
+      "fresh cilantro",
+      "coriander",
+      "chinese parsley"
+    ]
+  },
+  "parsley": {
+    "id": "parsley",
+    "displayName": "Parsley",
+    "category": "herbs",
+    "density": 0.24,
+    "densityGroup": "herbs",
+    "safeConversions": false,
+    "aliases": [
+      "fresh parsley",
+      "flat leaf parsley",
+      "italian parsley",
+      "curly parsley"
+    ]
+  },
+  "thyme": {
+    "id": "thyme",
+    "displayName": "Thyme",
+    "category": "herbs",
+    "density": 0.35,
+    "densityGroup": "herbs",
+    "safeConversions": false,
+    "aliases": [
+      "fresh thyme",
+      "thyme leaves",
+      "dried thyme",
+      "thyme sprigs"
+    ]
+  },
+  "rosemary": {
+    "id": "rosemary",
+    "displayName": "Rosemary",
+    "category": "herbs",
+    "density": 0.41,
+    "densityGroup": "herbs",
+    "safeConversions": false,
+    "aliases": [
+      "fresh rosemary",
+      "rosemary sprigs",
+      "dried rosemary",
+      "rosemary leaves"
+    ]
+  },
+  "oregano": {
+    "id": "oregano",
+    "displayName": "Oregano",
+    "category": "herbs",
+    "density": 0.31,
+    "densityGroup": "herbs",
+    "safeConversions": false,
+    "aliases": [
+      "dried oregano",
+      "fresh oregano",
+      "oregano leaves",
+      "italian oregano"
+    ]
+  },
+  "mint": {
+    "id": "mint",
+    "displayName": "Mint",
+    "category": "herbs",
+    "density": 0.21,
+    "densityGroup": "herbs",
+    "safeConversions": false,
+    "aliases": [
+      "fresh mint",
+      "mint leaves",
+      "peppermint",
+      "spearmint"
+    ]
+  },
+  "ginger": {
+    "id": "ginger",
+    "displayName": "Ginger",
+    "category": "produce",
+    "density": 1.08,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "fresh ginger",
+      "ginger root",
+      "minced ginger",
+      "grated ginger"
+    ]
+  },
+  "green_onion": {
+    "id": "green_onion",
+    "displayName": "Green Onion",
+    "category": "produce",
+    "density": 0.64,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "scallions",
+      "spring onion",
+      "green onions",
+      "chopped scallions"
+    ]
+  },
+  "jalapeno": {
+    "id": "jalapeno",
+    "displayName": "Jalapeño",
+    "category": "produce",
+    "density": 0.92,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "jalapenos",
+      "jalapeño pepper",
+      "fresh jalapeno",
+      "sliced jalapeno"
+    ]
+  },
+  "kale": {
+    "id": "kale",
+    "displayName": "Kale",
+    "category": "produce",
+    "density": 0.35,
+    "densityGroup": "leafy",
+    "safeConversions": false,
+    "aliases": [
+      "curly kale",
+      "lacinato kale",
+      "baby kale",
+      "kale leaves"
+    ]
+  },
+  "cauliflower": {
+    "id": "cauliflower",
+    "displayName": "Cauliflower",
+    "category": "produce",
+    "density": 0.27,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "cauliflower florets",
+      "cauliflower rice",
+      "fresh cauliflower"
+    ]
+  },
+  "asparagus": {
+    "id": "asparagus",
+    "displayName": "Asparagus",
+    "category": "produce",
+    "density": 0.69,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "asparagus spears",
+      "fresh asparagus",
+      "green asparagus"
+    ]
+  },
+  "green_beans": {
+    "id": "green_beans",
+    "displayName": "Green Beans",
+    "category": "produce",
+    "density": 0.69,
+    "densityGroup": "produce",
+    "safeConversions": true,
+    "aliases": [
+      "string beans",
+      "snap beans",
+      "french beans",
+      "haricot verts"
+    ]
+  },
+  "milk": {
+    "id": "milk",
+    "displayName": "Milk",
+    "category": "dairy",
+    "density": 1.03,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "whole milk",
+      "2% milk",
+      "skim milk",
+      "low-fat milk",
+      "dairy milk"
+    ]
+  },
+  "heavy_cream": {
+    "id": "heavy_cream",
+    "displayName": "Heavy Cream",
+    "category": "dairy",
+    "density": 0.994,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "whipping cream",
+      "heavy whipping cream",
+      "cream",
+      "double cream"
+    ]
+  },
+  "sour_cream": {
+    "id": "sour_cream",
+    "displayName": "Sour Cream",
+    "category": "dairy",
+    "density": 1.01,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "cultured cream",
+      "light sour cream",
+      "full-fat sour cream"
+    ]
+  },
+  "yogurt": {
+    "id": "yogurt",
+    "displayName": "Yogurt",
+    "category": "dairy",
+    "density": 1.03,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "plain yogurt",
+      "vanilla yogurt",
+      "low-fat yogurt",
+      "natural yogurt"
+    ]
+  },
+  "greek_yogurt": {
+    "id": "greek_yogurt",
+    "displayName": "Greek Yogurt",
+    "category": "dairy",
+    "density": 1.06,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "plain greek yogurt",
+      "strained yogurt",
+      "thick yogurt"
+    ]
+  },
+  "butter": {
+    "id": "butter",
+    "displayName": "Butter",
+    "category": "dairy",
+    "density": 0.911,
+    "densityGroup": "fat",
+    "safeConversions": true,
+    "aliases": [
+      "unsalted butter",
+      "salted butter",
+      "melted butter",
+      "softened butter"
+    ]
+  },
+  "cream_cheese": {
+    "id": "cream_cheese",
+    "displayName": "Cream Cheese",
+    "category": "dairy",
+    "density": 0.98,
+    "densityGroup": "dairy",
+    "safeConversions": true,
+    "aliases": [
+      "philadelphia cream cheese",
+      "softened cream cheese",
+      "low-fat cream cheese"
+    ]
+  },
+  "cheddar": {
+    "id": "cheddar",
+    "displayName": "Cheddar Cheese",
+    "category": "dairy",
+    "density": 0.99,
+    "densityGroup": "dairy",
+    "safeConversions": true,
+    "aliases": [
+      "cheddar cheese",
+      "sharp cheddar",
+      "mild cheddar",
+      "shredded cheddar",
+      "grated cheddar"
+    ]
+  },
+  "mozzarella": {
+    "id": "mozzarella",
+    "displayName": "Mozzarella",
+    "category": "dairy",
+    "density": 0.96,
+    "densityGroup": "dairy",
+    "safeConversions": true,
+    "aliases": [
+      "mozzarella cheese",
+      "shredded mozzarella",
+      "fresh mozzarella",
+      "part-skim mozzarella"
+    ]
+  },
+  "parmesan": {
+    "id": "parmesan",
+    "displayName": "Parmesan",
+    "category": "dairy",
+    "density": 0.93,
+    "densityGroup": "dairy",
+    "safeConversions": true,
+    "aliases": [
+      "parmesan cheese",
+      "parmigiano reggiano",
+      "grated parmesan",
+      "shredded parmesan"
+    ]
+  },
+  "feta": {
+    "id": "feta",
+    "displayName": "Feta Cheese",
+    "category": "dairy",
+    "density": 1.05,
+    "densityGroup": "dairy",
+    "safeConversions": true,
+    "aliases": [
+      "feta cheese",
+      "crumbled feta",
+      "greek feta"
+    ]
+  },
+  "eggs": {
+    "id": "eggs",
+    "displayName": "Eggs",
+    "category": "dairy",
+    "density": 1.03,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "egg",
+      "large eggs",
+      "whole eggs",
+      "fresh eggs",
+      "beaten eggs"
+    ]
+  },
+  "white_rice": {
+    "id": "white_rice",
+    "displayName": "White Rice",
+    "category": "grains",
+    "density": 0.753,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "long grain rice",
+      "jasmine rice",
+      "basmati rice",
+      "cooked rice"
+    ]
+  },
+  "brown_rice": {
+    "id": "brown_rice",
+    "displayName": "Brown Rice",
+    "category": "grains",
+    "density": 0.88,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "whole grain rice",
+      "long grain brown rice",
+      "short grain brown rice"
+    ]
+  },
+  "pasta": {
+    "id": "pasta",
+    "displayName": "Pasta",
+    "category": "grains",
+    "density": 0.64,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "spaghetti",
+      "penne",
+      "rigatoni",
+      "linguine",
+      "fettuccine",
+      "macaroni"
+    ]
+  },
+  "bread": {
+    "id": "bread",
+    "displayName": "Bread",
+    "category": "grains",
+    "density": 0.27,
+    "densityGroup": "bread",
+    "safeConversions": false,
+    "aliases": [
+      "white bread",
+      "whole wheat bread",
+      "sandwich bread",
+      "bread slices",
+      "sourdough"
+    ]
+  },
+  "tortilla": {
+    "id": "tortilla",
+    "displayName": "Tortilla",
+    "category": "grains",
+    "density": 0.42,
+    "densityGroup": "bread",
+    "safeConversions": false,
+    "aliases": [
+      "flour tortilla",
+      "corn tortilla",
+      "tortillas",
+      "wrap"
+    ]
+  },
+  "quinoa": {
+    "id": "quinoa",
+    "displayName": "Quinoa",
+    "category": "grains",
+    "density": 0.738,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "cooked quinoa",
+      "white quinoa",
+      "red quinoa",
+      "quinoa grain"
+    ]
+  },
+  "oats": {
+    "id": "oats",
+    "displayName": "Oats",
+    "category": "grains",
+    "density": 0.41,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "rolled oats",
+      "quick oats",
+      "oatmeal",
+      "steel cut oats",
+      "old fashioned oats"
+    ]
+  },
+  "couscous": {
+    "id": "couscous",
+    "displayName": "Couscous",
+    "category": "grains",
+    "density": 0.73,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "pearl couscous",
+      "israeli couscous",
+      "moroccan couscous"
+    ]
+  },
+  "noodles": {
+    "id": "noodles",
+    "displayName": "Noodles",
+    "category": "grains",
+    "density": 0.58,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "egg noodles",
+      "ramen noodles",
+      "rice noodles",
+      "udon noodles",
+      "soba noodles"
+    ]
+  },
+  "crackers": {
+    "id": "crackers",
+    "displayName": "Crackers",
+    "category": "grains",
+    "density": 0.45,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "saltine crackers",
+      "ritz crackers",
+      "whole wheat crackers",
+      "graham crackers"
+    ]
+  },
+  "all_purpose_flour": {
+    "id": "all_purpose_flour",
+    "displayName": "All-Purpose Flour",
+    "category": "baking",
+    "density": 0.593,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "flour",
+      "plain flour",
+      "white flour",
+      "ap flour",
+      "regular flour"
+    ]
+  },
+  "bread_flour": {
+    "id": "bread_flour",
+    "displayName": "Bread Flour",
+    "category": "baking",
+    "density": 0.55,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "high gluten flour",
+      "strong flour",
+      "bakers flour"
+    ]
+  },
+  "sugar": {
+    "id": "sugar",
+    "displayName": "Sugar",
+    "category": "baking",
+    "density": 0.845,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "granulated sugar",
+      "white sugar",
+      "table sugar",
+      "caster sugar"
+    ]
+  },
+  "brown_sugar": {
+    "id": "brown_sugar",
+    "displayName": "Brown Sugar",
+    "category": "baking",
+    "density": 0.72,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "light brown sugar",
+      "dark brown sugar",
+      "packed brown sugar"
+    ]
+  },
+  "powdered_sugar": {
+    "id": "powdered_sugar",
+    "displayName": "Powdered Sugar",
+    "category": "baking",
+    "density": 0.56,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "confectioners sugar",
+      "icing sugar",
+      "10x sugar"
+    ]
+  },
+  "baking_soda": {
+    "id": "baking_soda",
+    "displayName": "Baking Soda",
+    "category": "baking",
+    "density": 0.689,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "sodium bicarbonate",
+      "bicarb soda",
+      "bicarbonate of soda"
+    ]
+  },
+  "baking_powder": {
+    "id": "baking_powder",
+    "displayName": "Baking Powder",
+    "category": "baking",
+    "density": 0.72,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "double acting baking powder",
+      "single acting baking powder"
+    ]
+  },
+  "vanilla_extract": {
+    "id": "vanilla_extract",
+    "displayName": "Vanilla Extract",
+    "category": "baking",
+    "density": 0.88,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "vanilla",
+      "pure vanilla extract",
+      "vanilla essence"
+    ]
+  },
+  "cocoa_powder": {
+    "id": "cocoa_powder",
+    "displayName": "Cocoa Powder",
+    "category": "baking",
+    "density": 0.35,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "unsweetened cocoa",
+      "dutch process cocoa",
+      "cocoa"
+    ]
+  },
+  "chocolate_chips": {
+    "id": "chocolate_chips",
+    "displayName": "Chocolate Chips",
+    "category": "baking",
+    "density": 0.71,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "semi-sweet chocolate chips",
+      "dark chocolate chips",
+      "milk chocolate chips",
+      "mini chocolate chips"
+    ]
+  },
+  "yeast": {
+    "id": "yeast",
+    "displayName": "Yeast",
+    "category": "baking",
+    "density": 0.52,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "active dry yeast",
+      "instant yeast",
+      "bread machine yeast",
+      "rapid rise yeast"
+    ]
+  },
+  "cornstarch": {
+    "id": "cornstarch",
+    "displayName": "Cornstarch",
+    "category": "baking",
+    "density": 0.63,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "corn starch",
+      "cornflour",
+      "maize starch"
+    ]
+  },
+  "olive_oil": {
+    "id": "olive_oil",
+    "displayName": "Olive Oil",
+    "category": "condiments",
+    "density": 0.915,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "extra virgin olive oil",
+      "evoo",
+      "virgin olive oil",
+      "light olive oil"
+    ]
+  },
+  "vegetable_oil": {
+    "id": "vegetable_oil",
+    "displayName": "Vegetable Oil",
+    "category": "condiments",
+    "density": 0.921,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "cooking oil",
+      "canola oil",
+      "corn oil",
+      "sunflower oil"
+    ]
+  },
+  "vinegar": {
+    "id": "vinegar",
+    "displayName": "Vinegar",
+    "category": "condiments",
+    "density": 1.01,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "white vinegar",
+      "distilled vinegar",
+      "apple cider vinegar",
+      "red wine vinegar",
+      "balsamic vinegar"
+    ]
+  },
+  "soy_sauce": {
+    "id": "soy_sauce",
+    "displayName": "Soy Sauce",
+    "category": "condiments",
+    "density": 1.134,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "shoyu",
+      "tamari",
+      "light soy sauce",
+      "dark soy sauce"
+    ]
+  },
+  "ketchup": {
+    "id": "ketchup",
+    "displayName": "Ketchup",
+    "category": "condiments",
+    "density": 1.14,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "tomato ketchup",
+      "catsup",
+      "tomato sauce"
+    ]
+  },
+  "mustard": {
+    "id": "mustard",
+    "displayName": "Mustard",
+    "category": "condiments",
+    "density": 1.05,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "yellow mustard",
+      "dijon mustard",
+      "whole grain mustard",
+      "spicy mustard"
+    ]
+  },
+  "mayonnaise": {
+    "id": "mayonnaise",
+    "displayName": "Mayonnaise",
+    "category": "condiments",
+    "density": 0.94,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "mayo",
+      "aioli",
+      "light mayonnaise"
+    ]
+  },
+  "hot_sauce": {
+    "id": "hot_sauce",
+    "displayName": "Hot Sauce",
+    "category": "condiments",
+    "density": 1.02,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "tabasco",
+      "sriracha",
+      "franks hot sauce",
+      "buffalo sauce"
+    ]
+  },
+  "worcestershire": {
+    "id": "worcestershire",
+    "displayName": "Worcestershire Sauce",
+    "category": "condiments",
+    "density": 1.05,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "worcestershire sauce",
+      "lea and perrins"
+    ]
+  },
+  "honey": {
+    "id": "honey",
+    "displayName": "Honey",
+    "category": "condiments",
+    "density": 1.42,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "raw honey",
+      "liquid honey",
+      "clover honey"
+    ]
+  },
+  "maple_syrup": {
+    "id": "maple_syrup",
+    "displayName": "Maple Syrup",
+    "category": "condiments",
+    "density": 1.33,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "pure maple syrup",
+      "pancake syrup",
+      "real maple syrup"
+    ]
+  },
+  "peanut_butter": {
+    "id": "peanut_butter",
+    "displayName": "Peanut Butter",
+    "category": "condiments",
+    "density": 1.09,
+    "densityGroup": "thick_paste",
+    "safeConversions": true,
+    "aliases": [
+      "pb",
+      "creamy peanut butter",
+      "crunchy peanut butter",
+      "natural peanut butter"
+    ]
+  },
+  "salt": {
+    "id": "salt",
+    "displayName": "Salt",
+    "category": "spices",
+    "density": 1.217,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "table salt",
+      "sea salt",
+      "kosher salt",
+      "rock salt",
+      "fine salt"
+    ]
+  },
+  "black_pepper": {
+    "id": "black_pepper",
+    "displayName": "Black Pepper",
+    "category": "spices",
+    "density": 0.56,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "pepper",
+      "ground pepper",
+      "cracked pepper",
+      "peppercorns"
+    ]
+  },
+  "paprika": {
+    "id": "paprika",
+    "displayName": "Paprika",
+    "category": "spices",
+    "density": 0.54,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "smoked paprika",
+      "sweet paprika",
+      "hungarian paprika",
+      "spanish paprika"
+    ]
+  },
+  "cumin": {
+    "id": "cumin",
+    "displayName": "Cumin",
+    "category": "spices",
+    "density": 0.44,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "ground cumin",
+      "cumin powder",
+      "cumin seeds"
+    ]
+  },
+  "chili_powder": {
+    "id": "chili_powder",
+    "displayName": "Chili Powder",
+    "category": "spices",
+    "density": 0.41,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "chile powder",
+      "red chili powder",
+      "mexican chili powder"
+    ]
+  },
+  "cayenne": {
+    "id": "cayenne",
+    "displayName": "Cayenne Pepper",
+    "category": "spices",
+    "density": 0.54,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "cayenne pepper",
+      "red pepper",
+      "ground cayenne"
+    ]
+  },
+  "cinnamon": {
+    "id": "cinnamon",
+    "displayName": "Cinnamon",
+    "category": "spices",
+    "density": 0.56,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "ground cinnamon",
+      "cinnamon powder",
+      "cinnamon sticks"
+    ]
+  },
+  "nutmeg": {
+    "id": "nutmeg",
+    "displayName": "Nutmeg",
+    "category": "spices",
+    "density": 0.55,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "ground nutmeg",
+      "whole nutmeg",
+      "grated nutmeg"
+    ]
+  },
+  "turmeric": {
+    "id": "turmeric",
+    "displayName": "Turmeric",
+    "category": "spices",
+    "density": 0.48,
+    "densityGroup": "dry",
+    "safeConversions": false,
+    "aliases": [
+      "ground turmeric",
+      "turmeric powder",
+      "haldi"
+    ]
+  },
+  "canned_tomatoes": {
+    "id": "canned_tomatoes",
+    "displayName": "Canned Tomatoes",
+    "category": "canned",
+    "density": 1.03,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "diced tomatoes",
+      "crushed tomatoes",
+      "whole peeled tomatoes",
+      "tomato sauce"
+    ]
+  },
+  "tomato_paste": {
+    "id": "tomato_paste",
+    "displayName": "Tomato Paste",
+    "category": "canned",
+    "density": 1.15,
+    "densityGroup": "thick_paste",
+    "safeConversions": true,
+    "aliases": [
+      "concentrated tomato paste",
+      "tomato concentrate"
+    ]
+  },
+  "chicken_stock": {
+    "id": "chicken_stock",
+    "displayName": "Chicken Stock",
+    "category": "canned",
+    "density": 1.01,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "chicken broth",
+      "chicken bouillon",
+      "chicken stock cube"
+    ]
+  },
+  "beef_stock": {
+    "id": "beef_stock",
+    "displayName": "Beef Stock",
+    "category": "canned",
+    "density": 1.01,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "beef broth",
+      "beef bouillon",
+      "beef stock cube"
+    ]
+  },
+  "vegetable_stock": {
+    "id": "vegetable_stock",
+    "displayName": "Vegetable Stock",
+    "category": "canned",
+    "density": 1.01,
+    "densityGroup": "liquid",
+    "safeConversions": true,
+    "aliases": [
+      "vegetable broth",
+      "veggie stock",
+      "vegetable bouillon"
+    ]
+  },
+  "black_beans": {
+    "id": "black_beans",
+    "displayName": "Black Beans",
+    "category": "canned",
+    "density": 0.75,
+    "densityGroup": "legumes",
+    "safeConversions": true,
+    "aliases": [
+      "canned black beans",
+      "cooked black beans",
+      "turtle beans"
+    ]
+  },
+  "kidney_beans": {
+    "id": "kidney_beans",
+    "displayName": "Kidney Beans",
+    "category": "canned",
+    "density": 0.76,
+    "densityGroup": "legumes",
+    "safeConversions": true,
+    "aliases": [
+      "canned kidney beans",
+      "red kidney beans",
+      "red beans"
+    ]
+  },
+  "chickpeas": {
+    "id": "chickpeas",
+    "displayName": "Chickpeas",
+    "category": "canned",
+    "density": 0.76,
+    "densityGroup": "legumes",
+    "safeConversions": true,
+    "aliases": [
+      "garbanzo beans",
+      "canned chickpeas",
+      "chick peas"
+    ]
+  },
+  "almonds": {
+    "id": "almonds",
+    "displayName": "Almonds",
+    "category": "nuts",
+    "density": 0.64,
+    "densityGroup": "nuts",
+    "safeConversions": false,
+    "aliases": [
+      "whole almonds",
+      "sliced almonds",
+      "slivered almonds",
+      "almond pieces"
+    ]
+  },
+  "walnuts": {
+    "id": "walnuts",
+    "displayName": "Walnuts",
+    "category": "nuts",
+    "density": 0.65,
+    "densityGroup": "nuts",
+    "safeConversions": false,
+    "aliases": [
+      "walnut halves",
+      "walnut pieces",
+      "chopped walnuts",
+      "english walnuts"
+    ]
+  },
+  "pecans": {
+    "id": "pecans",
+    "displayName": "Pecans",
+    "category": "nuts",
+    "density": 0.68,
+    "densityGroup": "nuts",
+    "safeConversions": false,
+    "aliases": [
+      "pecan halves",
+      "chopped pecans",
+      "pecan pieces"
+    ]
+  },
+  "cashews": {
+    "id": "cashews",
+    "displayName": "Cashews",
+    "category": "nuts",
+    "density": 0.64,
+    "densityGroup": "nuts",
+    "safeConversions": false,
+    "aliases": [
+      "whole cashews",
+      "cashew pieces",
+      "roasted cashews"
+    ]
+  },
+  "peanuts": {
+    "id": "peanuts",
+    "displayName": "Peanuts",
+    "category": "nuts",
+    "density": 0.64,
+    "densityGroup": "nuts",
+    "safeConversions": false,
+    "aliases": [
+      "roasted peanuts",
+      "salted peanuts",
+      "peanut pieces"
+    ]
+  },
+  "pine_nuts": {
+    "id": "pine_nuts",
+    "displayName": "Pine Nuts",
+    "category": "nuts",
+    "density": 0.66,
+    "densityGroup": "nuts",
+    "safeConversions": false,
+    "aliases": [
+      "pignoli",
+      "pinon nuts",
+      "toasted pine nuts"
+    ]
+  },
+  "sesame_seeds": {
+    "id": "sesame_seeds",
+    "displayName": "Sesame Seeds",
+    "category": "seeds",
+    "density": 0.64,
+    "densityGroup": "seeds",
+    "safeConversions": false,
+    "aliases": [
+      "white sesame seeds",
+      "black sesame seeds",
+      "toasted sesame"
+    ]
+  },
+  "sunflower_seeds": {
+    "id": "sunflower_seeds",
+    "displayName": "Sunflower Seeds",
+    "category": "seeds",
+    "density": 0.62,
+    "densityGroup": "seeds",
+    "safeConversions": false,
+    "aliases": [
+      "hulled sunflower seeds",
+      "sunflower kernels"
+    ]
+  }
+}

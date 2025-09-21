@@ -18,7 +18,7 @@ import { Input } from '../../../core/components/ui/Input';
 import { ItemEditorModal } from '../components/ItemEditorModal';
 import { toTitleCase } from '../../../core/utils/textUtils';
 
-type LocationTab = 'all' | 'Fridge' | 'Freezer' | 'Pantry';
+type LocationTab = 'all' | 'fridge' | 'freezer' | 'pantry';
 
 interface InventoryItem {
   id: string;
@@ -27,7 +27,7 @@ interface InventoryItem {
   unit: string;
   category: string;
   expiresAt?: string;
-  location: 'Fridge' | 'Freezer' | 'Pantry';
+  location: 'fridge' | 'freezer' | 'pantry';
   emoji?: string;
 }
 

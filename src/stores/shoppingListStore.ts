@@ -22,6 +22,7 @@ interface ShoppingListState {
 
   // Actions
   addItem: (item: Omit<ShoppingItem, 'id' | 'checked' | 'addedAt'>) => void;
+  addBatchItems: (items: Array<Omit<ShoppingItem, 'id' | 'checked' | 'addedAt'>>) => void;
   updateItem: (id: string, updates: Partial<ShoppingItem>) => void;
   deleteItem: (id: string) => void;
   toggleItem: (id: string) => void;
@@ -59,6 +60,56 @@ export const useShoppingListStore = create<ShoppingListState>()(
         set((state) => ({
           items: [...state.items, newItem],
         }));
+      },
+
+      addBatchItems: (itemsData) => {
+        const existingItems = get().items;
+        const newItems: ShoppingItem[] = [];
+        const timestamp = Date.now();
+
+        itemsData.forEach((itemData, index) => {
+          // Check if item already exists (by name and unit)
+          const exists = existingItems.some(
+            existing =>
+              existing.name.toLowerCase() === itemData.name.toLowerCase() &&
+              existing.unit === itemData.unit &&
+              !existing.checked
+          );
+
+          if (!exists) {
+            newItems.push({
+              ...itemData,
+              id: `${timestamp}-${index}`,
+              checked: false,
+              addedAt: new Date().toISOString(),
+            });
+          } else {
+            // Optionally update quantity for existing item
+            const existingItem = existingItems.find(
+              existing =>
+                existing.name.toLowerCase() === itemData.name.toLowerCase() &&
+                existing.unit === itemData.unit &&
+                !existing.checked
+            );
+
+            if (existingItem) {
+              // Update quantity by adding the new quantity
+              set((state) => ({
+                items: state.items.map((item) =>
+                  item.id === existingItem.id
+                    ? { ...item, quantity: item.quantity + itemData.quantity }
+                    : item
+                ),
+              }));
+            }
+          }
+        });
+
+        if (newItems.length > 0) {
+          set((state) => ({
+            items: [...state.items, ...newItems],
+          }));
+        }
       },
 
       updateItem: (id, updates) => {
