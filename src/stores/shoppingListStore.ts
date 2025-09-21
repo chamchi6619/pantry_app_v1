@@ -26,8 +26,8 @@ interface ShoppingListState {
   updateItem: (id: string, updates: Partial<ShoppingItem>) => void;
   deleteItem: (id: string) => void;
   toggleItem: (id: string) => void;
-  clearChecked: () => void;
-  moveToInventory: (itemIds: string[]) => void;
+  clearCompleted: () => void;
+  moveToInventory: (locationAssignments?: Record<string, 'fridge' | 'freezer' | 'pantry'>) => number;
   setSearchQuery: (query: string) => void;
   setShowChecked: (show: boolean) => void;
   setSelectedCategory: (category: string | null) => void;
@@ -41,10 +41,104 @@ interface ShoppingListState {
   getItemsByCategory: () => Record<string, ShoppingItem[]>;
 }
 
+// Helper to fix duplicate IDs in existing data
+const fixDuplicateIds = (items: ShoppingItem[]): ShoppingItem[] => {
+  const seenIds = new Set<string>();
+  return items.map((item, index) => {
+    let id = item.id;
+    // If ID is duplicate or in old format (just timestamp), generate new one
+    if (seenIds.has(id) || !id.includes('-') || id.split('-').length < 2) {
+      // Add index to ensure uniqueness even if called rapidly
+      id = `${Date.now() + index}-${Math.random().toString(36).substr(2, 9)}-fixed`;
+    }
+    seenIds.add(id);
+    return { ...item, id };
+  });
+};
+
+// Sample shopping list items for testing
+const sampleShoppingItems: ShoppingItem[] = [
+  {
+    id: 'shop-1',
+    name: 'Avocados',
+    quantity: 3,
+    unit: 'pieces',
+    category: 'Produce',
+    checked: false,
+    addedAt: new Date().toISOString(),
+  },
+  {
+    id: 'shop-2',
+    name: 'Almond Milk',
+    quantity: 2,
+    unit: 'cartons',
+    category: 'Dairy',
+    checked: false,
+    addedAt: new Date().toISOString(),
+  },
+  {
+    id: 'shop-3',
+    name: 'Dark Chocolate',
+    quantity: 1,
+    unit: 'bar',
+    category: 'Snacks',
+    checked: true,
+    addedAt: new Date().toISOString(),
+    checkedAt: new Date().toISOString(),
+  },
+  {
+    id: 'shop-4',
+    name: 'Quinoa',
+    quantity: 1,
+    unit: 'bag',
+    category: 'Grains',
+    checked: false,
+    addedAt: new Date().toISOString(),
+  },
+  {
+    id: 'shop-5',
+    name: 'Baby Spinach',
+    quantity: 1,
+    unit: 'bag',
+    category: 'Produce',
+    checked: false,
+    addedAt: new Date().toISOString(),
+  },
+  {
+    id: 'shop-6',
+    name: 'Salmon Fillets',
+    quantity: 4,
+    unit: 'pieces',
+    category: 'Seafood',
+    checked: false,
+    addedAt: new Date().toISOString(),
+  },
+  {
+    id: 'shop-7',
+    name: 'Blueberries',
+    quantity: 2,
+    unit: 'containers',
+    category: 'Produce',
+    checked: true,
+    addedAt: new Date().toISOString(),
+    checkedAt: new Date().toISOString(),
+  },
+  {
+    id: 'shop-8',
+    name: 'Butter',
+    quantity: 1,
+    unit: 'stick',
+    category: 'Dairy',
+    checked: false,
+    addedAt: new Date().toISOString(),
+  },
+];
+
 export const useShoppingListStore = create<ShoppingListState>()(
-  persist(
+  // Temporarily disable persistence to use fresh sample data
+  // persist(
     (set, get) => ({
-      items: [],
+      items: sampleShoppingItems, // Use sample items for testing
       searchQuery: '',
       showChecked: true,
       selectedCategory: null,
@@ -52,7 +146,7 @@ export const useShoppingListStore = create<ShoppingListState>()(
       addItem: (itemData) => {
         const newItem: ShoppingItem = {
           ...itemData,
-          id: Date.now().toString(),
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           checked: false,
           addedAt: new Date().toISOString(),
         };
@@ -79,7 +173,7 @@ export const useShoppingListStore = create<ShoppingListState>()(
           if (!exists) {
             newItems.push({
               ...itemData,
-              id: `${timestamp}-${index}`,
+              id: `${timestamp}-${index}-${Math.random().toString(36).substr(2, 9)}`,
               checked: false,
               addedAt: new Date().toISOString(),
             });
@@ -140,17 +234,47 @@ export const useShoppingListStore = create<ShoppingListState>()(
         }));
       },
 
-      clearChecked: () => {
-        set((state) => ({
-          items: state.items.filter((item) => !item.checked),
-        }));
+      moveToInventory: (locationAssignments) => {
+        // Get checked items
+        const checkedItems = get().items.filter(item => item.checked);
+
+        if (checkedItems.length === 0) return 0;
+
+        try {
+          // Lazy import to avoid circular dependency
+          const { useInventoryStore } = require('./inventoryStore');
+
+          // Get the inventory store's addBatchItems function
+          const inventoryStore = useInventoryStore.getState();
+
+          // Convert shopping items to inventory items with assigned locations
+          const inventoryItems = checkedItems.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            category: item.category,
+            location: locationAssignments?.[item.id] || 'pantry' as 'pantry' | 'fridge' | 'freezer',
+            notes: item.notes,
+          }));
+
+          // Add to inventory
+          inventoryStore.addBatchItems(inventoryItems);
+
+          // Remove checked items from shopping list
+          set((state) => ({
+            items: state.items.filter((item) => !item.checked),
+          }));
+
+          return checkedItems.length; // Return count for UI feedback
+        } catch (error) {
+          console.error('[Shopping] Error moving items to inventory:', error);
+          return 0;
+        }
       },
 
-      moveToInventory: (itemIds) => {
-        // This will be connected to inventory store
-        // For now, just remove from shopping list
+      clearCompleted: () => {
         set((state) => ({
-          items: state.items.filter((item) => !itemIds.includes(item.id)),
+          items: state.items.filter((item) => !item.checked),
         }));
       },
 
@@ -236,10 +360,16 @@ export const useShoppingListStore = create<ShoppingListState>()(
 
         return grouped;
       },
-    }),
-    {
-      name: 'pantry-shopping-list-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    })
+    // {
+    //   name: 'pantry-shopping-list-storage',
+    //   storage: createJSONStorage(() => AsyncStorage),
+    //   onRehydrateStorage: () => (state) => {
+    //     // Fix duplicate IDs when loading from storage
+    //     if (state && state.items) {
+    //       state.items = fixDuplicateIds(state.items);
+    //     }
+    //   },
+    // }
+  // )
 );

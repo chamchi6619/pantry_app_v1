@@ -24,6 +24,7 @@ interface InventoryState {
 
   // Actions
   addItem: (item: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addBatchItems: (items: Array<Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'>>) => void;
   updateItem: (id: string, updates: Partial<InventoryItem>) => void;
   deleteItem: (id: string) => void;
   setSearchQuery: (query: string) => void;
@@ -45,70 +46,136 @@ export const useInventoryStore = create<InventoryState>()(
   // persist(
     (set, get) => ({
       items: [
-        // Sample inventory items - 6 items with realistic expiration dates
+        // Sample inventory items - diverse items with various expiration dates
         {
           id: '1',
-          name: 'Milk',
+          name: 'Whole Milk',
           quantity: 1,
           unit: 'gallon',
           category: 'Dairy',
           location: 'fridge',
-          expirationDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // Expired 2 days ago
+          expirationDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 3 days
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
         {
           id: '2',
-          name: 'Yogurt',
-          quantity: 3,
-          unit: 'cups',
+          name: 'Greek Yogurt',
+          quantity: 4,
+          unit: 'containers',
           category: 'Dairy',
           location: 'fridge',
-          expirationDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // Expired 5 days ago
+          expirationDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 5 days
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
         {
           id: '3',
-          name: 'Chicken Breast',
-          quantity: 2,
+          name: 'Chicken Thighs',
+          quantity: 3,
           unit: 'lbs',
           category: 'Meat',
           location: 'freezer',
-          expirationDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // Expired 1 day ago
+          expirationDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 2 months
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
         {
           id: '4',
-          name: 'Lettuce',
-          quantity: 1,
-          unit: 'head',
+          name: 'Romaine Lettuce',
+          quantity: 2,
+          unit: 'heads',
           category: 'Vegetables',
           location: 'fridge',
-          expirationDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // Expired 3 days ago
+          expirationDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 4 days
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
         {
           id: '5',
-          name: 'Pasta',
-          quantity: 2,
+          name: 'Penne Pasta',
+          quantity: 3,
           unit: 'boxes',
           category: 'Grains',
           location: 'pantry',
-          expirationDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 6 months
+          expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 1 year
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
         {
           id: '6',
-          name: 'Olive Oil',
+          name: 'Extra Virgin Olive Oil',
           quantity: 1,
           unit: 'bottle',
           category: 'Oils',
           location: 'pantry',
-          expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 1 year
+          expirationDate: new Date(Date.now() + 730 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 2 years
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '7',
+          name: 'Sourdough Bread',
+          quantity: 1,
+          unit: 'loaf',
+          category: 'Bakery',
+          location: 'pantry',
+          expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 2 days
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '8',
+          name: 'Cherry Tomatoes',
+          quantity: 2,
+          unit: 'containers',
+          category: 'Vegetables',
+          location: 'fridge',
+          expirationDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 6 days
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '9',
+          name: 'Cheddar Cheese',
+          quantity: 1,
+          unit: 'block',
+          category: 'Dairy',
+          location: 'fridge',
+          expirationDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 3 weeks
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '10',
+          name: 'Ground Beef',
+          quantity: 2,
+          unit: 'lbs',
+          category: 'Meat',
+          location: 'freezer',
+          expirationDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 3 months
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '11',
+          name: 'Bananas',
+          quantity: 6,
+          unit: 'pieces',
+          category: 'Fruits',
+          location: 'pantry',
+          expirationDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 3 days
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '12',
+          name: 'Eggs',
+          quantity: 12,
+          unit: 'pieces',
+          category: 'Dairy',
+          location: 'fridge',
+          expirationDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 2 weeks
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
@@ -128,6 +195,20 @@ export const useInventoryStore = create<InventoryState>()(
 
         set((state) => ({
           items: [...state.items, newItem],
+        }));
+      },
+
+      addBatchItems: (itemsData) => {
+        const timestamp = Date.now();
+        const newItems: InventoryItem[] = itemsData.map((itemData, index) => ({
+          ...itemData,
+          id: `${timestamp}-${index}-${Math.random().toString(36).substr(2, 9)}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }));
+
+        set((state) => ({
+          items: [...state.items, ...newItems],
         }));
       },
 

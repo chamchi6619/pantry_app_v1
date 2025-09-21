@@ -17,6 +17,7 @@ import { Button } from '../../../core/components/ui/Button';
 import { Input } from '../../../core/components/ui/Input';
 import { ItemEditorModal } from '../components/ItemEditorModal';
 import { toTitleCase } from '../../../core/utils/textUtils';
+import { useInventoryStore } from '../../../stores/inventoryStore';
 
 type LocationTab = 'all' | 'fridge' | 'freezer' | 'pantry';
 
@@ -26,9 +27,11 @@ interface InventoryItem {
   quantity: number;
   unit: string;
   category: string;
-  expiresAt?: string;
+  expirationDate?: string;
   location: 'fridge' | 'freezer' | 'pantry';
-  emoji?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface ItemRowProps {
@@ -236,72 +239,21 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
 });
 
 export const InventoryScreen: React.FC = () => {
+  const items = useInventoryStore((state) => state.items) as InventoryItem[];
+  const updateItem = useInventoryStore((state) => state.updateItem);
+  const deleteItem = useInventoryStore((state) => state.deleteItem);
+  const addItem = useInventoryStore((state) => state.addItem);
+
   const [activeTab, setActiveTab] = useState<LocationTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
-  const [items, setItems] = useState<InventoryItem[]>([
-    {
-      id: '1',
-      name: 'Ground Beef',
-      quantity: 1.2,
-      unit: 'lb',
-      category: 'Proteins',
-      expiresAt: '2024-12-26',
-      location: 'Fridge',
-      emoji: '🥩',
-    },
-    {
-      id: '2',
-      name: 'Bok Choy',
-      quantity: 1,
-      unit: 'bunch',
-      category: 'Vegetables',
-      expiresAt: '2024-12-30',
-      location: 'Fridge',
-      emoji: '🥬',
-    },
-    {
-      id: '3',
-      name: 'Eggs',
-      quantity: 8,
-      unit: 'pieces',
-      category: 'Dairy',
-      expiresAt: '2025-01-08',
-      location: 'Fridge',
-      emoji: '🥚',
-    },
-    {
-      id: '4',
-      name: 'Soy Milk',
-      quantity: 32,
-      unit: 'fl oz',
-      category: 'Dairy',
-      expiresAt: '2025-01-02',
-      location: 'Fridge',
-      emoji: '🥛',
-    },
-    {
-      id: '5',
-      name: 'Frozen Berries',
-      quantity: 2,
-      unit: 'bags',
-      category: 'Fruits',
-      location: 'Freezer',
-      emoji: '🫐',
-    },
-    {
-      id: '6',
-      name: 'Ice Cream',
-      quantity: 1,
-      unit: 'pint',
-      category: 'Frozen',
-      location: 'Freezer',
-      emoji: '🍦',
-    },
-  ]);
+
+  // Remove the hardcoded items that were here
+  const oldItems = [
+  ];
 
   // Group items by location for section list with sorting
   const getSectionData = useMemo(() => {
@@ -319,9 +271,9 @@ export const InventoryScreen: React.FC = () => {
     }
 
 
-    // Group by location
+    // Group by location (convert to title case for display)
     const grouped = filtered.reduce((acc, item) => {
-      const locationKey = item.location;
+      const locationKey = item.location.charAt(0).toUpperCase() + item.location.slice(1);
       if (!acc[locationKey]) {
         acc[locationKey] = [];
       }
@@ -408,13 +360,10 @@ export const InventoryScreen: React.FC = () => {
   };
 
   const handleQuantityChange = (itemId: string, delta: number) => {
-    setItems(prev =>
-      prev.map(item =>
-        item.id === itemId
-          ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-          : item
-      )
-    );
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+      updateItem(itemId, { quantity: Math.max(0, item.quantity + delta) });
+    }
   };
 
   const handleDeleteItem = (itemId: string) => {
@@ -426,7 +375,7 @@ export const InventoryScreen: React.FC = () => {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => setItems(prev => prev.filter(item => item.id !== itemId))
+          onPress: () => deleteItem(itemId)
         },
       ]
     );
@@ -438,28 +387,20 @@ export const InventoryScreen: React.FC = () => {
       name: toTitleCase(itemData.name),
       quantity: isNaN(itemData.quantity) || itemData.quantity === null ? 0 : itemData.quantity,
       unit: itemData.unit,
-      // Ensure location is properly capitalized
-      location: itemData.location.charAt(0).toUpperCase() + itemData.location.slice(1) as 'Fridge' | 'Freezer' | 'Pantry',
-      // Map expiryDate to expiresAt
-      expiresAt: itemData.expiryDate || undefined,
+      // Ensure location is lowercase for store
+      location: itemData.location.toLowerCase() as 'fridge' | 'freezer' | 'pantry',
+      // Map expiryDate to expirationDate
+      expirationDate: itemData.expiryDate || undefined,
       // Take first category from categories array
       category: itemData.categories && itemData.categories.length > 0 ? itemData.categories[0] : 'Other',
-      // Pass through emoji
-      emoji: itemData.emoji,
+      // Store notes if emoji is provided
+      notes: itemData.emoji ? `Icon: ${itemData.emoji}` : undefined,
     };
 
     if (editingItem) {
-      setItems(prev =>
-        prev.map(item =>
-          item.id === editingItem.id ? { ...item, ...mappedData } : item
-        )
-      );
+      updateItem(editingItem.id, mappedData);
     } else {
-      const newItem: InventoryItem = {
-        ...mappedData,
-        id: Date.now().toString(),
-      };
-      setItems(prev => [...prev, newItem]);
+      addItem(mappedData);
     }
     setShowModal(false);
     setEditingItem(null);

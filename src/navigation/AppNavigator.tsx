@@ -6,7 +6,7 @@ import { View, Text, StyleSheet, Platform, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../core/constants/theme';
 import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
-import { ShoppingListScreen } from '../features/shopping/screens/ShoppingListScreen';
+import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleShoppingListScreen';
 import { EnhancedRecipesScreen } from '../features/recipes/screens/EnhancedRecipesScreen';
 import { RecipeDetailScreen } from '../features/recipes/screens/RecipeDetailScreen';
 import { RecipeFormScreen } from '../features/recipes/screens/RecipeFormScreen';
@@ -106,7 +106,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Shopping"
-        component={ShoppingListScreen}
+        component={SimpleShoppingListScreen}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon="🛒" label="Shopping" />
