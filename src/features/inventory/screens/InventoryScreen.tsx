@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Animated,
   PanResponder,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../../core/constants/theme';
@@ -18,6 +19,8 @@ import { Input } from '../../../core/components/ui/Input';
 import { ItemEditorModal } from '../components/ItemEditorModal';
 import { toTitleCase } from '../../../core/utils/textUtils';
 import { useInventoryStore } from '../../../stores/inventoryStore';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 type LocationTab = 'all' | 'fridge' | 'freezer' | 'pantry';
 
@@ -39,18 +42,47 @@ interface ItemRowProps {
   onPress: (id: string) => void;
   onQuantityChange: (id: string, delta: number) => void;
   onDelete: (id: string) => void;
+  isOpen?: boolean;
+  hasAnyOpen?: boolean;
+  onOpenChange?: (id: string | null, isOpen: boolean) => void;
 }
 
-const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityChange, onDelete }) => {
+const ItemRow: React.FC<ItemRowProps> = React.memo(({
+  item,
+  onPress,
+  onQuantityChange,
+  onDelete,
+  isOpen: isOpenProp = false,
+  hasAnyOpen = false,
+  onOpenChange
+}) => {
   const translateX = useRef(new Animated.Value(0)).current;
   const lastOffset = useRef(0);
-  const isOpen = useRef(false);
+  const isOpen = useRef(isOpenProp);
 
-  const panResponder = useRef(
-    PanResponder.create({
+  // Sync open state with parent
+  React.useEffect(() => {
+    if (!isOpenProp && lastOffset.current !== 0) {
+      Animated.spring(translateX, {
+        toValue: 0,
+        tension: 100,
+        friction: 8,
+        useNativeDriver: true,
+      }).start(() => {
+        lastOffset.current = 0;
+        isOpen.current = false;
+      });
+    }
+  }, [isOpenProp, translateX]);
+
+  // Lazy initialize PanResponder to improve performance
+  const panResponder = useMemo(
+    () => PanResponder.create({
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        // Very sensitive - responds to tiny movements
-        return Math.abs(gestureState.dx) > 2 && Math.abs(gestureState.dy) < 15;
+        // More forgiving: prioritize horizontal movement
+        const isHorizontal = Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
+        const hasMovedEnough = Math.abs(gestureState.dx) > 5;
+        return isHorizontal && hasMovedEnough;
       },
       onPanResponderGrant: () => {
         // Stop any ongoing animations and store current value
@@ -62,8 +94,8 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
         // Direct 1:1 movement for responsive feel
         let newX = lastOffset.current + gestureState.dx;
 
-        // Clamp between 0 and -100 (no overscroll)
-        newX = Math.min(0, Math.max(-100, newX));
+        // Clamp between 0 and -80 (no overscroll)
+        newX = Math.min(0, Math.max(-80, newX));
 
         translateX.setValue(newX);
       },
@@ -74,32 +106,30 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
         // Determine target based on velocity and position
         let shouldOpen = false;
 
-        // Very sensitive to velocity
-        if (Math.abs(velocity) > 0.3) {
+        // More lenient thresholds
+        if (Math.abs(velocity) > 0.2) {
           shouldOpen = velocity < 0; // Swiping left
         } else {
-          // Lower threshold for opening/closing
-          shouldOpen = currentX < -20;
+          shouldOpen = currentX < -30; // Lower threshold for opening
         }
 
-        // Animate to final position with snappy animation
-        const toValue = shouldOpen ? -100 : 0;
+        const toValue = shouldOpen ? -80 : 0;
         isOpen.current = shouldOpen;
+        onOpenChange?.(item.id, shouldOpen); // Notify parent about swipe state
 
         Animated.spring(translateX, {
           toValue,
-          velocity: velocity * 0.8,
-          tension: 100,  // Higher tension for snappier feel
-          friction: 8,    // Lower friction for faster animation
+          velocity: velocity * 0.5,
+          tension: 70, // Softer spring
+          friction: 10, // More damping
           useNativeDriver: true,
         }).start(() => {
-          // CRITICAL: Update lastOffset after animation completes
           lastOffset.current = toValue;
         });
       },
       onPanResponderTerminate: () => {
         // If gesture is interrupted, snap to final position
-        const toValue = isOpen.current ? -100 : 0;
+        const toValue = isOpen.current ? -80 : 0;
         Animated.spring(translateX, {
           toValue,
           tension: 100,
@@ -109,8 +139,11 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
           lastOffset.current = toValue;
         });
       },
-    })
-  ).current;
+      onShouldBlockNativeResponder: () => true,
+      onPanResponderTerminationRequest: () => false, // Don't let scroll view steal the gesture
+    }),
+    []
+  );
 
   const handleDelete = () => {
     Alert.alert(
@@ -122,14 +155,14 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
+            // Delete immediately for better UX
+            onDelete(item.id);
+            // Then animate out
             Animated.timing(translateX, {
-              toValue: 0,
+              toValue: -screenWidth,
               duration: 200,
               useNativeDriver: true,
-            }).start(() => {
-              lastOffset.current = 0;
-              onDelete(item.id);
-            });
+            }).start();
           },
         },
       ]
@@ -152,9 +185,13 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
   };
 
   const handleItemPress = () => {
-    if (isOpen.current) {
-      closeSwipe();
-    } else {
+    // If any item is open, close it first
+    if (hasAnyOpen) {
+      onOpenChange?.(null, false);
+      return;
+    }
+    // Only open editor if no swipes are open
+    if (!isOpen.current) {
       onPress(item.id);
     }
   };
@@ -178,9 +215,17 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
   };
 
   const getDaysLeft = () => {
-    if (!item.expiresAt) return null;
+    if (!item.expirationDate) return null;
+
+    // Parse YYYY-MM-DD format properly to avoid timezone issues
+    const [year, month, day] = item.expirationDate.split('-').map(Number);
+    if (!year || !month || !day) return null;
+
+    // Create dates at noon to avoid timezone boundary issues
     const today = new Date();
-    const expiry = new Date(item.expiresAt);
+    today.setHours(12, 0, 0, 0);
+
+    const expiry = new Date(year, month - 1, day, 12, 0, 0, 0);
     const days = Math.floor((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return days;
   };
@@ -201,7 +246,7 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
           <Text style={styles.itemName}>{toTitleCase(item.name)}</Text>
           <View style={styles.itemMeta}>
             <Text style={styles.locationText}>{item.location}</Text>
-            {item.expiresAt ? (
+            {item.expirationDate ? (
               <Text style={[styles.expiryText, isExpiringSoon && styles.expiryTextUrgent]}>
                 {isExpiringSoon && '🔥 '}{daysLeft <= 0 ? 'Expired' : `${daysLeft} days left`}
               </Text>
@@ -239,6 +284,7 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({ item, onPress, onQuantityC
 });
 
 export const InventoryScreen: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const items = useInventoryStore((state) => state.items) as InventoryItem[];
   const updateItem = useInventoryStore((state) => state.updateItem);
   const deleteItem = useInventoryStore((state) => state.deleteItem);
@@ -250,6 +296,15 @@ export const InventoryScreen: React.FC = () => {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [openItemId, setOpenItemId] = useState<string | null>(null);
+
+  // Simulate loading delay for initial mount
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Remove the hardcoded items that were here
   const oldItems = [
@@ -352,12 +407,26 @@ export const InventoryScreen: React.FC = () => {
   };
 
   const handleEditItem = (itemId: string) => {
+    // Don't edit if any swipe is open
+    if (openItemId) {
+      setOpenItemId(null);
+      return;
+    }
     const item = items.find(i => i.id === itemId);
     if (item) {
       setEditingItem(item);
       setShowModal(true);
     }
   };
+
+  const handleOpenChange = useCallback((id: string | null, isOpen: boolean) => {
+    if (id === null) {
+      // Close all items
+      setOpenItemId(null);
+    } else {
+      setOpenItemId(isOpen ? id : null);
+    }
+  }, []);
 
   const handleQuantityChange = (itemId: string, delta: number) => {
     const item = items.find(i => i.id === itemId);
@@ -367,21 +436,12 @@ export const InventoryScreen: React.FC = () => {
   };
 
   const handleDeleteItem = (itemId: string) => {
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this item?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => deleteItem(itemId)
-        },
-      ]
-    );
+    // Direct delete - confirmation is handled in ItemRow swipe action
+    deleteItem(itemId);
   };
 
   const handleSaveItem = (itemData: any) => {
+    console.log('Received item data:', itemData);
     // Map modal data structure to inventory item structure
     const mappedData = {
       name: toTitleCase(itemData.name),
@@ -389,13 +449,17 @@ export const InventoryScreen: React.FC = () => {
       unit: itemData.unit,
       // Ensure location is lowercase for store
       location: itemData.location.toLowerCase() as 'fridge' | 'freezer' | 'pantry',
-      // Map expiryDate to expirationDate
-      expirationDate: itemData.expiryDate || undefined,
+      // Use expirationDate directly from modal as YYYY-MM-DD string
+      expirationDate: itemData.expirationDate && itemData.expirationDate !== ''
+        ? itemData.expirationDate
+        : undefined,
       // Take first category from categories array
       category: itemData.categories && itemData.categories.length > 0 ? itemData.categories[0] : 'Other',
       // Store notes if emoji is provided
       notes: itemData.emoji ? `Icon: ${itemData.emoji}` : undefined,
     };
+
+    console.log('Mapped data with expirationDate:', mappedData.expirationDate);
 
     if (editingItem) {
       updateItem(editingItem.id, mappedData);
@@ -425,8 +489,22 @@ export const InventoryScreen: React.FC = () => {
       onPress={handleEditItem}
       onQuantityChange={handleQuantityChange}
       onDelete={handleDeleteItem}
+      isOpen={openItemId === item.id}
+      hasAnyOpen={openItemId !== null}
+      onOpenChange={handleOpenChange}
     />
   );
+
+  // Show loading indicator for initial mount
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading inventory...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -476,22 +554,26 @@ export const InventoryScreen: React.FC = () => {
       </View>
 
       {activeTab === 'all' && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoryPills}
-          contentContainerStyle={styles.categoryPillsContent}
-        >
+        <View style={styles.categoryPillsContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoryPills}
+            contentContainerStyle={styles.categoryPillsContent}
+          >
           <Pressable
             onPress={() => setSelectedCategories(new Set())}
             style={[
               styles.categoryPill,
-              { backgroundColor: selectedCategories.size === 0 ? '#E5FFE5' : '#F0F0F0' }
+              {
+                backgroundColor: selectedCategories.size === 0 ? '#E5FFE5' : '#F0F0F0',
+                borderColor: selectedCategories.size === 0 ? theme.colors.primary : '#E5E7EB',
+              }
             ]}
           >
-            <Text style={styles.categoryPillIcon}>●</Text>
-            <Text style={styles.categoryPillText}>All</Text>
-            <Text style={styles.categoryPillCount}>{items.length}</Text>
+            <Text style={[styles.categoryPillIcon, selectedCategories.size === 0 && { color: '#000' }]}>●</Text>
+            <Text style={[styles.categoryPillText, selectedCategories.size === 0 && { color: '#000', fontWeight: '600' }]}>All</Text>
+            <Text style={[styles.categoryPillCount, selectedCategories.size === 0 && { color: '#000' }]}>{items.length}</Text>
           </Pressable>
           {topCategories.map(cat => {
             const isSelected = selectedCategories.has(cat.name);
@@ -511,18 +593,18 @@ export const InventoryScreen: React.FC = () => {
                   styles.categoryPill,
                   {
                     backgroundColor: isSelected ? cat.color : '#F0F0F0',
-                    borderWidth: isSelected ? 2 : 0,
-                    borderColor: isSelected ? theme.colors.primary : 'transparent'
+                    borderColor: isSelected ? theme.colors.primary : '#E5E7EB',
                   }
                 ]}
               >
-                <Text style={styles.categoryPillIcon}>{cat.icon}</Text>
-                <Text style={styles.categoryPillText}>{cat.name}</Text>
-                <Text style={styles.categoryPillCount}>{cat.count}</Text>
+                <Text style={[styles.categoryPillIcon, isSelected && { color: '#000' }]}>{cat.icon}</Text>
+                <Text style={[styles.categoryPillText, isSelected && { color: '#000', fontWeight: '600' }]}>{cat.name}</Text>
+                <Text style={[styles.categoryPillCount, isSelected && { color: '#000' }]}>{cat.count}</Text>
               </Pressable>
             );
           })}
-        </ScrollView>
+          </ScrollView>
+        </View>
       )}
 
       <SectionList
@@ -530,6 +612,7 @@ export const InventoryScreen: React.FC = () => {
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         keyExtractor={item => item.id}
+        extraData={items.length} // Force re-render when items change
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -629,7 +712,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
+    marginBottom: 0,  // No gap - pills container handles spacing
   },
   searchInput: {
     backgroundColor: theme.colors.surface,
@@ -657,34 +740,50 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontWeight: '600',
   },
+  categoryPillsContainer: {
+    height: 56,  // Fixed container height
+    backgroundColor: theme.colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    overflow: 'hidden',  // Prevent content overflow
+  },
   categoryPills: {
-    maxHeight: 50,
-    marginBottom: theme.spacing.sm,
+    flex: 1,  // Take full height of container
   },
   categoryPillsContent: {
-    paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.sm,
+    paddingHorizontal: 16,
+    paddingTop: 6,  // Reduced from 10 to bring closer to search
+    paddingBottom: 10,
+    gap: 8,
+    alignItems: 'center',  // Center pills vertically
+    flexDirection: 'row',  // Ensure horizontal layout
   },
   categoryPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: 2,  // Very slim - only 2px top and bottom
-    borderRadius: theme.borderRadius.full,
-    gap: theme.spacing.xs,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+    borderWidth: 1.5,  // Consistent border
+    minHeight: 36,  // Minimum height instead of fixed
+    justifyContent: 'center',
   },
   categoryPillIcon: {
     fontSize: 16,
+    lineHeight: 18,
   },
   categoryPillText: {
     fontSize: 14,
     fontWeight: '500',
     color: theme.colors.text,
+    lineHeight: 18,
   },
   categoryPillCount: {
     fontSize: 14,
     fontWeight: '600',
     color: theme.colors.text,
+    lineHeight: 18,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -694,7 +793,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
     borderTopWidth: 3,  // Bolder divider
     borderTopColor: theme.colors.border,
-    marginTop: theme.spacing.sm,
+    marginTop: 0,  // Remove margin to eliminate gap
   },
   sectionIcon: {
     fontSize: 20,
@@ -728,7 +827,7 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    width: 100,
+    width: 80,
     backgroundColor: theme.colors.error,
     justifyContent: 'center',
     alignItems: 'center',
@@ -826,6 +925,15 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   emptyText: {
+    ...theme.typography.body,
+    color: theme.colors.textLight,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
     ...theme.typography.body,
     color: theme.colors.textLight,
   },

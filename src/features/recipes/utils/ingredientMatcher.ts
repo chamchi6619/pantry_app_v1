@@ -123,18 +123,18 @@ export class IngredientMatcher {
   }
 
   private normalize(text: string): string {
-    return text
+    let normalized = text
       .toLowerCase()
       .trim()
       // Remove common words
-      .replace(/\b(fresh|frozen|dried|canned|organic|large|small|medium)\b/g, '')
-      // Remove brand names (simple heuristic)
-      .replace(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g, '')
+      .replace(/\b(fresh|frozen|dried|canned|organic|large|small|medium|extra|virgin|whole)\b/g, '')
       // Remove punctuation
       .replace(/[^\w\s]/g, '')
       // Normalize whitespace
       .replace(/\s+/g, ' ')
       .trim();
+
+    return normalized;
   }
 
   private isCanonical(id: string): boolean {
@@ -211,43 +211,65 @@ export class IngredientMatcher {
       return null;
     }
 
-    // Search within the same category
-    const categoryIngredients = this.categoryIndex[invCategory];
-    let bestMatch: { id: string; score: number } | null = null;
+    // First, find what the recipe ingredient actually is within this category
+    let recipeCanonicalId: string | null = null;
+    let bestRecipeScore = 0;
 
-    for (const id of categoryIngredients) {
+    for (const id of this.categoryIndex[recipeCategory]) {
       const ingredient = this.canonicalIngredients[id];
 
-      // Check against display name
       const displayScore = this.levenshteinSimilarity(
-        normInv,
+        normRecipe,
         this.normalize(ingredient.displayName)
       );
 
-      if (displayScore >= 0.60) {
-        if (!bestMatch || displayScore > bestMatch.score) {
-          bestMatch = { id, score: displayScore };
-        }
+      if (displayScore > bestRecipeScore) {
+        bestRecipeScore = displayScore;
+        recipeCanonicalId = id;
       }
 
-      // Check against aliases
       for (const alias of ingredient.aliases) {
-        const aliasScore = this.levenshteinSimilarity(normInv, this.normalize(alias));
-        if (aliasScore >= 0.60) {
-          if (!bestMatch || aliasScore > bestMatch.score) {
-            bestMatch = { id, score: aliasScore };
-          }
+        const aliasScore = this.levenshteinSimilarity(normRecipe, this.normalize(alias));
+        if (aliasScore > bestRecipeScore) {
+          bestRecipeScore = aliasScore;
+          recipeCanonicalId = id;
         }
       }
     }
 
-    if (bestMatch) {
+    // If we can't identify the recipe ingredient, no match
+    if (!recipeCanonicalId || bestRecipeScore < 0.60) {
+      return null;
+    }
+
+    // Now check if inventory matches the SAME canonical ingredient
+    const recipeCanonical = this.canonicalIngredients[recipeCanonicalId];
+
+    const invScore = this.levenshteinSimilarity(
+      normInv,
+      this.normalize(recipeCanonical.displayName)
+    );
+
+    if (invScore >= 0.60) {
       return {
-        id: bestMatch.id,
-        confidence: bestMatch.score,
-        score: bestMatch.score,
+        id: recipeCanonicalId,
+        confidence: invScore,
+        score: invScore,
         category: invCategory
       };
+    }
+
+    // Check aliases
+    for (const alias of recipeCanonical.aliases) {
+      const aliasScore = this.levenshteinSimilarity(normInv, this.normalize(alias));
+      if (aliasScore >= 0.60) {
+        return {
+          id: recipeCanonicalId,
+          confidence: aliasScore,
+          score: aliasScore,
+          category: invCategory
+        };
+      }
     }
 
     return null;
@@ -257,33 +279,58 @@ export class IngredientMatcher {
     normInv: string,
     normRecipe: string
   ): { id: string; score: number } | null {
-    let bestMatch: { id: string; score: number } | null = null;
+    // First, try to find what the recipe ingredient actually is
+    let recipeCanonicalId: string | null = null;
+    let bestRecipeMatch = 0;
 
+    // Find best canonical match for the recipe ingredient
     for (const [id, ingredient] of Object.entries(this.canonicalIngredients)) {
-      // Check against display name
       const displayScore = this.levenshteinSimilarity(
-        normInv,
+        normRecipe,
         this.normalize(ingredient.displayName)
       );
 
-      if (displayScore >= 0.60) {
-        if (!bestMatch || displayScore > bestMatch.score) {
-          bestMatch = { id, score: displayScore };
-        }
+      if (displayScore > bestRecipeMatch) {
+        bestRecipeMatch = displayScore;
+        recipeCanonicalId = id;
       }
 
-      // Check against aliases
       for (const alias of ingredient.aliases) {
-        const aliasScore = this.levenshteinSimilarity(normInv, this.normalize(alias));
-        if (aliasScore >= 0.60) {
-          if (!bestMatch || aliasScore > bestMatch.score) {
-            bestMatch = { id, score: aliasScore };
-          }
+        const aliasScore = this.levenshteinSimilarity(normRecipe, this.normalize(alias));
+        if (aliasScore > bestRecipeMatch) {
+          bestRecipeMatch = aliasScore;
+          recipeCanonicalId = id;
         }
       }
     }
 
-    return bestMatch;
+    // If we couldn't identify what the recipe wants, no match
+    if (!recipeCanonicalId || bestRecipeMatch < 0.60) {
+      return null;
+    }
+
+    // Now check if inventory item matches the same canonical ingredient
+    const recipeCanonical = this.canonicalIngredients[recipeCanonicalId];
+
+    // Check inventory against the recipe's canonical ingredient
+    const invVsRecipeScore = this.levenshteinSimilarity(
+      normInv,
+      this.normalize(recipeCanonical.displayName)
+    );
+
+    if (invVsRecipeScore >= 0.60) {
+      return { id: recipeCanonicalId, score: invVsRecipeScore };
+    }
+
+    // Check against aliases
+    for (const alias of recipeCanonical.aliases) {
+      const aliasScore = this.levenshteinSimilarity(normInv, this.normalize(alias));
+      if (aliasScore >= 0.60) {
+        return { id: recipeCanonicalId, score: aliasScore };
+      }
+    }
+
+    return null;
   }
 
   private findCategory(text: string): string | null {

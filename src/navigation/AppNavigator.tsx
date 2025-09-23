@@ -2,12 +2,13 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet, Platform, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Platform, Dimensions, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../core/constants/theme';
 import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
 import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleShoppingListScreen';
-import { EnhancedRecipesScreen } from '../features/recipes/screens/EnhancedRecipesScreen';
+// import { EnhancedRecipesScreen } from '../features/recipes/screens/EnhancedRecipesScreen';
+import { SimpleRecipesScreen } from '../features/recipes/screens/SimpleRecipesScreen';
 import { RecipeDetailScreen } from '../features/recipes/screens/RecipeDetailScreen';
 import { RecipeFormScreen } from '../features/recipes/screens/RecipeFormScreen';
 import { ReceiptCaptureWrapper } from '../features/receipt/screens/ReceiptCaptureWrapper';
@@ -43,6 +44,24 @@ const TabIcon: React.FC<{ focused: boolean; icon: string; label: string }> = ({ 
   </View>
 );
 
+// Custom tab button with immediate press feedback
+const CustomTabButton: React.FC<{ children: React.ReactNode; onPress?: () => void; accessibilityState?: any }> = ({
+  children,
+  onPress,
+  accessibilityState
+}) => (
+  <Pressable
+    onPress={onPress}
+    style={({ pressed }) => [
+      styles.tabButton,
+      pressed && styles.tabButtonPressed
+    ]}
+    android_ripple={{ borderless: true, color: theme.colors.primary + '20' }}
+  >
+    {children}
+  </Pressable>
+);
+
 // Recipe Stack Navigator
 const RecipeStack = () => (
   <Stack.Navigator
@@ -50,7 +69,7 @@ const RecipeStack = () => (
       headerShown: false,
     }}
   >
-    <Stack.Screen name="RecipeList" component={EnhancedRecipesScreen} />
+    <Stack.Screen name="RecipeList" component={SimpleRecipesScreen} />
     <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
     <Stack.Screen name="RecipeForm" component={RecipeFormScreen} />
   </Stack.Navigator>
@@ -92,7 +111,7 @@ const TabNavigator = () => {
         tabBarShowLabel: false,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.textLight,
-        headerShown: false,
+        headerShown: false
       }}
     >
       <Tab.Screen
@@ -101,6 +120,9 @@ const TabNavigator = () => {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon="📦" label="Inventory" />
+          ),
+          tabBarButton: (props) => (
+            <CustomTabButton {...props} />
           ),
         }}
       />
@@ -111,6 +133,9 @@ const TabNavigator = () => {
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon="🛒" label="Shopping" />
           ),
+          tabBarButton: (props) => (
+            <CustomTabButton {...props} />
+          ),
         }}
       />
       <Tab.Screen
@@ -119,6 +144,9 @@ const TabNavigator = () => {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon="🧾" label="Receipt" />
+          ),
+          tabBarButton: (props) => (
+            <CustomTabButton {...props} />
           ),
         }}
       />
@@ -129,6 +157,9 @@ const TabNavigator = () => {
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon="🍴" label="Recipes" />
           ),
+          tabBarButton: (props) => (
+            <CustomTabButton {...props} />
+          ),
         }}
       />
       <Tab.Screen
@@ -137,6 +168,9 @@ const TabNavigator = () => {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon="👤" label="Profile" />
+          ),
+          tabBarButton: (props) => (
+            <CustomTabButton {...props} />
           ),
         }}
       />
@@ -201,5 +235,15 @@ const styles = StyleSheet.create({
   tabLabelFocused: {
     color: theme.colors.primary,
     fontWeight: '600',
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+  },
+  tabButtonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.95 }],
   },
 });

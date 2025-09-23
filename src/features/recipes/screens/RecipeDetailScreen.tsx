@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Pressable,
   Alert,
+  InteractionManager,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -14,9 +16,9 @@ import { theme } from '../../../core/constants/theme';
 import { Recipe, RecipeIngredient } from '../types';
 import { useInventoryStore } from '../../../stores/inventoryStore';
 import { useShoppingListStore } from '../../../stores/shoppingListStore';
-import { ingredientMatcher } from '../utils/ingredientMatcher';
 import { shoppingListMerger } from '../utils/shoppingListMerger';
-import recipeConfig from '../config/recipeConfig.json';
+import { matchIngredientToInventory } from '../utils/simpleMatcher';
+import { normalizeName } from '../utils/normalizer';
 
 type RecipeDetailRouteParams = {
   RecipeDetail: {
@@ -66,52 +68,37 @@ export const RecipeDetailScreen: React.FC = () => {
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
   const [servingsMultiplier, setServingsMultiplier] = useState(1);
+  const [availabilityLoading, setAvailabilityLoading] = useState(true);
+  const [ingredientAvailability, setIngredientAvailability] = useState<Record<string, boolean>>({});
 
   const inventory = useInventoryStore((state) => state.items);
+  const inventoryVersion = useInventoryStore((state) => state.version || 0);
   const shoppingItems = useShoppingListStore((state) => state.items);
   const addShoppingItem = useShoppingListStore((state) => state.addItem);
 
-  // Check which ingredients are available
-  const ingredientAvailability = useMemo(() => {
-    const availability: Record<string, boolean> = {};
+  // Pre-normalize inventory items once
+  const inventoryNorms = useMemo(() => {
+    return inventory.map(item => item.normalized || normalizeName(item.name));
+  }, [inventory, inventoryVersion]);
 
-    console.log('🔍 Checking ingredient availability for:', recipe.name);
-    console.log('📦 Inventory items:', inventory.length);
-    console.log('🧪 Recipe ingredients:', recipe.ingredients.length);
-    console.log('Confidence threshold:', recipeConfig.matching.minConfidence);
+  // Check ingredients asynchronously to not block initial render
+  useEffect(() => {
+    setAvailabilityLoading(true);
 
-    for (const recipeIngredient of recipe.ingredients) {
-      let isAvailable = false;
-      const parsed = recipeIngredient.parsed;
+    // Compute availability after UI settles
+    InteractionManager.runAfterInteractions(() => {
+      const availability: Record<string, boolean> = {};
 
-      console.log(`  Checking "${parsed.ingredient}"...`);
-
-      for (const invItem of inventory) {
-        const matchResult = ingredientMatcher.match(
-          invItem.name,
-          parsed.ingredient
-        );
-
-        console.log(`    vs "${invItem.name}": confidence=${matchResult.confidence.toFixed(2)}`);
-
-        if (matchResult.confidence >= recipeConfig.matching.minConfidence) {
-          console.log(`    ✅ Match found!`);
-          // Check quantity if needed
-          if (recipeIngredient.requiredQuantity && invItem.quantity) {
-            isAvailable = invItem.quantity >= recipeIngredient.requiredQuantity * servingsMultiplier;
-          } else {
-            isAvailable = true;
-          }
-          break;
-        }
+      for (const recipeIngredient of recipe.ingredients) {
+        const ingredientNorm = normalizeName(recipeIngredient.parsed.ingredient);
+        const match = matchIngredientToInventory(ingredientNorm, inventoryNorms);
+        availability[recipeIngredient.id] = match.isAvailable;
       }
 
-      availability[recipeIngredient.id] = isAvailable;
-      console.log(`  Result: ${isAvailable ? '✅ Available' : '❌ Not available'}`);
-    }
-
-    return availability;
-  }, [recipe.ingredients, inventory, servingsMultiplier]);
+      setIngredientAvailability(availability);
+      setAvailabilityLoading(false);
+    });
+  }, [recipe.ingredients, inventoryNorms]);
 
   const availableCount = Object.values(ingredientAvailability).filter(Boolean).length;
   const totalIngredients = recipe.ingredients.length;
@@ -274,12 +261,21 @@ export const RecipeDetailScreen: React.FC = () => {
 
           {/* Match Status */}
           <View style={styles.matchStatus}>
-            <View style={styles.matchBar}>
-              <View style={[styles.matchBarFill, { width: `${matchPercentage}%` }]} />
-            </View>
-            <Text style={styles.matchText}>
-              {availableCount} of {totalIngredients} ingredients available ({matchPercentage}%)
-            </Text>
+            {availabilityLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <Text style={styles.loadingText}>Checking pantry...</Text>
+              </View>
+            ) : (
+              <>
+                <View style={styles.matchBar}>
+                  <View style={[styles.matchBarFill, { width: `${matchPercentage}%` }]} />
+                </View>
+                <Text style={styles.matchText}>
+                  {availableCount} of {totalIngredients} ingredients available ({matchPercentage}%)
+                </Text>
+              </>
+            )}
           </View>
         </View>
 
@@ -526,6 +522,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   matchText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.xs,
+    gap: theme.spacing.xs,
+  },
+  loadingText: {
     fontSize: 12,
     color: theme.colors.textSecondary,
   },

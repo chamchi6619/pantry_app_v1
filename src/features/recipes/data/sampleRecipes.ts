@@ -11,6 +11,35 @@ const createIngredient = (id: string, text: string, quantity: number | null, uni
 });
 
 export const sampleRecipes: Recipe[] = [
+  // Test recipe with ingredients we actually have in inventory
+  {
+    id: 'test-1',
+    name: 'Simple Egg & Cheese Sandwich',
+    description: 'Quick breakfast sandwich with ingredients from our pantry',
+    category: 'breakfast',
+    prepTime: 5,
+    cookTime: 5,
+    servings: 1,
+    difficulty: 'easy',
+    ingredients: [
+      createIngredient('test-1-1', '2 slices bread', 2, 'slice'),
+      createIngredient('test-1-2', '2 eggs', 2, 'piece'),
+      createIngredient('test-1-3', '2 slices cheese', 2, 'slice'),
+      createIngredient('test-1-4', '1 tbsp olive oil', 1, 'tbsp'),
+      createIngredient('test-1-5', 'lettuce leaves', null, null),
+      createIngredient('test-1-6', '2 slices tomato', 2, 'slice'),
+    ],
+    instructions: [
+      'Toast the bread slices',
+      'Heat olive oil in a pan',
+      'Fry the eggs',
+      'Place cheese on one slice of bread',
+      'Add fried eggs, lettuce, and tomato',
+      'Top with second slice and serve',
+    ],
+    tags: ['Breakfast', 'Quick', 'Simple'],
+    nutrition: { calories: 380, protein: 18, carbs: 32, fat: 20 },
+  },
   // Quick Recipes (Under 30 min)
   {
     id: '1',

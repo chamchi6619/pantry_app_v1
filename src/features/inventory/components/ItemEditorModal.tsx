@@ -63,8 +63,8 @@ export const ItemEditorModal: React.FC<ItemEditorModalProps> = ({
       setQuantity(qty === null || qty === undefined || qty === 0 ? '' : qty.toString());
       setUnit(item.unit || 'pieces');
       setLocation(item.location?.toLowerCase() || 'fridge');
-      // Map expiresAt to expiryDate for the modal
-      const dateStr = item.expiresAt || item.expiryDate || '';
+      // Map expirationDate to expiryDate for the modal
+      const dateStr = item.expirationDate || item.expiresAt || item.expiryDate || '';
       setExpiryDate(dateStr);
       if (dateStr) {
         setSelectedDate(new Date(dateStr));
@@ -98,10 +98,11 @@ export const ItemEditorModal: React.FC<ItemEditorModalProps> = ({
       quantity: isNaN(parsedQuantity) ? null : parsedQuantity,
       unit,
       location,
-      expiryDate,
+      expirationDate: expiryDate && expiryDate !== '' ? expiryDate : undefined, // Keep as YYYY-MM-DD string
       categories,
       emoji: selectedEmoji,
     };
+    console.log('Saving item with expiration date:', expiryDate);
     onSave(updatedItem);
     onClose();
   };
@@ -295,7 +296,11 @@ export const ItemEditorModal: React.FC<ItemEditorModalProps> = ({
               onPress={() => setShowDatePicker(true)}
             >
               <Text style={[styles.dateText, !expiryDate && styles.datePlaceholder]}>
-                {expiryDate ? new Date(expiryDate).toLocaleDateString() : 'Select date'}
+                {expiryDate ? (() => {
+                  // Parse YYYY-MM-DD format safely
+                  const [year, month, day] = expiryDate.split('-');
+                  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).toLocaleDateString();
+                })() : 'Select date'}
               </Text>
               <Text style={styles.calendarIcon}>📅</Text>
             </Pressable>
@@ -323,7 +328,12 @@ export const ItemEditorModal: React.FC<ItemEditorModalProps> = ({
                       onChange={(event: any, date?: Date) => {
                         if (date) {
                           setSelectedDate(date);
-                          setExpiryDate(date.toISOString().split('T')[0]);
+                          // Format date properly to avoid timezone issues
+                          const year = date.getFullYear();
+                          const month = String(date.getMonth() + 1).padStart(2, '0');
+                          const day = String(date.getDate()).padStart(2, '0');
+                          const localDateStr = `${year}-${month}-${day}`;
+                          setExpiryDate(localDateStr);
                         }
                       }}
                       style={{ height: 180, width: '100%' }}
@@ -360,7 +370,12 @@ export const ItemEditorModal: React.FC<ItemEditorModalProps> = ({
                 setShowDatePicker(false);
                 if (date) {
                   setSelectedDate(date);
-                  setExpiryDate(date.toISOString().split('T')[0]);
+                  // Format date properly to avoid timezone issues
+                  const year = date.getFullYear();
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const day = String(date.getDate()).padStart(2, '0');
+                  const localDateStr = `${year}-${month}-${day}`;
+                  setExpiryDate(localDateStr);
                 }
               }}
             />

@@ -126,28 +126,44 @@ export const EnhancedRecipesScreen: React.FC = () => {
   }, [inventoryKey, clearCache]);
 
   // Get all recipe scores - with fallback to show all recipes even without inventory
-  const allRecipeScores = useMemo(() => {
-    // If no inventory, still show recipes with 0% match
-    if (inventory.length === 0) {
-      return allRecipes.map(recipe => ({
-        recipe,
-        totalScore: 0,
-        matchPercentage: 0,
-        availableIngredients: [],
-        missingIngredients: recipe.ingredients.map(ing =>
-          ing.parsed?.ingredient || ing.recipeText
-        ),
-        expiringIngredients: [],
-        expiringScore: 0,
-        scoreBreakdown: {
-          baseMatch: 0,
-          expiringBonus: 0,
-          categoryBonus: 0,
-        }
-      }));
-    }
+  const [allRecipeScores, setAllRecipeScores] = useState<RecipeScore[]>([]);
+  const [isCalculating, setIsCalculating] = useState(true);
 
-    return recipeScores(inventory);
+  useEffect(() => {
+    // Defer heavy computation to avoid blocking UI
+    setIsCalculating(true);
+
+    const timer = setTimeout(() => {
+      // If no inventory, still show recipes with 0% match
+      if (inventory.length === 0) {
+        const emptyScores = allRecipes.map(recipe => ({
+          recipe,
+          totalScore: 0,
+          matchPercentage: 0,
+          availableIngredients: [],
+          missingIngredients: recipe.ingredients.map(ing =>
+            ing.parsed?.ingredient || ing.recipeText
+          ),
+          expiringIngredients: [],
+          expiringScore: 0,
+          scoreBreakdown: {
+            baseMatch: 0,
+            expiringBonus: 0,
+            categoryBonus: 0,
+          }
+        }));
+        setAllRecipeScores(emptyScores);
+        setIsCalculating(false);
+        return;
+      }
+
+      // Calculate scores in background
+      const scores = recipeScores(inventory);
+      setAllRecipeScores(scores);
+      setIsCalculating(false);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [inventory, recipeScores, allRecipes, inventoryVersion]);
 
   // Filter by search
@@ -307,6 +323,21 @@ export const EnhancedRecipesScreen: React.FC = () => {
       </View>
     );
   };
+
+  // Show loading state during initial calculation
+  if (isCalculating) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Recipes</Text>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>Finding recipes for you...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -682,5 +713,16 @@ const styles = StyleSheet.create({
   fabIcon: {
     fontSize: 28,
     color: '#FFFFFF',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.xl * 4,
+  },
+  loadingText: {
+    marginTop: theme.spacing.md,
+    ...theme.typography.body,
+    color: theme.colors.textLight,
   },
 });

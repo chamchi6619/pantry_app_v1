@@ -77,7 +77,7 @@ interface EnhancedRecipeState {
 // Use imported sample recipes directly
 
 export const useEnhancedRecipeStore = create<EnhancedRecipeState>()(
-  persist(
+  // Temporarily disable persist to use fresh sampleRecipes data
     (set, get) => ({
       recipes: sampleRecipes,
       searchQuery: '',
@@ -200,15 +200,15 @@ export const useEnhancedRecipeStore = create<EnhancedRecipeState>()(
         const score = recipeScorer.scoreRecipe(recipe, convertedInventory);
         return score.missingIngredients;
       }
-    }),
-    {
-      name: 'enhanced-recipe-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
-        recipes: state.recipes,
-        searchQuery: state.searchQuery,
-        selectedTags: state.selectedTags
-      })
-    }
-  )
+    })
+    // Persistence configuration commented out to use fresh data
+    // {
+    //   name: 'enhanced-recipe-storage',
+    //   storage: createJSONStorage(() => AsyncStorage),
+    //   partialize: (state) => ({
+    //     recipes: state.recipes,
+    //     searchQuery: state.searchQuery,
+    //     selectedTags: state.selectedTags
+    //   })
+    // }
 );
