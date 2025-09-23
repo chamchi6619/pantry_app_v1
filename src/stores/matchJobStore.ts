@@ -91,6 +91,13 @@ export const useMatchJobStore = create<MatchJobState>((set, get) => ({
       const batchResults: Record<string, MatchResult> = {};
 
       for (const recipe of batch) {
+        // Skip recipes without ingredients
+        if (!recipe || !recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+          console.log(`\nSkipping recipe without ingredients: ${recipe?.name || 'Unknown'}`);
+          batchResults[`${recipe?.id || 'unknown'}|${invVersion}`] = { pct: 0, hasExpiring: false };
+          continue;
+        }
+
         let matchCount = 0;
         let hasExpiring = false;
         const totalIngredients = recipe.ingredients.length;

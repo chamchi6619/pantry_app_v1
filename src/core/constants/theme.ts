@@ -1,9 +1,9 @@
 export const theme = {
   colors: {
-    // Primary
-    primary: '#00C853',
-    primaryLight: '#5EFC82',
-    primaryDark: '#00962D',
+    // Primary - Kitchen Stories inspired brand green
+    primary: '#1F7A3B',
+    primaryLight: '#2FA050',
+    primaryDark: '#155028',
 
     // Storage locations
     fridge: '#3B82F6',
@@ -24,15 +24,15 @@ export const theme = {
     fresh: '#10B981',
     warning: '#F59E0B',
 
-    // UI colors
+    // UI colors - Kitchen Stories inspired
     background: '#FFFFFF',
-    surface: '#F9FAFB',
+    surface: '#F6FBF8',  // Brand surface color
     border: '#E5E7EB',
     borderLight: '#F3F4F6',
 
-    // Text colors
-    text: '#111827',
-    textSecondary: '#6B7280',
+    // Text colors - Kitchen Stories inspired
+    text: '#111111',      // Text High
+    textSecondary: '#6B7280',  // Text Low
     textLight: '#9CA3AF',
     textInverse: '#FFFFFF',
 

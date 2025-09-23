@@ -8,7 +8,8 @@ import { theme } from '../core/constants/theme';
 import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
 import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleShoppingListScreen';
 // import { EnhancedRecipesScreen } from '../features/recipes/screens/EnhancedRecipesScreen';
-import { SimpleRecipesScreen } from '../features/recipes/screens/SimpleRecipesScreen';
+// import { SimpleRecipesScreen } from '../features/recipes/screens/SimpleRecipesScreen';
+import { ExploreRecipesScreen } from '../features/recipes/screens/ExploreRecipesScreen';
 import { RecipeDetailScreen } from '../features/recipes/screens/RecipeDetailScreen';
 import { RecipeFormScreen } from '../features/recipes/screens/RecipeFormScreen';
 import { ReceiptCaptureWrapper } from '../features/receipt/screens/ReceiptCaptureWrapper';
@@ -69,7 +70,7 @@ const RecipeStack = () => (
       headerShown: false,
     }}
   >
-    <Stack.Screen name="RecipeList" component={SimpleRecipesScreen} />
+    <Stack.Screen name="RecipeList" component={ExploreRecipesScreen} />
     <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
     <Stack.Screen name="RecipeForm" component={RecipeFormScreen} />
   </Stack.Navigator>

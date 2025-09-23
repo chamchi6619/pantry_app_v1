@@ -29,10 +29,17 @@ export class ShoppingListMerger {
     displayName: string;
     category: string;
   }> {
+    console.log('=== CALCULATE NEEDED INGREDIENTS ===');
+    console.log('Recipe:', recipe.name);
+    console.log('Recipe ingredients:', recipe.ingredients);
+    console.log('Inventory count:', inventory.length);
+
     const needed = [];
 
     for (const recipeIngredient of recipe.ingredients) {
       const parsed = recipeIngredient.parsed || ingredientParser.parse(recipeIngredient.recipeText);
+      console.log(`\nChecking ingredient: ${recipeIngredient.recipeText}`);
+      console.log('Parsed:', parsed);
 
       // Find matching inventory items
       let totalAvailable = 0;
@@ -41,6 +48,7 @@ export class ShoppingListMerger {
 
       for (const invItem of inventory) {
         const matchResult = ingredientMatcher.match(invItem.name, parsed.ingredient);
+        console.log(`  Matching against ${invItem.name}: confidence ${matchResult.confidence}`);
 
         if (matchResult.confidence >= 0.85) {
           canonicalId = matchResult.canonicalId;
@@ -74,8 +82,11 @@ export class ShoppingListMerger {
       }
 
       // Calculate how much more we need
-      const requiredQuantity = recipeIngredient.requiredQuantity || 0;
+      // Use requiredQuantity, or fall back to parsed quantity, or default to 1
+      const requiredQuantity = recipeIngredient.requiredQuantity || parsed.quantity || 1;
       const neededQuantity = Math.max(0, requiredQuantity - totalAvailable);
+
+      console.log(`  Required: ${requiredQuantity}, Available: ${totalAvailable}, Needed: ${neededQuantity}`);
 
       if (neededQuantity > 0) {
         // Get display name from canonical ingredient or parsed
@@ -87,6 +98,8 @@ export class ShoppingListMerger {
 
         const category = canonical?.category || 'Other';
 
+        console.log(`  NEEDS TO BUY: ${displayName} (${neededQuantity} ${recipeIngredient.requiredUnit || 'unit'})`);
+
         needed.push({
           ingredient: recipeIngredient,
           neededQuantity,
@@ -95,6 +108,8 @@ export class ShoppingListMerger {
           displayName,
           category: this.mapCategoryToShoppingCategory(category)
         });
+      } else {
+        console.log(`  Already have enough of ${parsed.ingredient}`);
       }
     }
 
@@ -151,6 +166,13 @@ export class ShoppingListMerger {
         newItems++;
       }
     }
+
+    console.log('=== MERGE RESULT ===');
+    console.log('Total needed:', needed.length);
+    console.log('Items to add:', itemsToAdd.length, itemsToAdd);
+    console.log('Items to update:', itemsToUpdate.length);
+    console.log('New items:', newItems);
+    console.log('Merged items:', mergedItems);
 
     return {
       itemsToAdd,

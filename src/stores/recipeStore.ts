@@ -201,10 +201,12 @@ export const useRecipeStore = create<RecipeState>()(
           filtered = filtered.filter(
             (recipe) =>
               recipe.title.toLowerCase().includes(query) ||
-              recipe.ingredients.some((ing) =>
-                ing.name.toLowerCase().includes(query)
-              ) ||
-              recipe.tags.some((tag) => tag.toLowerCase().includes(query))
+              (recipe.ingredients && Array.isArray(recipe.ingredients) &&
+                recipe.ingredients.some((ing) =>
+                  ing && ing.name && ing.name.toLowerCase().includes(query)
+                )) ||
+              (recipe.tags && Array.isArray(recipe.tags) &&
+                recipe.tags.some((tag) => tag && tag.toLowerCase().includes(query)))
           );
         }
 
@@ -240,8 +242,16 @@ export const useRecipeStore = create<RecipeState>()(
 
         return recipes
           .map((recipe) => {
+            if (!recipe || !recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+              return {
+                recipe,
+                matchPercentage: 0,
+                haveIngredients: [],
+                missingIngredients: [],
+              };
+            }
             const requiredIngredients = recipe.ingredients.filter(
-              (ing) => !ing.optional
+              (ing) => ing && !ing.optional
             );
             const haveIngredients = requiredIngredients.filter((ing) =>
               itemsLower.some((item) => item.includes(ing.name.toLowerCase()))
@@ -271,8 +281,11 @@ export const useRecipeStore = create<RecipeState>()(
 
         return recipes
           .map((recipe) => {
+            if (!recipe || !recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+              return null;
+            }
             const usesExpiringItems = recipe.ingredients.filter((ing) =>
-              itemsLower.some((item) => item.includes(ing.name.toLowerCase()))
+              ing && ing.name && itemsLower.some((item) => item.includes(ing.name.toLowerCase()))
             );
 
             if (usesExpiringItems.length === 0) {
@@ -280,7 +293,7 @@ export const useRecipeStore = create<RecipeState>()(
             }
 
             const requiredIngredients = recipe.ingredients.filter(
-              (ing) => !ing.optional
+              (ing) => ing && !ing.optional
             );
             const matchPercent = Math.round(
               (usesExpiringItems.length / requiredIngredients.length) * 100

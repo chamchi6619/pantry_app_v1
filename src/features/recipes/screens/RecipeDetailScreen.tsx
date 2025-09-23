@@ -63,7 +63,21 @@ const IngredientItem: React.FC<IngredientItemProps> = ({
 export const RecipeDetailScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<RecipeDetailRouteParams, 'RecipeDetail'>>();
-  const { recipe } = route.params;
+  const { recipe } = route.params || {};
+
+  // If no recipe provided, show error
+  if (!recipe || !recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Recipe not found</Text>
+          <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
@@ -81,28 +95,62 @@ export const RecipeDetailScreen: React.FC = () => {
     return inventory.map(item => item.normalized || normalizeName(item.name));
   }, [inventory, inventoryVersion]);
 
-  // Check ingredients asynchronously to not block initial render
+  // Check ingredient availability when recipe or inventory changes
   useEffect(() => {
-    setAvailabilityLoading(true);
-
-    // Compute availability after UI settles
-    InteractionManager.runAfterInteractions(() => {
+    if (!recipe?.ingredients) return;
+    if (inventoryNorms.length === 0) {
+      // If no inventory, mark all as missing
       const availability: Record<string, boolean> = {};
-
-      for (const recipeIngredient of recipe.ingredients) {
-        const ingredientNorm = normalizeName(recipeIngredient.parsed.ingredient);
-        const match = matchIngredientToInventory(ingredientNorm, inventoryNorms);
-        availability[recipeIngredient.id] = match.isAvailable;
-      }
-
+      recipe.ingredients.forEach(ing => {
+        availability[ing.id] = false;
+      });
       setIngredientAvailability(availability);
       setAvailabilityLoading(false);
-    });
-  }, [recipe.ingredients, inventoryNorms]);
+      console.log('No inventory items, marking all as missing');
+      return;
+    }
 
-  const availableCount = Object.values(ingredientAvailability).filter(Boolean).length;
-  const totalIngredients = recipe.ingredients.length;
-  const matchPercentage = Math.round((availableCount / totalIngredients) * 100);
+    // Delay computation slightly to let navigation animation complete
+    const timeout = setTimeout(() => {
+      const availability: Record<string, boolean> = {};
+
+      console.log('=== CHECKING AVAILABILITY ===');
+      console.log('Recipe ingredients:', recipe.ingredients);
+      console.log('Inventory normalized:', inventoryNorms);
+
+      if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
+        for (const recipeIngredient of recipe.ingredients) {
+          if (recipeIngredient?.parsed?.ingredient) {
+            const ingredientNorm = normalizeName(recipeIngredient.parsed.ingredient);
+            const match = matchIngredientToInventory(ingredientNorm, inventoryNorms);
+            availability[recipeIngredient.id] = match.isAvailable;
+            console.log(`Ingredient "${recipeIngredient.parsed.ingredient}" (${ingredientNorm}): ${match.isAvailable ? 'AVAILABLE' : 'MISSING'} - ${match.reason}`);
+          } else {
+            // If no parsed data, mark as missing
+            availability[recipeIngredient.id] = false;
+            console.log(`Ingredient ${recipeIngredient.id} has no parsed data, marking as MISSING`);
+          }
+        }
+      }
+
+      console.log('Final availability:', availability);
+      setIngredientAvailability(availability);
+      setAvailabilityLoading(false);
+    }, 300); // Delay to allow smooth navigation
+
+    return () => clearTimeout(timeout);
+  }, [recipe, inventoryNorms]); // Re-run when recipe or inventory changes
+
+  // Memoize calculations to prevent re-computation during swipe
+  const availableCount = useMemo(() =>
+    Object.values(ingredientAvailability).filter(Boolean).length,
+    [ingredientAvailability]
+  );
+  const totalIngredients = recipe.ingredients?.length || 0;
+  const matchPercentage = useMemo(() =>
+    totalIngredients > 0 ? Math.round((availableCount / totalIngredients) * 100) : 0,
+    [availableCount, totalIngredients]
+  );
 
   const handleToggleIngredient = (id: string) => {
     setCheckedIngredients((prev) => {
@@ -129,20 +177,42 @@ export const RecipeDetailScreen: React.FC = () => {
   };
 
   const handleAddMissingToShopping = () => {
-    const missingIngredients = recipe.ingredients.filter(
+    console.log('=== ADD MISSING DEBUG ===');
+    console.log('Recipe ingredients:', recipe.ingredients);
+    console.log('Ingredient availability:', ingredientAvailability);
+
+    const missingIngredients = (recipe.ingredients || []).filter(
       (ing) => !ingredientAvailability[ing.id]
     );
+
+    console.log('Missing ingredients found:', missingIngredients);
 
     if (missingIngredients.length === 0) {
       Alert.alert('All Set!', 'You have all the ingredients for this recipe.');
       return;
     }
 
+    // Create a recipe with ONLY missing ingredients to pass to the merger
+    // This prevents the merger from recalculating and adding items we already have
+    const recipeForMerge = {
+      ...recipe,
+      name: recipe.name || 'Recipe',
+      ingredients: missingIngredients, // Only pass missing ingredients!
+    };
+
+    console.log('Recipe for merge (only missing):', recipeForMerge);
+    console.log('Current inventory:', inventory);
+    console.log('Current shopping items:', shoppingItems);
+
+    // Now the merger will only process the missing ingredients
+    // Pass empty inventory since we've already determined these are missing
     const mergeResult = shoppingListMerger.mergeRecipeIngredients(
-      recipe,
-      inventory,
+      recipeForMerge,
+      [], // Empty inventory since these are confirmed missing
       shoppingItems
     );
+
+    console.log('Merge result:', mergeResult);
 
     // Add new items to shopping list
     for (const item of mergeResult.itemsToAdd) {
@@ -212,7 +282,13 @@ export const RecipeDetailScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        scrollEventThrottle={16}
+        decelerationRate="fast"
+        overScrollMode="never"
+      >
         {/* Recipe Image Placeholder */}
         <View style={styles.imageContainer}>
           <Text style={styles.imagePlaceholder}>
@@ -319,15 +395,15 @@ export const RecipeDetailScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {recipe.ingredients.map((ingredient) => {
+          {(recipe.ingredients || []).map((ingredient) => {
             const adjustedIngredient = {
               ...ingredient,
-              recipeText: ingredient.parsed.quantity
+              recipeText: ingredient?.parsed?.quantity
                 ? ingredient.recipeText.replace(
                     ingredient.parsed.quantity.toString(),
                     formatQuantity(ingredient.parsed.quantity, servingsMultiplier)
                   )
-                : ingredient.recipeText,
+                : ingredient?.recipeText || '',
             };
 
             return (
@@ -701,5 +777,21 @@ const styles = StyleSheet.create({
   cookIcon: {
     fontSize: 20,
     color: 'white',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.xl,
+  },
+  errorText: {
+    fontSize: 18,
+    color: theme.colors.textLight,
+    marginBottom: theme.spacing.lg,
+  },
+  backButtonText: {
+    color: theme.colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
