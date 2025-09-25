@@ -46,6 +46,23 @@ pantry_app_v1/
 
 ### Core Tables
 ```sql
+-- users table (mock auth)
+CREATE TABLE users (
+    id TEXT PRIMARY KEY,  -- UUID
+    email TEXT UNIQUE NOT NULL,
+    username TEXT,
+    password_hash TEXT,  -- For dev only, bcrypt hash
+    household_id TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- households table
+CREATE TABLE households (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
 -- recipes table
 CREATE TABLE recipes (
     id TEXT PRIMARY KEY,  -- UUID as text
@@ -133,6 +150,40 @@ CREATE TABLE staples (
     ingredient_id TEXT PRIMARY KEY,
     penalty_weight REAL DEFAULT 0.1
 );
+
+-- receipts table (OCR results)
+CREATE TABLE receipts (
+    id TEXT PRIMARY KEY,
+    household_id TEXT,
+    store_name TEXT,
+    date TEXT,
+    total_amount REAL,
+    tax_amount REAL,
+    image_path TEXT,
+    raw_ocr_text TEXT,
+    parsed_data TEXT,  -- JSON of parsed items
+    confidence_score REAL,
+    status TEXT DEFAULT 'pending',  -- pending|reviewed|processed
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (household_id) REFERENCES households(id)
+);
+
+-- receipt_items table (parsed items from receipts)
+CREATE TABLE receipt_items (
+    id TEXT PRIMARY KEY,
+    receipt_id TEXT,
+    raw_text TEXT,
+    parsed_name TEXT,
+    quantity REAL,
+    unit TEXT,
+    price REAL,
+    category TEXT,
+    matched_ingredient_id TEXT,
+    needs_review INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (receipt_id) REFERENCES receipts(id),
+    FOREIGN KEY (matched_ingredient_id) REFERENCES ingredients(id)
+);
 ```
 
 ### Indexes & FTS5
@@ -151,10 +202,16 @@ CREATE VIRTUAL TABLE recipes_fts USING fts5(
 
 ## API Endpoints
 
-### Core Endpoints
+### Auth Endpoints (Mock for Development)
 ```python
-GET  /healthz                    # Health check with FTS5 verification
-GET  /metrics                    # Simple counts for monitoring
+POST /auth/register              # Create user + household
+POST /auth/login                 # Get JWT token
+POST /auth/refresh               # Refresh token
+GET  /auth/me                    # Get current user
+```
+
+### Recipe Endpoints
+```python
 GET  /recipes/search             # Search with filters, pagination
 POST /recipes/match              # Pantry matching with scoring
 GET  /recipes/{id}               # Recipe details with attribution
@@ -162,8 +219,56 @@ GET  /ingredients/search         # Ingredient autocomplete
 POST /recipes/bulk-import        # Admin: ingest recipes
 ```
 
+### Receipt OCR Endpoints
+```python
+POST /receipts/upload            # Upload image for OCR
+POST /receipts/parse             # Parse OCR text to items
+GET  /receipts/{id}              # Get receipt details
+PUT  /receipts/{id}/items       # Update parsed items (fix queue)
+POST /receipts/{id}/confirm      # Confirm and add to inventory
+GET  /receipts/history           # Get household receipts
+```
+
+### System Endpoints
+```python
+GET  /healthz                    # Health check with FTS5 verification
+GET  /metrics                    # Simple counts for monitoring
+```
+
 ### Response Shapes (Standardized)
 ```typescript
+// Auth Response
+{
+  access_token: string,
+  refresh_token: string,
+  user: {
+    id: string,
+    email: string,
+    username: string,
+    household_id: string
+  }
+}
+
+// Receipt OCR Response
+{
+  receipt_id: string,
+  status: 'processing' | 'needs_review' | 'completed',
+  confidence: number,
+  items: Array<{
+    id: string,
+    raw_text: string,
+    parsed_name: string,
+    quantity: number,
+    unit: string,
+    price: number,
+    confidence: number,
+    needs_review: boolean
+  }>,
+  total: number,
+  store_name: string,
+  date: string
+}
+
 // Search Response
 {
   items: Recipe[],
@@ -191,6 +296,9 @@ POST /recipes/bulk-import        # Admin: ingest recipes
    python -m venv venv
    source venv/bin/activate
    pip install fastapi uvicorn[standard] sqlalchemy aiosqlite python-dotenv pydantic
+   pip install python-jose[cryptography] passlib[bcrypt] python-multipart  # Auth
+   pip install pytesseract pillow opencv-python-headless  # OCR
+   pip install aiofiles  # File handling
    ```
 
 2. **Create Database Schema**
@@ -208,7 +316,33 @@ POST /recipes/bulk-import        # Admin: ingest recipes
    SELECT sqlite_compileoption_used('ENABLE_FTS5')
    ```
 
-### Phase 2: Data Ingestion (Day 2)
+### Phase 2: Auth & OCR Setup (Day 2)
+1. **Mock Authentication**
+   ```python
+   # app/auth.py
+   - JWT token generation
+   - Password hashing with bcrypt
+   - Token refresh logic
+   - Household creation on register
+   - Middleware for protected routes
+   ```
+
+2. **Receipt OCR Pipeline**
+   ```python
+   # app/ocr/receipt_processor.py
+   - Image preprocessing (rotation, contrast)
+   - Tesseract OCR extraction
+   - Receipt parser (store, date, items, total)
+   - Item line parser (quantity, name, price)
+   - Fuzzy matching to ingredients DB
+   ```
+
+3. **Fix Queue System**
+   - Store uncertain items with confidence scores
+   - Allow manual correction via UI
+   - Learn from corrections (store mappings)
+
+### Phase 3: Data Ingestion (Day 3)
 1. **Build Pre-populated Database**
    - Run ingestion on PC, not devices
    - USDA recipes (~5000)
@@ -225,7 +359,7 @@ POST /recipes/bulk-import        # Admin: ingest recipes
    - Build FTS5 index
    - Load staples into memory
 
-### Phase 3: React Native Integration (Day 3)
+### Phase 4: React Native Integration (Day 4)
 1. **API Service Layer**
    ```typescript
    const API_URL = Platform.select({
@@ -245,7 +379,7 @@ POST /recipes/bulk-import        # Admin: ingest recipes
    - Add loading/error states
    - Implement response caching
 
-### Phase 4: Features & Polish (Week 2)
+### Phase 5: Features & Polish (Week 2)
 1. **Search & Filters**
    - Full-text search via FTS5
    - Diet/cuisine/time filters
@@ -327,6 +461,16 @@ DATABASE_URL=sqlite:///./data/pantry.db
 ALLOWED_ORIGINS=["http://localhost:19006","http://10.0.2.2:19006"]
 LOG_LEVEL=INFO
 RATE_LIMIT_PER_MINUTE=300
+
+# Auth
+SECRET_KEY=dev-secret-key-change-in-production
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# OCR
+TESSERACT_CMD=/usr/bin/tesseract  # or path to tesseract.exe on Windows
+OCR_CONFIDENCE_THRESHOLD=0.8
+UPLOAD_PATH=./data/uploads/receipts
 ```
 
 ## Testing Checklist
@@ -337,19 +481,27 @@ RATE_LIMIT_PER_MINUTE=300
 - [ ] CORS allows Expo connections
 - [ ] Rate limiter active
 
-### Day 2: Data
+### Day 2: Auth & OCR
+- [ ] JWT auth working
+- [ ] User registration creates household
+- [ ] Protected endpoints require token
+- [ ] Receipt image upload works
+- [ ] OCR extracts text from receipt
+- [ ] Items parsed with confidence scores
+
+### Day 3: Data
 - [ ] 3k+ recipes ingested
 - [ ] Attribution fields populated
 - [ ] FTS5 search working
 - [ ] Pantry match < 150ms
 
-### Day 3: Integration
+### Day 4: Integration
 - [ ] iOS Simulator connects
 - [ ] Android Emulator connects
 - [ ] Search from Expo works
 - [ ] Attribution displays in app
 
-### Day 4: Polish
+### Day 5: Polish
 - [ ] Physical device via LAN IP
 - [ ] Response caching active
 - [ ] Logs written to files
@@ -377,6 +529,103 @@ RATE_LIMIT_PER_MINUTE=300
 
 # CC BY
 "Recipe © original authors, CC BY 4.0. Source: [URL]"
+```
+
+## Receipt OCR Implementation
+
+### OCR Processing Pipeline
+```python
+# app/ocr/processor.py
+class ReceiptProcessor:
+    def process_image(self, image_path: str):
+        # 1. Preprocess image
+        - Convert to grayscale
+        - Apply adaptive threshold
+        - Deskew if rotated
+        - Enhance contrast
+
+        # 2. Extract text with Tesseract
+        raw_text = pytesseract.image_to_string(image, config='--psm 6')
+
+        # 3. Parse receipt structure
+        store_name = extract_store_name(raw_text)
+        date = extract_date(raw_text)
+        items = extract_items(raw_text)
+        total = extract_total(raw_text)
+
+        # 4. Process each item
+        for line in items:
+            parsed = parse_item_line(line)
+            # Returns: {name, quantity, unit, price, confidence}
+
+        # 5. Match to ingredients DB
+        for item in parsed_items:
+            match = fuzzy_match_ingredient(item.name)
+            item.matched_id = match.id if match else None
+            item.needs_review = match.confidence < 0.8
+
+        return parsed_receipt
+```
+
+### Item Parsing Patterns
+```python
+# Common receipt patterns to parse:
+"2 BANANAS @ 0.59/LB     1.18"  → {qty: 2, unit: 'lb', name: 'Bananas', price: 1.18}
+"MILK 2% 1GAL            3.99"  → {qty: 1, unit: 'gal', name: 'Milk 2%', price: 3.99}
+"3X YOGURT               5.97"  → {qty: 3, unit: 'item', name: 'Yogurt', price: 5.97}
+```
+
+### Fix Queue Workflow
+1. Items with confidence < 80% go to fix queue
+2. User reviews and corrects in app
+3. Corrections stored as mappings for future
+4. After review, items added to inventory
+
+## Mock Authentication System
+
+### JWT Token Structure
+```python
+# app/auth.py
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from datetime import datetime, timedelta
+
+SECRET_KEY = "dev-secret-key-change-in-production"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def verify_token(token: str):
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    return payload.get("sub")  # user_id
+```
+
+### Auth Flow
+1. **Registration**: Create user → Create household → Return tokens
+2. **Login**: Verify password → Generate tokens → Return user data
+3. **Protected Routes**: Verify JWT → Extract user_id → Check household
+4. **Token Refresh**: Validate refresh token → Issue new access token
+
+### Middleware
+```python
+# app/middleware.py
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    user_id = verify_token(token)
+    if not user_id:
+        raise HTTPException(status_code=401)
+    return await get_user(user_id)
+
+# Protected endpoint example
+@app.get("/receipts/history")
+async def get_receipts(user: User = Depends(get_current_user)):
+    return await get_household_receipts(user.household_id)
 ```
 
 ## Security & Compliance
