@@ -86,7 +86,7 @@ export const ItemEditorModal: React.FC<ItemEditorModalProps> = ({
     }
   }, [item]);
 
-  const units = ['half gallon', 'gallon', 'liter', 'ml', 'oz', 'fl oz', 'lb', 'kg', 'g', 'piece', 'bunch', 'pack'];
+  const units = ['serving', 'servings', 'half gallon', 'gallon', 'liter', 'ml', 'oz', 'fl oz', 'lb', 'kg', 'g', 'piece', 'pieces', 'bunch', 'pack'];
   const availableCategories = ['Beverages', 'Dairy', 'Essential', 'Frozen', 'Fruits', 'Grains', 'Proteins', 'Snacks', 'Vegetables'].sort();
   const popularCategories = ['Proteins', 'Vegetables', 'Fruits', 'Grains', 'Snacks'];
 
@@ -212,6 +212,31 @@ export const ItemEditorModal: React.FC<ItemEditorModalProps> = ({
                 <Text style={styles.chevron}>⌄</Text>
               </Pressable>
             </View>
+          </View>
+
+          {/* Quantity Presets */}
+          <View style={styles.presetContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.presetScroll}>
+              {[
+                { label: '1 serving', value: '1', unit: 'serving' },
+                { label: '2 servings', value: '2', unit: 'servings' },
+                { label: '1 lb', value: '1', unit: 'lb' },
+                { label: '500g', value: '500', unit: 'g' },
+                { label: '1 dozen', value: '12', unit: 'pieces' },
+                { label: '6 pack', value: '6', unit: 'pack' },
+              ].map((preset) => (
+                <Pressable
+                  key={preset.label}
+                  style={styles.presetButton}
+                  onPress={() => {
+                    setQuantity(preset.value);
+                    setUnit(preset.unit);
+                  }}
+                >
+                  <Text style={styles.presetText}>{preset.label}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
           </View>
 
           {/* Unit Picker Modal */}
@@ -698,6 +723,26 @@ const styles = StyleSheet.create({
   chevron: {
     fontSize: 20,
     color: theme.colors.textSecondary,
+  },
+  presetContainer: {
+    marginTop: -theme.spacing.sm,
+    marginBottom: theme.spacing.md,
+  },
+  presetScroll: {
+    paddingVertical: theme.spacing.xs,
+  },
+  presetButton: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.full,
+    marginRight: theme.spacing.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  presetText: {
+    fontSize: 14,
+    color: theme.colors.text,
   },
   unitPicker: {
     backgroundColor: theme.colors.surface,

@@ -18,7 +18,10 @@ import { Button } from '../../../core/components/ui/Button';
 import { Input } from '../../../core/components/ui/Input';
 import { ItemEditorModal } from '../components/ItemEditorModal';
 import { toTitleCase } from '../../../core/utils/textUtils';
-import { useInventoryStore } from '../../../stores/inventoryStore';
+import { useInventorySupabaseStore } from '../../../stores/inventorySupabaseStore';
+import { useAuth } from '../../../contexts/AuthContext';
+import { FEATURE_FLAGS } from '../../../config/featureFlags';
+import { SyncStatusIndicator } from '../../../components/SyncStatusIndicator';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -196,8 +199,9 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({
     }
   };
   const getItemIcon = () => {
-    if (item.emoji) {
-      return item.emoji;
+    // Check if emoji is stored in notes field
+    if (item.notes && item.notes.startsWith('Icon: ')) {
+      return item.notes.substring(6);
     }
     const categoryIcons: Record<string, string> = {
       'Proteins': '🥩',
@@ -285,10 +289,18 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({
 
 export const InventoryScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const items = useInventoryStore((state) => state.items) as InventoryItem[];
-  const updateItem = useInventoryStore((state) => state.updateItem);
-  const deleteItem = useInventoryStore((state) => state.deleteItem);
-  const addItem = useInventoryStore((state) => state.addItem);
+  const { householdId } = useAuth();
+
+  // Use Supabase store
+  const items = useInventorySupabaseStore((state) => state.items) as InventoryItem[];
+  const updateItem = useInventorySupabaseStore((state) => state.updateItem);
+  const deleteItem = useInventorySupabaseStore((state) => state.deleteItem);
+  const addItem = useInventorySupabaseStore((state) => state.addItem);
+  const initialize = useInventorySupabaseStore((state) => state.initialize);
+  const loadFromSupabase = useInventorySupabaseStore((state) => state.loadFromSupabase);
+  const isSyncing = useInventorySupabaseStore((state) => state.isSyncing);
+  const syncError = useInventorySupabaseStore((state) => state.syncError);
+  const forceSync = useInventorySupabaseStore((state) => state.forceSync);
 
   const [activeTab, setActiveTab] = useState<LocationTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -298,13 +310,17 @@ export const InventoryScreen: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [openItemId, setOpenItemId] = useState<string | null>(null);
 
-  // Simulate loading delay for initial mount
+  // Initialize store with household ID
   React.useEffect(() => {
-    const timer = setTimeout(() => {
+    const initializeInventory = async () => {
+      if (householdId) {
+        await initialize(householdId);
+      }
       setIsLoading(false);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+    };
+
+    initializeInventory();
+  }, [householdId, initialize]);
 
   // Remove the hardcoded items that were here
   const oldItems = [
@@ -414,7 +430,12 @@ export const InventoryScreen: React.FC = () => {
     }
     const item = items.find(i => i.id === itemId);
     if (item) {
-      setEditingItem(item);
+      // Extract emoji from notes if stored there
+      let itemWithEmoji = { ...item };
+      if (item.notes && item.notes.startsWith('Icon: ')) {
+        itemWithEmoji.emoji = item.notes.substring(6);
+      }
+      setEditingItem(itemWithEmoji);
       setShowModal(true);
     }
   };
@@ -431,13 +452,35 @@ export const InventoryScreen: React.FC = () => {
   const handleQuantityChange = (itemId: string, delta: number) => {
     const item = items.find(i => i.id === itemId);
     if (item) {
-      updateItem(itemId, { quantity: Math.max(0, item.quantity + delta) });
+      const newQuantity = item.quantity + delta;
+      if (newQuantity <= 0) {
+        Alert.alert(
+          'Remove Item?',
+          `"${item.name}" quantity will be 0. Remove from inventory?`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Remove',
+              style: 'destructive',
+              onPress: () => deleteItem(itemId)
+            }
+          ]
+        );
+      } else {
+        updateItem(itemId, { quantity: newQuantity });
+      }
     }
   };
 
   const handleDeleteItem = (itemId: string) => {
     // Direct delete - confirmation is handled in ItemRow swipe action
     deleteItem(itemId);
+  };
+
+  const handleForceSync = () => {
+    console.log('[Inventory] Force sync requested');
+    // Trigger force sync
+    forceSync();
   };
 
   const handleSaveItem = (itemData: any) => {
@@ -455,8 +498,8 @@ export const InventoryScreen: React.FC = () => {
         : undefined,
       // Take first category from categories array
       category: itemData.categories && itemData.categories.length > 0 ? itemData.categories[0] : 'Other',
-      // Store notes if emoji is provided
-      notes: itemData.emoji ? `Icon: ${itemData.emoji}` : undefined,
+      // Store emoji in notes field for persistence
+      notes: itemData.emoji ? `Icon: ${itemData.emoji}` : (editingItem?.notes || undefined),
     };
 
     console.log('Mapped data with expirationDate:', mappedData.expirationDate);
@@ -470,10 +513,16 @@ export const InventoryScreen: React.FC = () => {
     setEditingItem(null);
   };
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  }, []);
+
+    // Reload from Supabase if sync is enabled
+    if (FEATURE_FLAGS.SYNC_INVENTORY) {
+      await loadFromSupabase();
+    }
+
+    setRefreshing(false);
+  }, [loadFromSupabase]);
 
   const renderSectionHeader = ({ section }: any) => (
     <View style={styles.sectionHeader}>
@@ -508,14 +557,28 @@ export const InventoryScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {FEATURE_FLAGS.SHOW_SYNC_STATUS && <SyncStatusIndicator />}
       <View style={styles.header}>
-        <Text style={styles.title}>Inventory</Text>
-        <Pressable style={styles.addItemButton} onPress={handleAddItem}>
-          <Text style={styles.addItemText}>Add Item</Text>
-          <View style={[styles.addButton, { marginLeft: 3 }]}>
-            <Text style={styles.addIcon}>+</Text>
-          </View>
-        </Pressable>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Inventory</Text>
+          {FEATURE_FLAGS.SHOW_SYNC_STATUS && isSyncing && (
+            <Text style={styles.syncStatus}>🔄 Syncing...</Text>
+          )}
+          {FEATURE_FLAGS.SHOW_SYNC_STATUS && syncError && (
+            <Text style={styles.syncError}>⚠️ Sync error</Text>
+          )}
+        </View>
+        <View style={styles.headerButtons}>
+          <Pressable style={styles.syncButton} onPress={handleForceSync}>
+            <Text style={styles.syncButtonText}>🔄 Sync</Text>
+          </Pressable>
+          <Pressable style={styles.addItemButton} onPress={handleAddItem}>
+            <Text style={styles.addItemText}>Add Item</Text>
+            <View style={[styles.addButton, { marginLeft: 3 }]}>
+              <Text style={styles.addIcon}>+</Text>
+            </View>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.tabContainer}>
@@ -936,5 +999,36 @@ const styles = StyleSheet.create({
   loadingText: {
     ...theme.typography.body,
     color: theme.colors.textLight,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  syncButton: {
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  syncButtonText: {
+    color: theme.colors.primary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  syncStatus: {
+    fontSize: 12,
+    color: theme.colors.primary,
+  },
+  syncError: {
+    fontSize: 12,
+    color: theme.colors.error,
   },
 });

@@ -89,6 +89,7 @@ export const RecipeDetailScreen: React.FC = () => {
   const inventoryVersion = useInventoryStore((state) => state.version || 0);
   const shoppingItems = useShoppingListStore((state) => state.items);
   const addShoppingItem = useShoppingListStore((state) => state.addItem);
+  const updateShoppingItem = useShoppingListStore((state) => state.updateItem);
 
   // Pre-normalize inventory items once
   const inventoryNorms = useMemo(() => {
@@ -180,35 +181,51 @@ export const RecipeDetailScreen: React.FC = () => {
     console.log('=== ADD MISSING DEBUG ===');
     console.log('Recipe ingredients:', recipe.ingredients);
     console.log('Ingredient availability:', ingredientAvailability);
+    console.log('Checked ingredients:', checkedIngredients);
 
-    const missingIngredients = (recipe.ingredients || []).filter(
-      (ing) => !ingredientAvailability[ing.id]
-    );
+    // Get ingredients to add to shopping list:
+    // 1. All unchecked ingredients that are missing (not in inventory)
+    // 2. All checked ingredients (regardless of inventory status)
+    const ingredientsToAdd = (recipe.ingredients || []).filter((ing) => {
+      const isChecked = checkedIngredients.has(ing.id);
+      const isAvailable = ingredientAvailability[ing.id];
 
-    console.log('Missing ingredients found:', missingIngredients);
+      // Add if: checked (user wants it) OR (unchecked AND missing from inventory)
+      return isChecked || (!isChecked && !isAvailable);
+    });
 
-    if (missingIngredients.length === 0) {
-      Alert.alert('All Set!', 'You have all the ingredients for this recipe.');
+    console.log('Ingredients to add to shopping:', ingredientsToAdd);
+
+    if (ingredientsToAdd.length === 0) {
+      Alert.alert('All Set!', 'You have all the unchecked ingredients for this recipe.');
       return;
     }
 
-    // Create a recipe with ONLY missing ingredients to pass to the merger
-    // This prevents the merger from recalculating and adding items we already have
+    // Apply serving multiplier to ingredient quantities
+    const adjustedIngredients = ingredientsToAdd.map(ing => ({
+      ...ing,
+      requiredQuantity: (ing.requiredQuantity || ing.parsed?.quantity || 1) * servingsMultiplier,
+      parsed: ing.parsed ? {
+        ...ing.parsed,
+        quantity: (ing.parsed.quantity || 1) * servingsMultiplier
+      } : undefined
+    }));
+
+    // Create a recipe with adjusted ingredients to pass to the merger
     const recipeForMerge = {
       ...recipe,
       name: recipe.name || 'Recipe',
-      ingredients: missingIngredients, // Only pass missing ingredients!
+      ingredients: adjustedIngredients,
     };
 
-    console.log('Recipe for merge (only missing):', recipeForMerge);
-    console.log('Current inventory:', inventory);
+    console.log('Recipe for merge:', recipeForMerge);
     console.log('Current shopping items:', shoppingItems);
 
-    // Now the merger will only process the missing ingredients
-    // Pass empty inventory since we've already determined these are missing
+    // Process the ingredients
+    // Pass actual inventory so quantities are calculated correctly
     const mergeResult = shoppingListMerger.mergeRecipeIngredients(
       recipeForMerge,
-      [], // Empty inventory since these are confirmed missing
+      inventory, // Use actual inventory for proper quantity calculation
       shoppingItems
     );
 
@@ -219,9 +236,17 @@ export const RecipeDetailScreen: React.FC = () => {
       addShoppingItem(item);
     }
 
+    // Update existing items' quantities
+    for (const update of mergeResult.itemsToUpdate || []) {
+      updateShoppingItem(update.id, update.updates);
+    }
+
+    // Clear checked ingredients after adding
+    setCheckedIngredients(new Set());
+
     Alert.alert(
       'Added to Shopping List',
-      `Added ${mergeResult.newItems} missing ingredients to your shopping list.${
+      `Added ${mergeResult.newItems} ingredients to your shopping list.${
         mergeResult.mergedItems > 0
           ? ` Updated quantities for ${mergeResult.mergedItems} existing items.`
           : ''
@@ -367,7 +392,7 @@ export const RecipeDetailScreen: React.FC = () => {
             </TouchableOpacity>
             <View style={styles.servingsDisplay}>
               <Text style={styles.servingsNumber}>
-                {Math.round(recipe.servings * servingsMultiplier)}
+                {Math.round((recipe.servings || 4) * servingsMultiplier)}
               </Text>
               <Text style={styles.servingsLabel}>
                 {servingsMultiplier !== 1 && `(${servingsMultiplier}x)`}

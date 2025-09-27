@@ -136,30 +136,34 @@ export class ShoppingListMerger {
       const existing = this.findExistingItem(item, existingList);
 
       if (existing) {
-        // Merge quantities
-        const mergedQuantity = this.mergeQuantities(
-          existing,
+        // Intelligently merge quantities based on units
+        const mergedQty = this.mergeQuantitiesIntelligently(
+          existing.quantity || 1,
+          existing.unit || 'item',
           item.neededQuantity,
-          item.neededUnit,
-          item.canonicalId
+          item.neededUnit
         );
 
-        // Update existing item
         itemsToUpdate.push({
           id: existing.id,
           updates: {
-            quantity: mergedQuantity.quantity,
-            unit: mergedQuantity.unit,
+            quantity: mergedQty.quantity,
+            unit: mergedQty.unit,
             notes: this.mergeNotes(existing.notes, `For: ${recipe.name}`)
           }
         });
         mergedItems++;
       } else {
-        // Add new item
+        // Add new item with proper quantity and unit
+        const normalizedQty = this.normalizeQuantityForShopping(
+          item.neededQuantity,
+          item.neededUnit
+        );
+
         itemsToAdd.push({
           name: item.displayName,
-          quantity: item.neededQuantity,
-          unit: item.neededUnit,
+          quantity: normalizedQty.quantity,
+          unit: normalizedQty.unit,
           category: item.category,
           notes: `For: ${recipe.name}`
         });
@@ -196,7 +200,9 @@ export class ShoppingListMerger {
     // First try exact canonical match
     if (needed.canonicalId) {
       for (const item of existingList) {
-        const matchResult = ingredientMatcher.match(item.name, item.name);
+        // Strip quantity info from name (e.g., "Beef (500g)" -> "Beef")
+        const itemNameClean = item.name.replace(/\s*\([^)]+\)\s*$/, '').trim();
+        const matchResult = ingredientMatcher.match(itemNameClean, itemNameClean);
         if (matchResult.canonicalId === needed.canonicalId) {
           return item;
         }
@@ -205,8 +211,19 @@ export class ShoppingListMerger {
 
     // Then try fuzzy match on display name
     for (const item of existingList) {
-      const matchResult = ingredientMatcher.match(item.name, needed.displayName);
+      // Strip quantity info from name for better matching
+      const itemNameClean = item.name.replace(/\s*\([^)]+\)\s*$/, '').trim();
+      const matchResult = ingredientMatcher.match(itemNameClean, needed.displayName);
       if (matchResult.confidence >= 0.9) {
+        return item;
+      }
+    }
+
+    // Also try simple case-insensitive match as fallback
+    const neededLower = needed.displayName.toLowerCase();
+    for (const item of existingList) {
+      const itemNameClean = item.name.replace(/\s*\([^)]+\)\s*$/, '').trim().toLowerCase();
+      if (itemNameClean === neededLower) {
         return item;
       }
     }
@@ -316,6 +333,167 @@ export class ShoppingListMerger {
   /**
    * Convert string to title case
    */
+  /**
+   * Intelligently merge quantities, converting and summing units
+   */
+  private mergeQuantitiesIntelligently(
+    existingQty: number,
+    existingUnit: string,
+    additionalQty: number,
+    additionalUnit: string
+  ): { quantity: number; unit: string } {
+    console.log(`=== MERGE QUANTITIES ===`);
+    console.log(`Existing: ${existingQty} ${existingUnit}`);
+    console.log(`Additional: ${additionalQty} ${additionalUnit}`);
+
+    // Handle countable items (pieces, items, etc.)
+    if (this.isCountableUnit(existingUnit) && this.isCountableUnit(additionalUnit)) {
+      const result = {
+        quantity: existingQty + additionalQty,  // Fixed: removed (|| 1) fallback
+        unit: existingUnit
+      };
+      console.log(`Countable merge result: ${result.quantity} ${result.unit}`);
+      return result;
+    }
+
+    // Try to convert to same unit system
+    const converted = this.convertToSameUnit(
+      existingQty,
+      existingUnit,
+      additionalQty,
+      additionalUnit
+    );
+
+    // Normalize to user-friendly units
+    return this.normalizeQuantityForShopping(converted.quantity, converted.unit);
+  }
+
+  /**
+   * Convert quantities to the same unit system for addition
+   */
+  private convertToSameUnit(
+    qty1: number,
+    unit1: string,
+    qty2: number,
+    unit2: string
+  ): { quantity: number; unit: string } {
+    // Simple conversion table
+    const conversions: Record<string, number> = {
+      // Weight - everything to grams
+      'g': 1,
+      'gram': 1,
+      'grams': 1,
+      'kg': 1000,
+      'kilogram': 1000,
+      'kilograms': 1000,
+      'oz': 28.35,
+      'ounce': 28.35,
+      'ounces': 28.35,
+      'lb': 453.592,
+      'pound': 453.592,
+      'pounds': 453.592,
+      'lbs': 453.592,
+
+      // Volume - everything to ml
+      'ml': 1,
+      'milliliter': 1,
+      'milliliters': 1,
+      'l': 1000,
+      'liter': 1000,
+      'liters': 1000,
+      'cup': 240,
+      'cups': 240,
+      'tbsp': 15,
+      'tablespoon': 15,
+      'tablespoons': 15,
+      'tsp': 5,
+      'teaspoon': 5,
+      'teaspoons': 5,
+    };
+
+    const unit1Lower = unit1.toLowerCase();
+    const unit2Lower = unit2.toLowerCase();
+
+    // If both units are in our conversion table
+    if (conversions[unit1Lower] && conversions[unit2Lower]) {
+      // Convert both to base unit
+      const base1 = qty1 * conversions[unit1Lower];
+      const base2 = qty2 * conversions[unit2Lower];
+      const total = base1 + base2;
+
+      // Determine if weight or volume
+      const isWeight = ['g', 'gram', 'grams', 'kg', 'oz', 'lb'].some(u =>
+        unit1Lower.includes(u) || unit2Lower.includes(u)
+      );
+
+      return {
+        quantity: total,
+        unit: isWeight ? 'g' : 'ml'
+      };
+    }
+
+    // If units don't match and can't convert, just add the quantities
+    // This handles units like "cloves", "sprigs", etc. that aren't in our conversion table
+    return {
+      quantity: qty1 + qty2,
+      unit: unit1
+    };
+  }
+
+  /**
+   * Normalize quantities to user-friendly units
+   */
+  private normalizeQuantityForShopping(
+    quantity: number,
+    unit: string
+  ): { quantity: number; unit: string } {
+    const unitLower = unit.toLowerCase();
+
+    // Weight conversions
+    if (unitLower === 'g' || unitLower === 'grams') {
+      if (quantity >= 1000) {
+        return { quantity: parseFloat((quantity / 1000).toFixed(2)), unit: 'kg' };
+      }
+      return { quantity: Math.round(quantity), unit: 'g' };
+    }
+
+    // Volume conversions
+    if (unitLower === 'ml' || unitLower === 'milliliters') {
+      if (quantity >= 1000) {
+        return { quantity: parseFloat((quantity / 1000).toFixed(2)), unit: 'L' };
+      }
+      return { quantity: Math.round(quantity), unit: 'ml' };
+    }
+
+    // Ounces to pounds
+    if (unitLower === 'oz' || unitLower === 'ounces') {
+      if (quantity >= 16) {
+        return { quantity: parseFloat((quantity / 16).toFixed(2)), unit: 'lb' };
+      }
+      return { quantity: Math.round(quantity), unit: 'oz' };
+    }
+
+    // For countable items or unknown units, round to whole numbers
+    if (this.isCountableUnit(unit) || !quantity) {
+      return {
+        quantity: Math.ceil(quantity || 1),
+        unit: unit || 'item'
+      };
+    }
+
+    return { quantity: parseFloat(quantity.toFixed(2)), unit };
+  }
+
+  /**
+   * Check if unit is countable (pieces, items, etc.)
+   */
+  private isCountableUnit(unit: string): boolean {
+    const countable = ['item', 'items', 'piece', 'pieces', 'can', 'cans',
+                       'bottle', 'bottles', 'package', 'packages', 'bunch',
+                       'bunches', 'head', 'heads', 'clove', 'cloves'];
+    return countable.includes(unit.toLowerCase());
+  }
+
   private titleCase(str: string): string {
     return str.replace(/\w\S*/g, (txt) => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();

@@ -8,22 +8,35 @@ import {
   Platform,
   ScrollView,
   Pressable,
+  ActivityIndicator,
 } from 'react-native';
 import { theme } from '../../../core/constants/theme';
 import { Input } from '../../../core/components/ui/Input';
 import { Button } from '../../../core/components/ui/Button';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [useMagicLink, setUseMagicLink] = useState(true);
 
-  const handleSignIn = () => {
-    console.log('Sign in:', email, password);
-  };
+  const { signInWithEmail, signInWithPassword, signUp, loading } = useAuth();
 
-  const handleSocialLogin = (provider: string) => {
-    console.log('Social login:', provider);
+  const handleAuth = async () => {
+    if (!email.trim()) {
+      return;
+    }
+
+    if (useMagicLink) {
+      await signInWithEmail(email);
+    } else if (isSignUp) {
+      await signUp(email, password, displayName);
+    } else {
+      await signInWithPassword(email, password);
+    }
   };
 
   return (
@@ -45,8 +58,57 @@ export const AuthScreen: React.FC = () => {
             <Text style={styles.subtitle}>Manage your food inventory smart</Text>
           </View>
 
+          {/* Tab Selector */}
+          <View style={styles.tabContainer}>
+            <Pressable
+              style={[styles.tab, useMagicLink && styles.activeTab]}
+              onPress={() => {
+                setUseMagicLink(true);
+                setIsSignUp(false);
+              }}
+            >
+              <Text style={[styles.tabText, useMagicLink && styles.activeTabText]}>
+                Magic Link
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.tab, !useMagicLink && !isSignUp && styles.activeTab]}
+              onPress={() => {
+                setUseMagicLink(false);
+                setIsSignUp(false);
+              }}
+            >
+              <Text style={[styles.tabText, !useMagicLink && !isSignUp && styles.activeTabText]}>
+                Password
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.tab, isSignUp && styles.activeTab]}
+              onPress={() => {
+                setUseMagicLink(false);
+                setIsSignUp(true);
+              }}
+            >
+              <Text style={[styles.tabText, isSignUp && styles.activeTabText]}>
+                Sign Up
+              </Text>
+            </Pressable>
+          </View>
+
           {/* Form */}
           <View style={styles.form}>
+            {isSignUp && (
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Display Name</Text>
+                <Input
+                  placeholder="Enter your name"
+                  value={displayName}
+                  onChangeText={setDisplayName}
+                  autoCapitalize="words"
+                />
+              </View>
+            )}
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Email</Text>
               <Input
@@ -58,77 +120,61 @@ export const AuthScreen: React.FC = () => {
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Password</Text>
-              <Input
-                placeholder="Enter your password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                rightIcon={
-                  <Pressable onPress={() => setShowPassword(!showPassword)}>
-                    <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-                  </Pressable>
-                }
-              />
-            </View>
+            {!useMagicLink && (
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Password</Text>
+                <Input
+                  placeholder="Enter your password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  rightIcon={
+                    <Pressable onPress={() => setShowPassword(!showPassword)}>
+                      <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+                    </Pressable>
+                  }
+                />
+              </View>
+            )}
 
             <Button
               variant="primary"
               fullWidth
-              onPress={handleSignIn}
+              onPress={handleAuth}
               style={styles.signInButton}
+              disabled={loading}
             >
-              Sign In
+              {loading ? (
+                <ActivityIndicator color={theme.colors.textInverse} />
+              ) : useMagicLink ? (
+                'Send Magic Link'
+              ) : isSignUp ? (
+                'Create Account'
+              ) : (
+                'Sign In'
+              )}
             </Button>
 
-            <View style={styles.linkContainer}>
-              <Pressable>
-                <Text style={styles.link}>Forgot password?</Text>
-              </Pressable>
-              <Pressable>
-                <Text style={styles.link}>Create account</Text>
-              </Pressable>
-            </View>
+            {useMagicLink && (
+              <Text style={styles.helperText}>
+                We'll send you a magic link to sign in. No password needed!
+              </Text>
+            )}
+
+            {!useMagicLink && !isSignUp && (
+              <View style={styles.linkContainer}>
+                <Pressable>
+                  <Text style={styles.link}>Forgot password?</Text>
+                </Pressable>
+              </View>
+            )}
           </View>
 
-          {/* Divider */}
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Social Login */}
-          <View style={styles.socialButtons}>
-            <Pressable
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('google')}
-            >
-              <View style={[styles.socialIcon, styles.googleIcon]}>
-                <Text style={styles.socialIconText}>G</Text>
-              </View>
-              <Text style={styles.socialButtonText}>Continue with Google</Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('facebook')}
-            >
-              <View style={[styles.socialIcon, styles.facebookIcon]}>
-                <Text style={styles.socialIconText}>f</Text>
-              </View>
-              <Text style={styles.socialButtonText}>Continue with Facebook</Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('apple')}
-            >
-              <View style={[styles.socialIcon, styles.appleIcon]}>
-                <Text style={styles.socialIconText}>🍎</Text>
-              </View>
-              <Text style={styles.socialButtonText}>Continue with Apple</Text>
+          {/* Demo Mode */}
+          <View style={styles.demoContainer}>
+            <Text style={styles.demoText}>Just exploring?</Text>
+            <Pressable style={styles.demoButton}>
+              <Text style={styles.demoButtonText}>Try Demo Mode</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -177,6 +223,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.textSecondary,
   },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: theme.spacing.lg,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: theme.spacing.sm,
+    alignItems: 'center',
+  },
+  activeTab: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.sm,
+  },
+  tabText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    fontWeight: '500',
+  },
+  activeTabText: {
+    color: theme.colors.textInverse,
+  },
   form: {
     marginBottom: theme.spacing.lg,
   },
@@ -195,66 +266,41 @@ const styles = StyleSheet.create({
   },
   linkContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   link: {
     fontSize: 14,
     color: theme.colors.primary,
     fontWeight: '500',
   },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: theme.spacing.lg,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: theme.colors.border,
-  },
-  dividerText: {
-    marginHorizontal: theme.spacing.md,
+  helperText: {
     fontSize: 14,
     color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
   },
-  socialButtons: {
-    gap: theme.spacing.sm,
-  },
-  socialButton: {
-    flexDirection: 'row',
+  demoContainer: {
     alignItems: 'center',
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    marginTop: theme.spacing.xl,
+    paddingTop: theme.spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  demoText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
     marginBottom: theme.spacing.sm,
   },
-  socialIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: theme.spacing.md,
+  demoButton: {
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
   },
-  googleIcon: {
-    backgroundColor: '#EA4335',
-  },
-  facebookIcon: {
-    backgroundColor: '#1877F2',
-  },
-  appleIcon: {
-    backgroundColor: '#000000',
-  },
-  socialIconText: {
-    color: theme.colors.textInverse,
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  socialButtonText: {
+  demoButtonText: {
     fontSize: 16,
-    color: theme.colors.text,
+    color: theme.colors.primary,
     fontWeight: '500',
   },
   eyeIcon: {

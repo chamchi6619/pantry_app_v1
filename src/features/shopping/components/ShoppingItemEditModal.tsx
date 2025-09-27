@@ -55,7 +55,7 @@ export const ShoppingItemEditModal: React.FC<ShoppingItemEditModalProps> = ({
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       onRequestClose={onClose}
     >

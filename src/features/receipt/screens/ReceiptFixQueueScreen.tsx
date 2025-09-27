@@ -12,13 +12,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../../core/constants/theme';
 import { Button } from '../../../core/components/ui/Button';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useInventoryStore } from '../../../stores/inventoryStore';
-import { useShoppingListStore } from '../../../stores/shoppingListStore';
+import { useInventorySupabaseStore } from '../../../stores/inventorySupabaseStore';
+import { useShoppingListSupabaseStore } from '../../../stores/shoppingListSupabaseStore';
+import { useReceiptSupabaseStore } from '../../../stores/receiptSupabaseStore';
+import { useAuth } from '../../../contexts/AuthContext';
+import { FEATURE_FLAGS } from '../../../config/featureFlags';
 
 interface ReceiptItem {
   id: string;
   rawText: string;
   name: string;
+  displayName?: string;  // Normalized name for display
   quantity: number;
   unit: string;
   price: number;
@@ -35,6 +39,7 @@ interface ReceiptData {
   total: number;
   currency: string;
   items: ReceiptItem[];
+  recognizedItems?: any[]; // Items that were successfully recognized
 }
 
 const locations = ['Fridge', 'Freezer', 'Pantry'];
@@ -49,8 +54,18 @@ export const ReceiptFixQueueScreen: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // Use stores
-  const { addItem: addToInventory } = useInventoryStore();
-  const { addItem: addToShoppingList } = useShoppingListStore();
+  const { householdId } = useAuth();
+  const { addItem: addToInventory } = useInventorySupabaseStore();
+  const { addItem: addToShoppingList } = useShoppingListSupabaseStore();
+  const { addReceipt, addToFixQueue, resolveFixQueueItem } = useReceiptSupabaseStore();
+  const { initialize: initializeReceipts } = useReceiptSupabaseStore();
+
+  // Initialize receipt store
+  React.useEffect(() => {
+    if (householdId) {
+      initializeReceipts(householdId);
+    }
+  }, [householdId, initializeReceipts]);
 
   const handleEditItem = (id: string, field: keyof ReceiptItem, value: any) => {
     setItems(prev =>
@@ -77,36 +92,60 @@ export const ReceiptFixQueueScreen: React.FC = () => {
     );
   };
 
-  const handleSaveToInventory = () => {
-    const itemsWithLocation = items.filter(item => item.location);
-    const itemsWithoutLocation = items.filter(item => !item.location);
+  const handleSaveToInventory = async () => {
+    // Also handle recognized items that weren't in Fix Queue
+    const recognizedItems = receiptData?.recognizedItems || [];
 
-    // Add items with location to inventory
-    itemsWithLocation.forEach(item => {
-      addToInventory({
-        name: item.name,
+    // Add all recognized items to inventory with default location (pantry)
+    for (const item of recognizedItems) {
+      await addToInventory({
+        name: item.normalized_name || item.parsed_name || item.item_name,
+        quantity: item.quantity || 1,
+        unit: item.unit || 'pcs',
+        category: item.category || 'Other',
+        location: 'pantry', // Default location
+        notes: `From receipt: ${receiptData?.storeName || 'Unknown Store'}`,
+        normalized: item.normalized_name || item.parsed_name?.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      });
+    }
+
+    // Add ALL Fix Queue items to inventory (with selected or default location)
+    for (const item of items) {
+      await addToInventory({
+        name: item.displayName || item.name,
         quantity: item.quantity,
         unit: item.unit,
         category: item.category || 'Other',
-        location: item.location as 'Fridge' | 'Freezer' | 'Pantry',
+        location: (item.location?.toLowerCase() || 'pantry') as 'fridge' | 'freezer' | 'pantry',
         notes: `From receipt: ${receiptData?.storeName || 'Unknown Store'}`,
+        normalized: item.displayName?.toLowerCase().replace(/[^a-z0-9]/g, '') || item.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
       });
-    });
 
-    // Add items without location to shopping list
-    itemsWithoutLocation.forEach(item => {
-      addToShoppingList({
-        name: item.name,
+      // Mark fix queue item as resolved if it exists
+      if (item.id && !item.id.startsWith('temp')) {
+        await resolveFixQueueItem(item.id, { id: item.id });
+      }
+    }
+
+    // Save receipt to history
+    await addReceipt({
+      date: receiptData?.date || new Date().toISOString(),
+      storeName: receiptData?.storeName || 'Unknown Store',
+      totalAmount: receiptData?.total || items.reduce((sum, item) => sum + (item.price || 0), 0),
+      items: items.map(item => ({
+        name: item.displayName || item.name,
         quantity: item.quantity,
         unit: item.unit,
-        category: item.category || 'Other',
-        notes: `From receipt: ${receiptData?.storeName || 'Unknown Store'}`,
-      });
+        price: item.price,
+      })),
+      scannedImageUri: imageUri,
     });
+
+    const totalInventoryItems = recognizedItems.length + items.length;
 
     Alert.alert(
       'Success',
-      `Added ${itemsWithLocation.length} items to inventory and ${itemsWithoutLocation.length} items to shopping list.`,
+      `Added ${totalInventoryItems} items to inventory and saved receipt to history.`,
       [{ text: 'OK', onPress: () => navigation.navigate('Inventory' as never) }]
     );
   };
@@ -144,9 +183,9 @@ export const ReceiptFixQueueScreen: React.FC = () => {
       <View style={styles.banner}>
         <Text style={styles.bannerIcon}>📍</Text>
         <View style={styles.bannerText}>
-          <Text style={styles.bannerTitle}>Location determines destination</Text>
+          <Text style={styles.bannerTitle}>Select storage location for each item</Text>
           <Text style={styles.bannerSubtext}>
-            With location → Inventory | No location → Shopping List
+            All items will be added to inventory (default: Pantry)
           </Text>
         </View>
       </View>
@@ -154,7 +193,16 @@ export const ReceiptFixQueueScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.summarySection}>
           <Text style={styles.storeName}>{receiptData?.storeName}</Text>
-          <Text style={styles.itemCount}>{items.length} items detected</Text>
+          <View style={styles.itemCountRow}>
+            <Text style={styles.itemCount}>
+              {items.length} items need review
+            </Text>
+            {receiptData?.recognizedItems && receiptData.recognizedItems.length > 0 && (
+              <Text style={styles.recognizedCount}>
+                ✅ {receiptData.recognizedItems.length} auto-recognized
+              </Text>
+            )}
+          </View>
           {ocrConfidence && (
             <View style={styles.ocrConfidenceBadge}>
               <Text style={styles.ocrConfidenceText}>
@@ -167,7 +215,12 @@ export const ReceiptFixQueueScreen: React.FC = () => {
         {sortedItems.map((item) => (
           <View key={item.id} style={styles.itemCard}>
             <View style={styles.itemHeader}>
-              <Text style={styles.rawText}>{item.rawText}</Text>
+              <View style={styles.itemHeaderLeft}>
+                {item.displayName && item.displayName !== item.name && (
+                  <Text style={styles.normalizedName}>{item.displayName}</Text>
+                )}
+                <Text style={styles.rawText}>{item.rawText}</Text>
+              </View>
               <View style={styles.headerRight}>
                 <View
                   style={[
@@ -203,8 +256,11 @@ export const ReceiptFixQueueScreen: React.FC = () => {
                 {editingId === `${item.id}-name` ? (
                   <TextInput
                     style={styles.fieldInput}
-                    value={item.name}
-                    onChangeText={(text) => handleEditItem(item.id, 'name', text)}
+                    value={item.displayName || item.name}
+                    onChangeText={(text) => {
+                      handleEditItem(item.id, 'displayName', text);
+                      handleEditItem(item.id, 'name', text);
+                    }}
                     onBlur={() => setEditingId(null)}
                     autoFocus
                   />
@@ -213,7 +269,7 @@ export const ReceiptFixQueueScreen: React.FC = () => {
                     style={styles.fieldValue}
                     onPress={() => setEditingId(`${item.id}-name`)}
                   >
-                    <Text style={styles.fieldText}>{item.name || '—'}</Text>
+                    <Text style={styles.fieldText}>{item.displayName || item.name || '—'}</Text>
                   </Pressable>
                 )}
               </View>
@@ -329,7 +385,7 @@ export const ReceiptFixQueueScreen: React.FC = () => {
 
             <View style={styles.destinationBadge}>
               <Text style={styles.destinationText}>
-                → {item.location ? 'Inventory' : 'Shopping List'}
+                → Inventory ({item.location || 'Pantry'})
               </Text>
             </View>
           </View>
@@ -337,23 +393,27 @@ export const ReceiptFixQueueScreen: React.FC = () => {
 
         <View style={styles.summary}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>To Inventory:</Text>
+            <Text style={styles.summaryLabel}>Total Items to Inventory:</Text>
             <Text style={styles.summaryValue}>
-              {items.filter((i) => i.location).length} items
-            </Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>To Shopping List:</Text>
-            <Text style={styles.summaryValue}>
-              {items.filter((i) => !i.location).length} items
+              {(receiptData?.recognizedItems?.length || 0) + items.length} items
             </Text>
           </View>
           <View style={[styles.summaryRow, styles.totalRow]}>
-            <Text style={styles.totalLabel}>Total:</Text>
+            <Text style={styles.totalLabel}>Items Total:</Text>
             <Text style={styles.totalValue}>
-              ${items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+              ${[
+                ...(receiptData?.recognizedItems || []),
+                ...items
+              ].reduce((sum, item) => sum + (item.price || 0), 0).toFixed(2)}
             </Text>
           </View>
+          {receiptData?.total && (
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryNote}>
+                Receipt Total: ${receiptData.total.toFixed(2)} (includes tax)
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.actionSection}>
@@ -432,9 +492,19 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginBottom: theme.spacing.xs,
   },
+  itemCountRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   itemCount: {
     fontSize: 14,
     color: theme.colors.textSecondary,
+  },
+  recognizedCount: {
+    fontSize: 14,
+    color: theme.colors.success,
+    fontWeight: '600',
   },
   ocrConfidenceBadge: {
     marginTop: theme.spacing.xs,
@@ -461,14 +531,22 @@ const styles = StyleSheet.create({
   itemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: theme.spacing.sm,
+  },
+  itemHeaderLeft: {
+    flex: 1,
+  },
+  normalizedName: {
+    fontSize: 14,
+    color: theme.colors.primary,
+    fontWeight: '600',
+    marginBottom: 2,
   },
   rawText: {
     fontSize: 12,
     color: theme.colors.textSecondary,
     fontStyle: 'italic',
-    flex: 1,
   },
   headerRight: {
     flexDirection: 'row',
@@ -665,6 +743,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: theme.colors.text,
+  },
+  summaryNote: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontStyle: 'italic',
   },
   actionSection: {
     padding: theme.spacing.md,

@@ -1,8 +1,9 @@
 import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { supabase } from '../lib/supabase';
 
-// OCR Service that works with Expo Go
-// We'll use a free OCR API or implement a simple solution
+// OCR Service that uses Supabase Edge Function
+// Processes receipts with Google Vision API + Gemini AI
 
 interface OCRResult {
   text: string;
@@ -67,20 +68,63 @@ class OCRService {
     }
   }
 
-  // Perform OCR using a free service or local processing
-  async performOCR(imageUri: string): Promise<OCRResult> {
+  // Perform OCR using Supabase Edge Function
+  async performOCR(imageUri: string, householdId?: string): Promise<OCRResult> {
     try {
       // Preprocess the image
       const processedImage = await this.preprocessImage(imageUri);
 
-      // For Expo Go compatibility, we'll use a mock implementation
-      // In production, this would call a real OCR service
-      const mockOCRResult = await this.mockOCR(processedImage);
+      // Get current user and household
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // Fallback to mock for testing
+        return await this.mockOCR(processedImage);
+      }
 
-      return mockOCRResult;
+      // Get household ID if not provided
+      if (!householdId) {
+        const { data: member } = await supabase
+          .from('household_members')
+          .select('household_id')
+          .eq('user_id', user.id)
+          .single();
+        householdId = member?.household_id;
+      }
+
+      if (!householdId) {
+        throw new Error('No household found');
+      }
+
+      // Call Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('process-receipt', {
+        body: {
+          image_base64: processedImage,
+          household_id: householdId,
+          user_id: user.id,
+          use_gemini: false
+        }
+      });
+
+      if (error) {
+        console.error('OCR Edge Function error:', error);
+        // Fallback to mock
+        return await this.mockOCR(processedImage);
+      }
+
+      // Convert Edge Function response to OCRResult format
+      const ocrText = data.items.map((item: any) =>
+        `${item.normalized_name} ${item.quantity} ${item.unit} ${item.price || ''}`
+      ).join('\n');
+
+      return {
+        text: ocrText,
+        blocks: this.textToBlocks(ocrText),
+        confidence: data.confidence || 0.8
+      };
     } catch (error) {
       console.error('OCR error:', error);
-      throw error;
+      // Fallback to mock for testing
+      return await this.mockOCR('');
     }
   }
 
@@ -146,7 +190,7 @@ Thank you for shopping!
   }
 
   // Parse OCR text into structured receipt data
-  parseReceipt(ocrResult: OCRResult): ParsedReceipt {
+  async parseReceipt(ocrResult: OCRResult, householdId?: string): Promise<ParsedReceipt> {
     const lines = ocrResult.text.split('\n');
     const items: ParsedReceiptItem[] = [];
     let storeName = 'Unknown Store';
@@ -220,7 +264,7 @@ Thank you for shopping!
             cleanName = cleanName.replace(/2X/i, '').trim();
           }
 
-          items.push({
+          const item = {
             id: Date.now().toString() + '_' + i,
             rawText: line,
             name: this.cleanItemName(cleanName),
@@ -229,7 +273,14 @@ Thank you for shopping!
             price,
             confidence: this.calculateItemConfidence(cleanName, price),
             needsReview: this.needsReview(cleanName, price),
-          });
+            location: this.guessLocation(cleanName),
+          };
+          items.push(item);
+
+          // Auto-add high confidence items to pantry if authenticated
+          if (householdId && item.confidence >= 0.8 && !item.needsReview) {
+            this.addToPantry(item, householdId).catch(console.error);
+          }
         }
       }
     }
@@ -306,6 +357,51 @@ Thank you for shopping!
       price > 100 ||
       /[^A-Za-z0-9\s\-.]/.test(name)
     );
+  }
+
+  // Add item to pantry inventory
+  private async addToPantry(item: ParsedReceiptItem, householdId: string) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const category = this.detectCategory(item.name);
+      const location = item.location || this.guessLocation(item.name);
+
+      await supabase
+        .from('pantry_items')
+        .insert({
+          household_id: householdId,
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          category,
+          location,
+          source: 'receipt',
+          added_by: user.id
+        });
+    } catch (error) {
+      console.error('Failed to add item to pantry:', error);
+    }
+  }
+
+  // Guess storage location based on item name
+  private guessLocation(itemName: string): string {
+    const lower = itemName.toLowerCase();
+
+    // Frozen items
+    if (lower.includes('frozen') || lower.includes('ice cream')) {
+      return 'freezer';
+    }
+
+    // Fridge items
+    const fridgeItems = ['milk', 'yogurt', 'cheese', 'meat', 'chicken', 'beef', 'fish', 'lettuce', 'tomato'];
+    if (fridgeItems.some(item => lower.includes(item))) {
+      return 'fridge';
+    }
+
+    // Default to pantry
+    return 'pantry';
   }
 
   // Enhanced parsing with category detection

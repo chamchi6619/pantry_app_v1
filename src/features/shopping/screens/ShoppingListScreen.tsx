@@ -15,6 +15,7 @@ import { theme } from '../../../core/constants/theme';
 import { Button } from '../../../core/components/ui/Button';
 import { ShoppingItemEditModal } from '../components/ShoppingItemEditModal';
 import { toTitleCase } from '../../../core/utils/textUtils';
+import { smartSyncService } from '../../../services/smartSyncService';
 
 type FilterStatus = 'all' | 'pending' | 'done';
 
@@ -213,6 +214,8 @@ export const ShoppingListScreen: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<ShoppingItem | null>(null);
   const [hasPurchasedItems, setHasPurchasedItems] = useState(false);
+  const [isCoShopping, setIsCoShopping] = useState(false);
+  const [activeUsers, setActiveUsers] = useState(1);
   const [items, setItems] = useState<ShoppingItem[]>([
     {
       id: '1',
@@ -332,6 +335,25 @@ export const ShoppingListScreen: React.FC = () => {
     setShowAddModal(true);
   };
 
+  const handleToggleCoShopping = async () => {
+    if (!isCoShopping) {
+      // Enable co-shopping
+      console.log('[Shopping] Enabling co-shopping mode');
+      const users = await smartSyncService.enableCoShopping();
+      if (users) {
+        setActiveUsers(users);
+        setIsCoShopping(true);
+        console.log(`[Shopping] Co-shopping enabled - ${users} users active`);
+      }
+    } else {
+      // Disable co-shopping
+      console.log('[Shopping] Disabling co-shopping mode');
+      await smartSyncService.disableCoShopping();
+      setActiveUsers(1);
+      setIsCoShopping(false);
+    }
+  };
+
   const handleSaveItem = useCallback((itemData: any) => {
     if (editingItem) {
       setItems(prev =>
@@ -425,6 +447,14 @@ export const ShoppingListScreen: React.FC = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Shopping List</Text>
         <View style={styles.headerActions}>
+          <Pressable
+            style={[styles.coShoppingButton, isCoShopping && styles.coShoppingButtonActive]}
+            onPress={handleToggleCoShopping}
+          >
+            <Text style={[styles.coShoppingButtonText, isCoShopping && styles.coShoppingButtonTextActive]}>
+              {isCoShopping ? `👥 ${activeUsers}` : '👤'}
+            </Text>
+          </Pressable>
           <Pressable style={styles.headerButton} onPress={handleClearAll}>
             <Text style={styles.headerButtonText}>Clear</Text>
           </Pressable>
@@ -471,21 +501,26 @@ export const ShoppingListScreen: React.FC = () => {
         </Pressable>
       </View>
 
-      <SectionList
-        sections={getSectionData}
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        stickySectionHeadersEnabled={false}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>🛒</Text>
-            <Text style={styles.emptyText}>Your shopping list is empty</Text>
-            <Text style={styles.emptySubtext}>Add items to get started</Text>
-          </View>
-        }
-      />
+      <View style={{ flex: 1 }}>
+        <SectionList
+          sections={getSectionData}
+          renderItem={renderItem}
+          renderSectionHeader={renderSectionHeader}
+          keyExtractor={item => item.id}
+          contentContainerStyle={[
+            styles.listContent,
+            completedItems > 0 && styles.listContentWithBottom
+          ]}
+          stickySectionHeadersEnabled={false}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>🛒</Text>
+              <Text style={styles.emptyText}>Your shopping list is empty</Text>
+              <Text style={styles.emptySubtext}>Add items to get started</Text>
+            </View>
+          }
+        />
+      </View>
 
       {completedItems > 0 && (
         <View style={styles.bottomActions}>
@@ -499,18 +534,18 @@ export const ShoppingListScreen: React.FC = () => {
         </View>
       )}
 
-      {showAddModal && (
-        <ShoppingItemEditModal
-          visible={showAddModal}
-          item={editingItem}
-          onSave={handleSaveItem}
-          onClose={() => {
-            setShowAddModal(false);
-            setEditingItem(null);
-          }}
-        />
-      )}
     </SafeAreaView>
+    {showAddModal && (
+      <ShoppingItemEditModal
+        visible={showAddModal}
+        item={editingItem}
+        onSave={handleSaveItem}
+        onClose={() => {
+          setShowAddModal(false);
+          setEditingItem(null);
+        }}
+      />
+    )}
   );
 };
 
@@ -533,6 +568,26 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: 'row',
     gap: theme.spacing.sm,
+  },
+  coShoppingButton: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  coShoppingButtonActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  coShoppingButtonText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+  coShoppingButtonTextActive: {
+    color: '#fff',
   },
   headerButton: {
     paddingHorizontal: theme.spacing.md,
@@ -616,7 +671,11 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   listContent: {
-    paddingBottom: 100,
+    flexGrow: 1,
+    paddingBottom: theme.spacing.xl,
+  },
+  listContentWithBottom: {
+    paddingBottom: 80,
   },
   swipeContainer: {
     position: 'relative',
@@ -670,6 +729,7 @@ const styles = StyleSheet.create({
   },
   itemInfo: {
     flex: 1,
+    marginRight: theme.spacing.sm,
   },
   itemName: {
     ...theme.typography.body,
@@ -688,6 +748,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
+    flexShrink: 0, // Prevent quantity controls from shrinking
   },
   quantityButton: {
     width: 28,
@@ -709,7 +770,8 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: theme.spacing.xl * 3,
+    paddingVertical: theme.spacing.xl * 2,
+    paddingTop: theme.spacing.xl * 3,
   },
   emptyIcon: {
     fontSize: 48,

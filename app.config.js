@@ -5,6 +5,11 @@ export default {
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
+    extra: {
+      eas: {
+        projectId: 'cf90aca2-e420-4071-b27c-b1f5f74a7fb0'
+      }
+    },
     splash: {
       image: './assets/splash.png',
       resizeMode: 'contain',

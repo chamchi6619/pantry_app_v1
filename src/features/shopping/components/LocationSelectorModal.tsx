@@ -48,6 +48,11 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({
     return items.every(item => assignments[item.id] !== null);
   }, [items, assignments]);
 
+  // Count unassigned items
+  const unassignedCount = useMemo(() => {
+    return items.filter(item => assignments[item.id] === null).length;
+  }, [items, assignments]);
+
   const handleLocationSelect = (itemId: string, location: Location) => {
     setAssignments(prev => ({
       ...prev,
@@ -63,11 +68,12 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({
 
   const renderItem = ({ item }: { item: ShoppingItem }) => {
     const selectedLocation = assignments[item.id];
+    const isUnassigned = selectedLocation === null;
 
     return (
-      <View style={styles.itemRow}>
+      <View style={[styles.itemRow, isUnassigned && styles.itemRowUnassigned]}>
         <View style={styles.itemInfo}>
-          <Text style={styles.itemName}>
+          <Text style={[styles.itemName, isUnassigned && styles.itemNameUnassigned]}>
             {item.name}
             {item.quantity > 1 && (
               <Text style={styles.itemQuantity}> ({item.quantity})</Text>
@@ -135,7 +141,9 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({
                   !allAssigned && styles.confirmButtonTextDisabled,
                 ]}
               >
-                Move to Inventory
+                {allAssigned
+                  ? 'Move to Inventory'
+                  : `Select ${unassignedCount} Location${unassignedCount > 1 ? 's' : ''}`}
               </Text>
             </Pressable>
           </View>
@@ -184,12 +192,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
+  itemRowUnassigned: {
+    backgroundColor: '#FEF3C7', // Light yellow background for unassigned items
+  },
   itemInfo: {
     flex: 1,
   },
   itemName: {
     ...theme.typography.body,
     color: theme.colors.text,
+  },
+  itemNameUnassigned: {
+    fontWeight: '600', // Bold text for unassigned items
   },
   itemQuantity: {
     color: theme.colors.textLight,

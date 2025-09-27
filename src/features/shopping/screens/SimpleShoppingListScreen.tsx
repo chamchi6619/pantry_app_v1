@@ -14,7 +14,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../../core/constants/theme';
-import { useShoppingListStore } from '../../../stores/shoppingListStore';
+import { useShoppingListSupabaseStore } from '../../../stores/shoppingListSupabaseStore';
+import { useAuth } from '../../../contexts/AuthContext';
+import { FEATURE_FLAGS } from '../../../config/featureFlags';
 import { LocationSelectorModal, LocationAssignments } from '../components/LocationSelectorModal';
 
 type FilterStatus = 'all' | 'pending' | 'done';
@@ -51,6 +53,20 @@ const InlineItem: React.FC<InlineItemProps> = React.memo(({
   const translateX = useRef(new Animated.Value(0)).current;
   const lastOffset = useRef(0);
   const lastEditSubmitRef = useRef({ text: '', time: 0 });
+
+  // Format quantity with unit for display
+  const formatQuantityWithUnit = useCallback((item: ShoppingListItem) => {
+    const qty = item.quantity || 1;
+    const unit = item.unit || 'item';
+
+    // Only show unit if it's meaningful (not "item" or "piece")
+    if (unit === 'item' || unit === 'piece') {
+      return qty.toString();
+    }
+
+    // Format with unit
+    return `${qty}${unit}`;
+  }, []);
 
   // Sync open state with parent
   React.useEffect(() => {
@@ -161,21 +177,25 @@ const InlineItem: React.FC<InlineItemProps> = React.memo(({
       return;
     }
 
-    // If another item was open, just close it (don't edit)
+    // If another item was open, just close it
     if (hasAnyOpen) {
       onOpenChange(null, false);
       return;
     }
 
-    // If item is checked, uncheck it instead of editing
-    if (item.checked) {
-      onToggle(item.id);
+    // Always toggle checkbox - this is the primary action while shopping
+    onToggle(item.id);
+  }, [item.id, isOpen, hasAnyOpen, isAddingNew, onOpenChange, onToggle]);
+
+  const handleLongPress = useCallback(() => {
+    // Don't edit if swipe is open or adding new item
+    if (isOpen || hasAnyOpen || isAddingNew) {
       return;
     }
 
-    // Item is unchecked and no swipes open, go into edit mode
+    // Enter edit mode
     onEditingChange(item.id);
-  }, [item.id, item.checked, isOpen, hasAnyOpen, isAddingNew, onOpenChange, onToggle, onEditingChange]);
+  }, [item.id, isOpen, hasAnyOpen, isAddingNew, onEditingChange]);
 
   const handleSubmit = useCallback(() => {
     const trimmedText = editText.trim();
@@ -200,12 +220,17 @@ const InlineItem: React.FC<InlineItemProps> = React.memo(({
   }, [editText, item.id, item.name, onUpdate, onDelete, onEditingChange]);
 
   const handleBlur = useCallback(() => {
-    // Don't submit on blur - let onSubmitEditing handle it
-    // This prevents double-submission with Chinese IME
-    if (!editText.trim()) {
+    // Save on blur - same as submit
+    const trimmedText = editText.trim();
+    if (!trimmedText) {
+      // If empty, just cancel edit without deleting
       onEditingChange(null);
+    } else if (trimmedText !== item.name) {
+      // Save the changes
+      onUpdate(item.id, { name: trimmedText });
     }
-  }, [editText, onEditingChange]);
+    onEditingChange(null);
+  }, [editText, item.id, item.name, onUpdate, onEditingChange]);
 
   const handleDelete = () => {
     // Animate out then delete
@@ -220,18 +245,44 @@ const InlineItem: React.FC<InlineItemProps> = React.memo(({
 
   if (isEditing) {
     return (
-      <View style={styles.itemRow}>
-        <View style={styles.checkbox} />
-        <TextInput
-          ref={inputRef}
-          style={styles.inlineInput}
-          value={editText}
-          onChangeText={setEditText}
-          onSubmitEditing={handleSubmit}
-          onBlur={handleBlur}
-          autoCapitalize="none"
-          returnKeyType="done"
-        />
+      <View style={styles.swipeContainer}>
+        <View style={styles.itemContainer}>
+          <View style={styles.itemRow}>
+            <View style={{ width: 40, flexShrink: 0 }}>
+              <View style={[styles.checkbox, { marginRight: 0 }]} />
+            </View>
+            <View style={{ flex: 1, justifyContent: 'center', height: 24 }}>
+              <TextInput
+                ref={inputRef}
+                style={styles.inlineInput}
+                value={editText}
+                onChangeText={setEditText}
+                onSubmitEditing={handleSubmit}
+                onBlur={handleBlur}
+                autoCapitalize="none"
+                returnKeyType="done"
+                multiline={false}
+                numberOfLines={1}
+              />
+            </View>
+          </View>
+          {/* Keep quantity controls visible during edit */}
+          <View style={styles.quantityControls}>
+            <Pressable
+              style={styles.quantityButton}
+              onPress={() => onQuantityChange(item.id, -1)}
+            >
+              <Text style={styles.quantityButtonText}>−</Text>
+            </Pressable>
+            <Text style={styles.quantityText}>{formatQuantityWithUnit(item)}</Text>
+            <Pressable
+              style={styles.quantityButton}
+              onPress={() => onQuantityChange(item.id, 1)}
+            >
+              <Text style={styles.quantityButtonText}>+</Text>
+            </Pressable>
+          </View>
+        </View>
       </View>
     );
   }
@@ -245,14 +296,26 @@ const InlineItem: React.FC<InlineItemProps> = React.memo(({
         ]}
         {...panResponder.panHandlers}
       >
-        <Pressable style={styles.itemRow} onPress={handlePress}>
-          <Pressable
+        <Pressable
+          style={({ pressed }) => [
+            styles.itemRow,
+            pressed && styles.itemRowPressed
+          ]}
+          onPress={handlePress}
+          onLongPress={handleLongPress}
+          delayLongPress={500}
+          android_ripple={{ color: theme.colors.primary + '10' }}
+        >
+          <View
             style={[styles.checkbox, item.checked && styles.checkboxChecked]}
-            onPress={() => onToggle(item.id)}
           >
             {item.checked && <Text style={styles.checkmark}>✓</Text>}
-          </Pressable>
-          <Text style={[styles.itemText, item.checked && styles.itemTextChecked]}>
+          </View>
+          <Text
+            style={[styles.itemText, item.checked && styles.itemTextChecked]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {item.name}
           </Text>
         </Pressable>
@@ -283,13 +346,33 @@ const InlineItem: React.FC<InlineItemProps> = React.memo(({
 });
 
 export const SimpleShoppingListScreen: React.FC = () => {
-  const items = useShoppingListStore((state) => state.items);
-  const addItem = useShoppingListStore((state) => state.addItem);
-  const updateItem = useShoppingListStore((state) => state.updateItem);
-  const deleteItem = useShoppingListStore((state) => state.deleteItem);
-  const toggleItem = useShoppingListStore((state) => state.toggleItem);
-  const clearCompleted = useShoppingListStore((state) => state.clearCompleted);
-  const moveToInventory = useShoppingListStore((state) => state.moveToInventory);
+  const { householdId } = useAuth();
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Use Supabase store
+  const items = useShoppingListSupabaseStore((state) => state.items);
+  const addItem = useShoppingListSupabaseStore((state) => state.addItem);
+  const updateItem = useShoppingListSupabaseStore((state) => state.updateItem);
+  const deleteItem = useShoppingListSupabaseStore((state) => state.deleteItem);
+  const toggleItem = useShoppingListSupabaseStore((state) => state.toggleItem);
+  const clearCompleted = useShoppingListSupabaseStore((state) => state.clearCompleted);
+  const moveToInventory = useShoppingListSupabaseStore((state) => state.moveToInventory);
+  const initialize = useShoppingListSupabaseStore((state) => state.initialize);
+  const loadFromSupabase = useShoppingListSupabaseStore((state) => state.loadFromSupabase);
+  const isSyncing = useShoppingListSupabaseStore((state) => state.isSyncing);
+  const syncError = useShoppingListSupabaseStore((state) => state.syncError);
+
+  // Initialize store with household ID
+  React.useEffect(() => {
+    const initializeShoppingList = async () => {
+      if (householdId) {
+        await initialize(householdId);
+      }
+      setIsInitialized(true);
+    };
+
+    initializeShoppingList();
+  }, [householdId, initialize]);
 
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -336,7 +419,7 @@ export const SimpleShoppingListScreen: React.FC = () => {
     }, 100);
   }, [editingItemId, openItemId]);
 
-  const handleAddSubmit = useCallback(() => {
+  const handleAddSubmit = useCallback(async () => {
     const trimmedText = newItemText.trim();
 
     if (trimmedText) {
@@ -351,16 +434,21 @@ export const SimpleShoppingListScreen: React.FC = () => {
 
       lastSubmitRef.current = { text: trimmedText, time: now };
 
-      addItem({
+      await addItem({
         name: trimmedText,
         quantity: 1,
         unit: 'pieces',
         category: 'Other',
-        checked: false,
       });
       setNewItemText('');
-      // Keep input focused for rapid entry
-      addInputRef.current?.focus();
+      // Keep add mode active and input focused for continuous entry
+      setIsAddingNew(true);
+      // Scroll to bottom to keep input visible after adding item
+      // Use longer delay to ensure item is rendered first
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+        addInputRef.current?.focus();
+      }, 100);
     } else {
       setIsAddingNew(false);
       // Clear any open states when done adding
@@ -395,6 +483,26 @@ export const SimpleShoppingListScreen: React.FC = () => {
     }
   }, []);
 
+  const handleClearAll = useCallback(() => {
+    if (items.length === 0) return;
+
+    Alert.alert(
+      'Clear Shopping List',
+      'Remove all items from the shopping list?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear All',
+          style: 'destructive',
+          onPress: () => {
+            // Clear all items
+            items.forEach(item => deleteItem(item.id));
+          }
+        }
+      ]
+    );
+  }, [items, deleteItem]);
+
   const handleMovePurchased = useCallback(() => {
     const checkedItems = items.filter(item => item.checked);
     if (checkedItems.length === 0) {
@@ -405,8 +513,8 @@ export const SimpleShoppingListScreen: React.FC = () => {
     setShowLocationModal(true);
   }, [items]);
 
-  const handleLocationConfirm = useCallback((assignments: LocationAssignments) => {
-    const movedCount = moveToInventory(assignments);
+  const handleLocationConfirm = useCallback(async (assignments: LocationAssignments) => {
+    const movedCount = await moveToInventory(assignments);
     setShowLocationModal(false);
     if (movedCount) {
       Alert.alert('Success', `Moved ${movedCount} items to inventory`);
@@ -445,7 +553,15 @@ export const SimpleShoppingListScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Shopping List</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Shopping List</Text>
+            {FEATURE_FLAGS.SHOW_SYNC_STATUS && isSyncing && (
+              <Text style={styles.syncStatus}>🔄 Syncing...</Text>
+            )}
+            {FEATURE_FLAGS.SHOW_SYNC_STATUS && syncError && (
+              <Text style={styles.syncError}>⚠️ Sync error</Text>
+            )}
+          </View>
           <View style={styles.headerActions}>
             {completedItems > 0 && (
               <Pressable style={styles.moveButton} onPress={handleMovePurchased}>
@@ -462,30 +578,42 @@ export const SimpleShoppingListScreen: React.FC = () => {
         </View>
 
         <View style={styles.filterTabs}>
-          <Pressable
-            style={[styles.filterTab, filter === 'all' && styles.filterTabActive]}
-            onPress={() => setFilter('all')}
-          >
-            <Text style={[styles.filterTabText, filter === 'all' && styles.filterTabTextActive]}>
-              All
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.filterTab, filter === 'pending' && styles.filterTabActive]}
-            onPress={() => setFilter('pending')}
-          >
-            <Text style={[styles.filterTabText, filter === 'pending' && styles.filterTabTextActive]}>
-              To Buy
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.filterTab, filter === 'done' && styles.filterTabActive]}
-            onPress={() => setFilter('done')}
-          >
-            <Text style={[styles.filterTabText, filter === 'done' && styles.filterTabTextActive]}>
-              Done
-            </Text>
-          </Pressable>
+          <View style={styles.filterTabsLeft}>
+            <Pressable
+              style={[styles.filterTab, filter === 'all' && styles.filterTabActive]}
+              onPress={() => setFilter('all')}
+            >
+              <Text style={[styles.filterTabText, filter === 'all' && styles.filterTabTextActive]}>
+                All
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.filterTab, filter === 'pending' && styles.filterTabActive]}
+              onPress={() => setFilter('pending')}
+            >
+              <Text style={[styles.filterTabText, filter === 'pending' && styles.filterTabTextActive]}>
+                To Buy
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.filterTab, filter === 'done' && styles.filterTabActive]}
+              onPress={() => setFilter('done')}
+            >
+              <Text style={[styles.filterTabText, filter === 'done' && styles.filterTabTextActive]}>
+                Done
+              </Text>
+            </Pressable>
+          </View>
+          {items.length > 0 && (
+            <Pressable
+              style={[styles.filterTab, styles.clearAllTab]}
+              onPress={handleClearAll}
+            >
+              <Text style={[styles.filterTabText, styles.clearAllText]}>
+                Clear
+              </Text>
+            </Pressable>
+          )}
         </View>
 
         <Pressable
@@ -538,22 +666,27 @@ export const SimpleShoppingListScreen: React.FC = () => {
           ))}
 
           {/* Tap-to-add area */}
-          <Pressable style={styles.addArea} onPress={handleAddArea}>
+          <Pressable style={[styles.addArea, isAddingNew && { paddingTop: 0 }]} onPress={handleAddArea}>
             {isAddingNew ? (
               <View style={styles.itemRow}>
-                <View style={styles.checkbox} />
-                <TextInput
-                  ref={addInputRef}
-                  style={styles.inlineInput}
-                  value={newItemText}
-                  onChangeText={setNewItemText}
-                  onSubmitEditing={handleAddSubmit}
-                  onBlur={handleAddBlur}
-                  placeholder="Add item..."
-                  placeholderTextColor={theme.colors.textLight}
-                  autoCapitalize="none"
-                  returnKeyType="next"
-                />
+                <View style={{ width: 40, flexShrink: 0 }}>
+                  <View style={[styles.checkbox, { marginRight: 0 }]} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <TextInput
+                    ref={addInputRef}
+                    style={styles.inlineInput}
+                    value={newItemText}
+                    onChangeText={setNewItemText}
+                    onSubmitEditing={handleAddSubmit}
+                    onBlur={handleAddBlur}
+                    placeholder="Add item..."
+                    placeholderTextColor={theme.colors.textLight}
+                    autoCapitalize="none"
+                    returnKeyType="done"
+                    blurOnSubmit={false}
+                  />
+                </View>
               </View>
             ) : (
               <Text style={styles.addPrompt}>Tap to add item...</Text>
@@ -629,6 +762,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  filterTabsLeft: {
+    flexDirection: 'row',
+    flex: 1,
     gap: theme.spacing.xs,
   },
   filterTab: {
@@ -640,6 +779,11 @@ const styles = StyleSheet.create({
   filterTabActive: {
     backgroundColor: theme.colors.primary,
   },
+  clearAllTab: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: theme.colors.error,
+  },
   filterTabText: {
     ...theme.typography.button,
     fontSize: 14,
@@ -648,11 +792,15 @@ const styles = StyleSheet.create({
   filterTabTextActive: {
     color: '#FFFFFF',
   },
+  clearAllText: {
+    color: theme.colors.error,
+    fontWeight: '600',
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: 200, // Increased padding to ensure input is visible above keyboard
   },
   swipeContainer: {
     position: 'relative',
@@ -688,6 +836,10 @@ const styles = StyleSheet.create({
     minHeight: 52,
     flex: 1,
   },
+  itemRowPressed: {
+    backgroundColor: theme.colors.surface,
+    opacity: 0.9,
+  },
   checkbox: {
     width: 24,
     height: 24,
@@ -697,6 +849,7 @@ const styles = StyleSheet.create({
     marginRight: theme.spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
+    flexShrink: 0, // Prevent checkbox from shrinking
   },
   checkboxChecked: {
     backgroundColor: theme.colors.primary,
@@ -711,17 +864,23 @@ const styles = StyleSheet.create({
     ...theme.typography.body,
     color: theme.colors.text,
     flex: 1,
+    textAlignVertical: 'center',
+    includeFontPadding: false,
+    marginRight: theme.spacing.sm, // Add space before quantity controls
   },
   itemTextChecked: {
     textDecorationLine: 'line-through',
     color: theme.colors.textLight,
   },
   inlineInput: {
-    flex: 1,
-    ...theme.typography.body,
+    fontSize: theme.typography.body.fontSize,
+    fontWeight: theme.typography.body.fontWeight,
     color: theme.colors.text,
     padding: 0,
-    paddingVertical: 4,
+    margin: 0,
+    height: '100%',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
   },
   quantityControls: {
     flexDirection: 'row',
@@ -745,8 +904,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   addArea: {
-    minHeight: 80,
-    paddingTop: theme.spacing.md,
+    minHeight: 56, // Match item row height
+    paddingTop: theme.spacing.sm,
   },
   addPrompt: {
     paddingHorizontal: theme.spacing.md + 24 + theme.spacing.md,
@@ -774,5 +933,18 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#FFFFFF',
     fontWeight: '300',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  syncStatus: {
+    fontSize: 12,
+    color: theme.colors.primary,
+  },
+  syncError: {
+    fontSize: 12,
+    color: theme.colors.error,
   },
 });

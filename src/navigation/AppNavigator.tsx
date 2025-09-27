@@ -2,9 +2,11 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet, Platform, Dimensions, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Platform, Dimensions, Pressable, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../core/constants/theme';
+import { useAuth } from '../contexts/AuthContext';
+import { AuthScreen } from '../features/auth/screens/AuthScreen';
 import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
 import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleShoppingListScreen';
 // import { EnhancedRecipesScreen } from '../features/recipes/screens/EnhancedRecipesScreen';
@@ -14,20 +16,13 @@ import { RecipeDetailScreen } from '../features/recipes/screens/RecipeDetailScre
 import { RecipeFormScreen } from '../features/recipes/screens/RecipeFormScreen';
 import { ReceiptCaptureWrapper } from '../features/receipt/screens/ReceiptCaptureWrapper';
 import { ReceiptFixQueueScreen } from '../features/receipt/screens/ReceiptFixQueueScreen';
+import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
+import { TestOCRScreen } from '../screens/TestOCRScreen';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
-// Placeholder screen
-const ProfileScreen = () => (
-  <View style={styles.placeholderContainer}>
-    <Text style={styles.placeholderText}>👤</Text>
-    <Text style={styles.placeholderTitle}>Profile</Text>
-    <Text style={styles.placeholderSubtitle}>Coming soon</Text>
-  </View>
-);
 
 const TabIcon: React.FC<{ focused: boolean; icon: string; label: string }> = ({ focused, icon, label }) => (
   <View style={styles.tabIconContainer}>
@@ -83,6 +78,7 @@ const ReceiptStack = () => (
       headerShown: false,
     }}
   >
+    <Stack.Screen name="TestOCR" component={TestOCRScreen} />
     <Stack.Screen name="ReceiptCapture" component={ReceiptCaptureWrapper} />
     <Stack.Screen
       name="ReceiptFixQueue"
@@ -179,8 +175,22 @@ const TabNavigator = () => {
   );
 };
 
+// Loading Screen
+const LoadingScreen = () => (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" color={theme.colors.primary} />
+    <Text style={styles.loadingText}>Loading...</Text>
+  </View>
+);
+
 // Main Stack Navigator for modals
 export const AppNavigator: React.FC = () => {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -188,13 +198,28 @@ export const AppNavigator: React.FC = () => {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Main" component={TabNavigator} />
+        {session ? (
+          <Stack.Screen name="Main" component={TabNavigator} />
+        ) : (
+          <Stack.Screen name="Auth" component={AuthScreen} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  loadingText: {
+    marginTop: theme.spacing.md,
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+  },
   placeholderContainer: {
     flex: 1,
     justifyContent: 'center',
