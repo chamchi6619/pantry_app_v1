@@ -9,6 +9,7 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  hasProfile: boolean;
   householdId: string | null;
   isInitialized: boolean;
   syncStatus: 'idle' | 'syncing' | 'error' | 'success';
@@ -42,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasProfile, setHasProfile] = useState(false);
   const [householdId, setHouseholdId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'error' | 'success'>('idle');
@@ -52,13 +54,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const initializeAuth = async () => {
     try {
+      console.log('[Auth] Starting initialization...');
+
       // Check for existing session
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      console.log('[Auth] Session check result:', {
+        hasSession: !!session,
+        sessionUser: session?.user?.email || 'none',
+        error: error?.message || 'none'
+      });
+
+      if (error) {
+        console.log('[Auth] Session error:', error.message);
+        // Clear invalid session
+        await supabase.auth.signOut();
+        setSession(null);
+        setUser(null);
+        setHasProfile(false);
+        setIsInitialized(true);
+        setLoading(false);
+        return;
+      }
+
+      console.log('[Auth] Session check complete:', session ? 'Has session' : 'No session');
 
       if (session) {
         setSession(session);
         setUser(session.user);
         await initializeUserData(session.user.id);
+      } else {
+        // No session, user needs to sign in
+        console.log('[Auth] No session, setting initialized');
+        setIsInitialized(true);
       }
 
       // Listen for auth changes
@@ -71,25 +99,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await initializeUserData(session.user.id);
           } else {
             // Clean up on logout
+            setHasProfile(false);
             setHouseholdId(null);
-            setIsInitialized(false);
+            // Don't reset isInitialized - we're still initialized, just logged out
             setSyncStatus('idle');
             syncService.cleanup();
           }
         }
       );
 
+      // Always set initialized at the end of auth setup
+      setIsInitialized(true);
       setLoading(false);
 
       return () => subscription.unsubscribe();
     } catch (error) {
       console.error('Auth initialization error:', error);
+      setSession(null);
+      setUser(null);
+      setHasProfile(false);
+      setIsInitialized(true);
       setLoading(false);
     }
   };
 
   const initializeUserData = async (userId: string) => {
     try {
+      // First check if profile exists
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', userId)
+        .single();
+
+      setHasProfile(!!profile);
+
+      if (!profile) {
+        console.log(`[Auth] No profile found for user ${userId}`);
+        setIsInitialized(true);
+        return;
+      }
+
       // Fetch user's household
       const household = await fetchUserHousehold(userId);
       console.log(`[Auth] Fetched household: ${household} for user: ${userId}`);
@@ -246,6 +296,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+
+      // Force clear all auth state immediately
+      setSession(null);
+      setUser(null);
+      setHasProfile(false);
+      setHouseholdId(null);
+
+      console.log('[Auth] User signed out successfully');
     } catch (error: any) {
       Alert.alert('Error', error.message);
     } finally {
@@ -259,6 +317,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     user,
     loading,
+    hasProfile,
     householdId,
     isInitialized,
     syncStatus,

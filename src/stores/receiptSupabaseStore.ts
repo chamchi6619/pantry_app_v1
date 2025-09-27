@@ -160,7 +160,7 @@ export const useReceiptSupabaseStore = create<ReceiptState>()(
 
           // Load fix queue items
           const { data: fixQueueData, error: fixQueueError } = await supabase
-            .from('fix_queue')
+            .from('receipt_fix_queue')
             .select('*')
             .eq('household_id', householdId)
             .eq('resolved', false)
@@ -413,7 +413,7 @@ export const useReceiptSupabaseStore = create<ReceiptState>()(
 
         try {
           const { data, error } = await supabase
-            .from('fix_queue')
+            .from('receipt_fix_queue')
             .insert(
               newItems.map(item => ({
                 household_id: householdId,
@@ -470,7 +470,7 @@ export const useReceiptSupabaseStore = create<ReceiptState>()(
         // Sync to Supabase
         try {
           const { error } = await supabase
-            .from('fix_queue')
+            .from('receipt_fix_queue')
             .update({
               resolved: true,
               linked_item_id: itemData.id,
@@ -506,7 +506,7 @@ export const useReceiptSupabaseStore = create<ReceiptState>()(
         try {
           for (const item of resolvedItems) {
             await supabase
-              .from('fix_queue')
+              .from('receipt_fix_queue')
               .delete()
               .eq('id', item.id)
               .eq('household_id', householdId);

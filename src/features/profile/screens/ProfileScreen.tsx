@@ -12,8 +12,10 @@ import { theme } from '../../../core/constants/theme';
 import { useReceiptStore } from '../../../stores/receiptStore';
 import { useInventoryStore } from '../../../stores/inventoryStore';
 import { useShoppingListStore } from '../../../stores/shoppingListStore';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export const ProfileScreen: React.FC = () => {
+  const { signOut, user } = useAuth();
   const receipts = useReceiptStore((state) => state.receipts);
   const deleteReceipt = useReceiptStore((state) => state.deleteReceipt);
 
@@ -69,7 +71,13 @@ export const ProfileScreen: React.FC = () => {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>👤</Text>
           </View>
+          <Text style={styles.userEmail}>{user?.email || 'Not signed in'}</Text>
         </View>
+
+        {/* Sign Out Button */}
+        <Pressable style={styles.signOutButton} onPress={signOut}>
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </Pressable>
 
         {/* Stats Section */}
         <View style={styles.statsContainer}>
@@ -225,6 +233,24 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 40,
+  },
+  userEmail: {
+    ...theme.typography.caption,
+    color: theme.colors.textSecondary,
+    marginTop: theme.spacing.xs,
+  },
+  signOutButton: {
+    marginHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+    backgroundColor: theme.colors.error,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+  },
+  signOutText: {
+    ...theme.typography.body,
+    color: '#fff',
+    fontWeight: '600',
   },
   statsContainer: {
     flexDirection: 'row',

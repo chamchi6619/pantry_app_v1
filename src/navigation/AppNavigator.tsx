@@ -185,11 +185,22 @@ const LoadingScreen = () => (
 
 // Main Stack Navigator for modals
 export const AppNavigator: React.FC = () => {
-  const { session, loading } = useAuth();
+  const { session, loading, hasProfile, isInitialized } = useAuth();
 
-  if (loading) {
+  console.log('[AppNavigator] State:', {
+    loading,
+    isInitialized,
+    hasSession: !!session,
+    hasProfile
+  });
+
+  if (loading || !isInitialized) {
     return <LoadingScreen />;
   }
+
+  // User must have both a session AND a profile to access the app
+  // Profile is 1:1 with auth user, household is optional
+  const hasValidSession = session && hasProfile;
 
   return (
     <NavigationContainer>
@@ -198,7 +209,7 @@ export const AppNavigator: React.FC = () => {
           headerShown: false,
         }}
       >
-        {session ? (
+        {hasValidSession ? (
           <Stack.Screen name="Main" component={TabNavigator} />
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />
