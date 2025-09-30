@@ -14,10 +14,9 @@ import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleSho
 import { ExploreRecipesScreen } from '../features/recipes/screens/ExploreRecipesScreen';
 import { RecipeDetailScreen } from '../features/recipes/screens/RecipeDetailScreen';
 import { RecipeFormScreen } from '../features/recipes/screens/RecipeFormScreen';
-import { ReceiptCaptureWrapper } from '../features/receipt/screens/ReceiptCaptureWrapper';
-import { ReceiptFixQueueScreen } from '../features/receipt/screens/ReceiptFixQueueScreen';
+import { ScannerScreen } from '../features/scanner/screens/ScannerScreen';
+import { FixQueueScreen } from '../features/receipt/screens/FixQueueScreen';
 import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
-import { TestOCRScreen } from '../screens/TestOCRScreen';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -78,11 +77,10 @@ const ReceiptStack = () => (
       headerShown: false,
     }}
   >
-    <Stack.Screen name="TestOCR" component={TestOCRScreen} />
-    <Stack.Screen name="ReceiptCapture" component={ReceiptCaptureWrapper} />
+    <Stack.Screen name="Scanner" component={ScannerScreen} />
     <Stack.Screen
-      name="ReceiptFixQueue"
-      component={ReceiptFixQueueScreen}
+      name="FixQueue"
+      component={FixQueueScreen}
       options={{
         presentation: 'modal',
       }}

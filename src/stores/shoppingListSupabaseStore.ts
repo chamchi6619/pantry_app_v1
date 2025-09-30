@@ -215,13 +215,13 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
         };
 
         // Update local state immediately
-        set({ items: [newItem, ...items] });
+        set({ items: [...items, newItem] });
 
         if (!FEATURE_FLAGS.SYNC_SHOPPING || !activeListId) {
           // If sync is disabled, just use local ID
           newItem.id = Date.now().toString();
           newItem.syncStatus = 'synced';
-          set({ items: [newItem, ...items.slice(1)] });
+          set({ items: [...items, newItem] });
           return newItem;
         }
 
@@ -255,7 +255,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
           };
 
           set({
-            items: [syncedItem, ...items],
+            items: [...items, syncedItem],
             lastSync: new Date(),
           });
 
@@ -265,7 +265,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
           // Mark as error but keep in local state
           newItem.syncStatus = 'error';
           set({
-            items: [newItem, ...items],
+            items: [...items, newItem],
             syncError: error.message,
           });
           return null;

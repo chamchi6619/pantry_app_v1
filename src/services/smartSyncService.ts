@@ -298,16 +298,22 @@ class SmartSyncService {
       switch (operation.type) {
         case 'add':
           result = await supabase.from(operation.table).insert(operation.data);
-          console.log(`[Sync] Insert result:`, result.error || 'Success');
-          if (result.error) throw result.error;
+          console.log(`[Sync] Insert result:`, result.error ? `Error: ${result.error.message}` : 'Success');
+          if (result.error) {
+            console.error(`[Sync] Insert failed:`, result.error);
+            throw result.error;
+          }
           break;
         case 'update':
           result = await supabase
             .from(operation.table)
             .update(operation.data)
             .eq('id', operation.data.id);
-          console.log(`[Sync] Update result:`, result.error || 'Success');
-          if (result.error) throw result.error;
+          console.log(`[Sync] Update result:`, result.error ? `Error: ${result.error.message}` : 'Success');
+          if (result.error) {
+            console.error(`[Sync] Update failed:`, result.error);
+            throw result.error;
+          }
           break;
         case 'delete':
           result = await supabase
@@ -321,13 +327,26 @@ class SmartSyncService {
 
       console.log(`[Sync] Operation completed successfully`);
       this.metadata.lastSync = Date.now();
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[Sync] Operation failed:`, error);
+      console.error(`[Sync] Operation details:`, {
+        type: operation.type,
+        table: operation.table,
+        retries: operation.retries,
+        data: operation.data
+      });
+
       operation.retries++;
 
       if (operation.retries < SYNC_MODES.MAX_RETRY_ATTEMPTS) {
-        // Re-queue for retry
-        this.syncQueue.push(operation);
+        // Re-queue for retry with delay
+        console.log(`[Sync] Retrying operation (attempt ${operation.retries}/${SYNC_MODES.MAX_RETRY_ATTEMPTS})`);
+        setTimeout(() => {
+          this.syncQueue.push(operation);
+        }, SYNC_MODES.RETRY_DELAY_MS * operation.retries);
+      } else {
+        console.error(`[Sync] Operation failed permanently after ${operation.retries} attempts. Removing from queue.`);
+        // Don't re-queue after max retries to prevent infinite loop
       }
     }
   }
@@ -451,6 +470,13 @@ class SmartSyncService {
       if (this.isInitialized) {
         this.processPendingSync();
       }
+      return;
+    }
+
+    // Filter out invalid operations like sync_trigger
+    const supportedTables = ['pantry_items', 'shopping_list_items', 'shopping_lists'];
+    if (!supportedTables.includes(table)) {
+      console.log(`[Sync] Ignoring operation for unsupported table: ${table}`);
       return;
     }
 

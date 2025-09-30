@@ -211,7 +211,13 @@ export const useInventorySupabaseStore = create<InventoryState>()(
         if (FEATURE_FLAGS.SYNC_MODE_INVENTORY === 'lite') {
           // Queue the operation for next sync
           smartSyncService.queueOperation('add', 'pantry_items', {
-            ...item,
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            location: item.location,
+            category: item.category,
+            notes: item.notes,
+            expiry_date: item.expirationDate, // Map to correct column name
             household_id: householdId,
             status: 'active',
           });
@@ -297,17 +303,19 @@ export const useInventorySupabaseStore = create<InventoryState>()(
         set({ isSyncing: true });
 
         try {
+          // Build update object with only defined fields
+          const updateData: any = {};
+          if (updates.name !== undefined) updateData.name = updates.name;
+          if (updates.quantity !== undefined) updateData.quantity = updates.quantity;
+          if (updates.unit !== undefined) updateData.unit = updates.unit;
+          if (updates.location !== undefined) updateData.location = updates.location;
+          if (updates.category !== undefined) updateData.category = updates.category;
+          if (updates.notes !== undefined) updateData.notes = updates.notes;
+          if (updates.expirationDate !== undefined) updateData.expiry_date = updates.expirationDate;
+
           const { error } = await supabase
             .from('pantry_items')
-            .update({
-              name: updates.name,
-              quantity: updates.quantity,
-              unit: updates.unit,
-              location: updates.location,
-              category: updates.category,
-              notes: updates.notes,
-              expiry_date: updates.expirationDate,
-            })
+            .update(updateData)
             .eq('id', id)
             .eq('household_id', householdId);
 
