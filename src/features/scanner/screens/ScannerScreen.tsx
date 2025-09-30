@@ -36,8 +36,8 @@ export function ScannerScreen() {
     const imageResult = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
-      quality: 0.8,
-      base64: true,
+      quality: 0.9,  // Higher quality for better OCR
+      base64: false,  // Don't include base64 - we'll read it separately
     });
 
     if (!imageResult.canceled && imageResult.assets[0]) {
@@ -56,8 +56,8 @@ export function ScannerScreen() {
     const imageResult = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
-      quality: 0.8,
-      base64: true,
+      quality: 0.9,  // Higher quality for better OCR
+      base64: false,  // Don't include base64 - we'll read it separately
     });
 
     if (!imageResult.canceled && imageResult.assets[0]) {
@@ -81,7 +81,10 @@ export function ScannerScreen() {
       const ocrText = await CloudVisionService.extractText(asset.uri);
 
       // If no text extracted, use mock
-      const extractedOcrText = ocrText || generateMockOCR();
+      let extractedOcrText = ocrText || generateMockOCR();
+
+      // TEMPORARY: Force new parse by adding timestamp to bypass cache
+      extractedOcrText = extractedOcrText + '\n[v11-' + Date.now() + ']';
 
       setExtractedText(extractedOcrText);
       setProcessStage('Processing receipt data...');

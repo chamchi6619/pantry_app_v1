@@ -1,5 +1,6 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { Alert } from 'react-native';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { ImageEnhancementService, QUALITY_THRESHOLDS } from './imageEnhancementService';
 
 // Get API key from environment or use the configured key
@@ -124,32 +125,30 @@ export class CloudVisionService {
     } catch (error: any) {
       console.error(`Attempt ${attempts} failed:`, error.message);
       lastError = error;
+    }
 
-      // Check if it's a bad image data error
-      if (error.message?.includes('Bad image data') || error.message?.includes('Invalid image')) {
-        warnings.push('Image format issue detected');
-
-        // Strategy 2: Try enhanced image
-        attempts++;
-        console.log(`🔄 Attempt ${attempts}: Enhanced image`);
-        try {
-          const enhancedUri = await ImageEnhancementService.enhanceForOCR(imageUri);
-          const result = await this.callVisionAPI(enhancedUri);
-          if (result && result.length > 50) {
-            return {
-              text: result,
-              confidence: initialConfidence * 0.9,
-              method: 'google-enhanced',
-              attempts,
-              warnings
-            };
-          }
-          if (result.length > partialText.length) {
-            partialText = result;
-          }
-        } catch (enhanceError: any) {
-          console.error(`Attempt ${attempts} failed:`, enhanceError.message);
+    // Strategy 2: Always try enhanced image if original failed
+    if (!partialText || partialText.length < 50) {
+      attempts++;
+      console.log(`🔄 Attempt ${attempts}: Enhanced image`);
+      try {
+        const enhancedUri = await ImageEnhancementService.enhanceForOCR(imageUri);
+        const result = await this.callVisionAPI(enhancedUri);
+        if (result && result.length > 50) {
+          return {
+            text: result,
+            confidence: initialConfidence * 0.9,
+            method: 'google-enhanced',
+            attempts,
+            warnings
+          };
         }
+        if (result.length > partialText.length) {
+          partialText = result;
+        }
+      } catch (enhanceError: any) {
+        console.error(`Attempt ${attempts} failed:`, enhanceError.message);
+        warnings.push('Image enhancement failed');
       }
     }
 
@@ -235,14 +234,36 @@ export class CloudVisionService {
       throw new Error('Image file does not exist');
     }
 
-    // Log file size for debugging
+    // Log file info for debugging
+    console.log('📁 File info:', fileInfo);
     const fileSize = (fileInfo as any).size || 0;
     console.log(`📁 File size: ${(fileSize / 1024).toFixed(2)} KB`);
+    console.log(`📁 File URI: ${imageUri}`);
+
+    // Try to process/normalize the image first with ImageManipulator
+    let processedUri = imageUri;
+    try {
+      console.log('🔧 Processing image with ImageManipulator...');
+
+      const processed = await ImageManipulator.manipulateAsync(
+        imageUri,
+        [], // No operations, just re-encode
+        {
+          compress: 0.95,
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      );
+
+      processedUri = processed.uri;
+      console.log('✅ Image processed:', processedUri);
+    } catch (processError) {
+      console.warn('⚠️ Could not process image, using original:', processError);
+    }
 
     // Convert to base64 with error handling
     let base64Image: string;
     try {
-      base64Image = await FileSystem.readAsStringAsync(imageUri, {
+      base64Image = await FileSystem.readAsStringAsync(processedUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
     } catch (readError: any) {
@@ -251,7 +272,7 @@ export class CloudVisionService {
       // Try alternative encoding
       try {
         console.log('Trying alternative read method...');
-        base64Image = await FileSystem.readAsStringAsync(imageUri, {
+        base64Image = await FileSystem.readAsStringAsync(processedUri, {
           encoding: 'base64' as any,
         });
       } catch (altError) {

@@ -114,12 +114,16 @@ class ReceiptService {
       }
 
       console.log('=== RECEIPT PROCESSING SUCCESS ===');
-      console.log('Parse method:', data.data.method);
-      console.log('Confidence:', data.data.confidence);
-      console.log('Items parsed:', data.data.items?.length || 0);
-      console.log('Raw items data:', JSON.stringify(data.data.items, null, 2));
 
-      if (data.data.method === 'gemini') {
+      // Handle both response formats (v11 and v12)
+      const responseData = data.data || data;
+
+      console.log('Parse method:', responseData.method);
+      console.log('Confidence:', responseData.confidence);
+      console.log('Items parsed:', responseData.items?.length || 0);
+      console.log('Raw items data:', JSON.stringify(responseData.items, null, 2));
+
+      if (responseData.method === 'gemini') {
         console.log('🤖 GEMINI AI was used for parsing (low confidence heuristics)');
       } else {
         console.log('📝 Heuristics only - confidence was sufficient');
@@ -129,13 +133,13 @@ class ReceiptService {
       const result = {
         success: true,
         receipt: {
-          ...data.data.receipt,
-          parse_method: data.data.method  // Add parse_method to receipt
+          ...responseData.receipt,
+          parse_method: responseData.method  // Add parse_method to receipt
         },
-        items: data.data.items || [],
-        confidence: data.data.confidence,
-        path_taken: data.data.method,
-        processing_time_ms: data.duration_ms
+        items: responseData.items || [],
+        confidence: responseData.confidence,
+        path_taken: responseData.method,
+        processing_time_ms: data.duration_ms || responseData.duration_ms
       };
 
       console.log('=== RETURNING TO SCANNER ===');

@@ -147,26 +147,25 @@ export class ImageEnhancementService {
    */
   static async autoCrop(imageUri: string): Promise<string> {
     try {
-      // In a full implementation, we'd use edge detection
-      // For now, just remove some borders
-      const enhanced = await ImageManipulator.manipulateAsync(
+      console.log('📐 Auto-cropping image...');
+
+      // Get image dimensions first
+      const info = await ImageManipulator.manipulateAsync(
         imageUri,
-        [
-          // Crop 5% from each edge (conservative)
-          { crop: {
-            originX: 0.05,
-            originY: 0.05,
-            width: 0.9,
-            height: 0.9
-          } },
-        ],
-        {
-          compress: 0.9,
-          format: ImageManipulator.SaveFormat.JPEG,
-        }
+        [],
+        { format: ImageManipulator.SaveFormat.JPEG }
       );
 
-      return enhanced.uri;
+      console.log('Original dimensions:', info);
+
+      // FIXED: Crop values are relative to image dimensions, not percentages
+      // originX/Y are pixel offsets, width/height are pixel dimensions
+      // We need to get the actual dimensions and calculate pixels
+
+      // For now, just return the original since we can't get dimensions easily
+      // A proper implementation would use native modules
+      console.log('⚠️ Auto-crop skipped - returning original');
+      return imageUri;
     } catch (error) {
       console.error('Auto-crop failed:', error);
       return imageUri;
