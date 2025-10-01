@@ -70,41 +70,52 @@ class ReceiptServiceGemini {
       console.log(ocrText);
       console.log('─────────────────────────────────────────────');
 
-      // Call Supabase Edge Function with timeout
+      // Call Supabase Edge Function with timeout using Promise.race
       console.log('⏱️ Calling Edge Function with 45s timeout...');
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('Request timed out. Please try again with a shorter receipt.'));
+        }, 45000); // 45 second timeout
+      });
+
+      const invokePromise = supabase.functions.invoke('parse-receipt-gemini', {
+        body: {
+          ocr_text: ocrText,
+          household_id: householdId
+        },
+        headers: {
+          'x-timeout': '40000' // Tell Edge Function to timeout at 40s
+        }
+      });
 
       let response;
       try {
-        response = await supabase.functions.invoke('parse-receipt-gemini', {
-          body: {
-            ocr_text: ocrText,
-            household_id: householdId
-          },
-          headers: {
-            'x-timeout': '40000' // Tell Edge Function to timeout at 40s
-          }
-        });
-        clearTimeout(timeoutId);
+        response = await Promise.race([invokePromise, timeoutPromise]) as any;
       } catch (error) {
-        clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
-          console.error('⏱️ Edge Function timeout after 45 seconds');
-          throw new Error('Request timed out. Please try again with a shorter receipt.');
-        }
+        console.error('⏱️ Edge Function call failed or timed out:', error);
         throw error;
       }
 
+      console.log('✅ Edge Function responded');
+
       if (response.error) {
-        console.error('Edge Function error:', response.error);
+        console.error('❌ Edge Function returned error:');
+        console.error('   Error type:', typeof response.error);
+        console.error('   Error:', JSON.stringify(response.error, null, 2));
         throw response.error;
       }
 
       const data = response.data;
+      console.log('📦 Response data received:', data ? 'yes' : 'NO DATA!');
+
+      if (!data) {
+        console.error('❌ Edge Function returned no data');
+        throw new Error('Edge Function returned no data');
+      }
 
       if (!data?.success) {
+        console.error('❌ Processing failed:', data?.error || 'Unknown error');
         throw new Error(data?.error || 'Processing failed');
       }
 
