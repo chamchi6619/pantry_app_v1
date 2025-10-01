@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-console.log('🤖 Gemini 2.0 Flash JSON Mode - ' + new Date().toISOString());
+console.log('🤖 Gemini 2.0 Flash with AI Normalization - ' + new Date().toISOString());
 
 // CORS headers
 const corsHeaders = {
@@ -9,15 +9,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Receipt JSON Schema
+// Receipt JSON Schema with normalization
 const receiptSchema = {
   type: "object",
   properties: {
-    merchant: { type: "string" },
-    date: { type: "string" },
-    total: { type: "number" },
-    subtotal: { type: "number" },
-    tax: { type: "number" },
     items: {
       type: "array",
       items: {
@@ -25,12 +20,11 @@ const receiptSchema = {
         properties: {
           raw_text: { type: "string" },
           item_name: { type: "string" },
+          category: { type: "string" },
           price: { type: "number" },
-          quantity: { type: "number" },
-          unit: { type: "string" },
-          category: { type: "string" }
+          quantity: { type: "number" }
         },
-        required: ["item_name", "price"]
+        required: ["raw_text", "item_name", "price"]
       }
     }
   },
@@ -104,17 +98,32 @@ serve(async (req) => {
     }
 
     // Call Gemini 2.0 Flash with JSON mode
-    console.log('🤖 Calling Gemini 2.0 Flash...');
+    console.log('🤖 Calling Gemini 2.0 Flash with normalization...');
 
-    const prompt = `Extract all items from this receipt.
+    const prompt = `Extract and normalize items from this receipt to JSON.
 
-Normalize abbreviations:
-ORG→Organic, MLK→Milk, WHP→Whipped, WHD→Whipped, CRM→Cream, HVY→Heavy
-CHKN→Chicken, BF→Beef, CHZ→Cheese, CHED→Cheddar, VEG→Vegetable
-GRND→Ground, BRST→Breast, BNLS→Boneless, SKLS→Skinless
-WHL→Whole, SM/SML→Small, LG/LRG→Large
+For each item provide:
+- raw_text: Item name EXACTLY as it appears on receipt (abbreviations and all)
+- item_name: Normalized, readable product name
+- category: One of: dairy, produce, meat, seafood, pantry, frozen, beverages, bakery, deli, household, other
+- price: ACTUAL PRICE PAID (use rightmost price, "You Pay" column, or price after discounts)
+- quantity: Number of units (default 1 if not specified)
 
-Receipt text:
+CRITICAL PRICE RULES:
+- If receipt has "Price" and "You Pay" columns, use "You Pay" amount
+- If item has "Member Savings" or discount, use discounted price NOT original price
+- Use the rightmost dollar amount on each item line
+- Ignore original/crossed-out prices
+
+NORMALIZATION RULES:
+1. Expand abbreviations: ORG→Organic, WHP→Whipped, CHZ→Cheese, MLK→Milk, CHKN→Chicken, GRND→Ground, BNLS→Boneless, LG→Large, SM→Small, CRM→Cream, VEG→Vegetable, BTR→Butter, BRD→Bread
+2. Infer specific product names using brand, context, and price
+3. PRESERVE important attributes: Organic, size, grade, flavor, brand
+4. Use concise names (2-5 words)
+5. DO NOT hallucinate details not on receipt
+
+Store: ${storeName}
+
 ${ocr_text}`;
 
     const geminiResponse = await fetch(
@@ -152,12 +161,11 @@ ${ocr_text}`;
     const result = JSON.parse(responseText);
     console.log(`✅ Parsed ${result.items?.length || 0} items`);
 
-    // Extract totals
+    // Calculate totals from items
     const itemsTotal = result.items?.reduce((sum: number, item: any) => sum + (item.price || 0), 0) || 0;
-    const receiptTotal = result.total || itemsTotal;
-    const confidence = receiptTotal > 0 ? Math.min(itemsTotal / receiptTotal, 0.99) : 0.85;
+    const confidence = itemsTotal > 0 ? 0.9 : 0.85;
 
-    console.log(`Total: $${receiptTotal.toFixed(2)}, Confidence: ${(confidence * 100).toFixed(0)}%`);
+    console.log(`Items total: $${itemsTotal.toFixed(2)}, Confidence: ${(confidence * 100).toFixed(0)}%`);
 
     // Detect store
     const storeName = detectStore(ocr_text);
@@ -168,12 +176,12 @@ ${ocr_text}`;
       .insert({
         household_id,
         store_name: storeName,
-        receipt_date: result.date || new Date().toISOString(),
-        total_amount_cents: Math.round(receiptTotal * 100),
-        tax_amount_cents: Math.round((result.tax || 0) * 100),
-        subtotal_cents: Math.round((result.subtotal || itemsTotal) * 100),
+        receipt_date: new Date().toISOString(),
+        total_amount_cents: Math.round(itemsTotal * 100),
+        tax_amount_cents: 0,
+        subtotal_cents: Math.round(itemsTotal * 100),
         status: 'pending',
-        parse_method: 'gemini-2.0-flash',
+        parse_method: 'gemini-2.0-flash-normalized',
         confidence: confidence,
         raw_text: ocr_text.substring(0, 10000)
       })
@@ -198,10 +206,11 @@ ${ocr_text}`;
     const queueItems = result.items?.map((item: any) => ({
       household_id,
       receipt_id: receipt.id,
-      raw_text: item.raw_text || item.item_name,
-      parsed_name: item.item_name,
+      raw_text: item.raw_text || item.item_name,  // Original from receipt
+      parsed_name: item.item_name,  // Normalized name
+      categories: item.category || 'other',  // AI-inferred category
       quantity: item.quantity || 1,
-      unit: item.unit || 'piece',
+      unit: 'piece',
       price_cents: Math.round(item.price * 100),
       confidence: confidence,
       needs_review: confidence < 0.8
@@ -223,7 +232,7 @@ ${ocr_text}`;
       receipt_id: receipt.id,
       receipt,
       items: queueItems,
-      method: 'gemini-2.0-flash',
+      method: 'gemini-2.0-flash-normalized',
       confidence: confidence,
       store: storeName,
       gemini_cost: cost
