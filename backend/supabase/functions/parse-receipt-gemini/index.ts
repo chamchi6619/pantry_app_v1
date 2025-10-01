@@ -152,23 +152,43 @@ ${ocr_text}`;
     console.log(prompt.substring(0, 500));
     console.log('─────────────────────────────────────────────');
 
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: prompt }]
-          }],
-          generationConfig: {
-            temperature: 0,
-            responseMimeType: "application/json",
-            responseSchema: receiptSchema
-          }
-        })
+    // Gemini API call with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      console.error('⏱️ Gemini API timeout after 35 seconds');
+      controller.abort();
+    }, 35000); // 35 second timeout
+
+    let geminiResponse;
+    try {
+      geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: prompt }]
+            }],
+            generationConfig: {
+              temperature: 0,
+              responseMimeType: "application/json",
+              responseSchema: receiptSchema
+            }
+          }),
+          signal: controller.signal
+        }
+      );
+      clearTimeout(timeoutId);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        console.error('Gemini API request timed out');
+        throw new Error('Gemini API timeout - receipt too complex');
       }
-    );
+      console.error('Gemini fetch error:', error);
+      throw error;
+    }
 
     if (!geminiResponse.ok) {
       const errorText = await geminiResponse.text();
