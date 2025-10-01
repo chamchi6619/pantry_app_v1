@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-console.log('🤖 Gemini 2.0 Flash with AI Normalization - ' + new Date().toISOString());
+console.log('🤖 Gemini 2.0 Flash with Receipt Validation v8 - ' + new Date().toISOString());
 
 // CORS headers
 const corsHeaders = {
@@ -51,6 +51,14 @@ serve(async (req) => {
     if (!ocr_text || !household_id) {
       throw new Error('Missing required fields: ocr_text, household_id');
     }
+
+    // Validate this looks like a receipt
+    const validation = validateReceiptLike(ocr_text);
+    if (!validation.isValid) {
+      console.warn('⚠️ Not a receipt:', validation.reason);
+      throw new Error(`This doesn't look like a receipt. ${validation.reason}`);
+    }
+    console.log(`✅ Receipt validation passed (confidence: ${(validation.confidence * 100).toFixed(0)}%)`);
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -339,4 +347,81 @@ function detectStore(text: string): string {
   }
 
   return 'UNKNOWN';
+}
+
+/**
+ * Validate that text looks like a grocery receipt
+ * Returns: { isValid: boolean, confidence: number, reason?: string }
+ */
+function validateReceiptLike(text: string): { isValid: boolean; confidence: number; reason?: string } {
+  const upper = text.toUpperCase();
+  let score = 0;
+  const indicators: string[] = [];
+
+  // 1. Check for known store names (30 points)
+  const stores = [
+    'WALMART', 'WAL-MART', 'SAFEWAY', 'SAFEWAYS', 'TARGET', 'COSTCO',
+    'KROGER', 'WHOLE FOODS', 'TRADER JOE', 'ALBERTSONS', 'PUBLIX',
+    'ALDI', 'FOOD LION', 'GIANT', 'WEGMANS', 'HEB', 'MEIJER',
+    'SHOPRITE', 'STOP & SHOP', 'HARRIS TEETER', 'RALPH', 'VONS'
+  ];
+
+  const hasStore = stores.some(s => upper.includes(s));
+  if (hasStore) {
+    score += 30;
+    indicators.push('store name');
+  }
+
+  // 2. Check for receipt keywords (10 points each, max 30)
+  const keywords = ['SUBTOTAL', 'TAX', 'TOTAL', 'RECEIPT', 'CHANGE', 'BALANCE', 'TENDER'];
+  const keywordMatches = keywords.filter(k => upper.includes(k));
+  const keywordScore = Math.min(keywordMatches.length * 10, 30);
+  if (keywordScore > 0) {
+    score += keywordScore;
+    indicators.push(`${keywordMatches.length} receipt keywords`);
+  }
+
+  // 3. Check for multiple price patterns ($X.XX) - must have at least 3 (20 points)
+  const priceMatches = text.match(/\$\d+\.\d{2}/g);
+  if (priceMatches && priceMatches.length >= 3) {
+    score += 20;
+    indicators.push(`${priceMatches.length} prices`);
+  }
+
+  // 4. Check for payment methods (15 points)
+  const paymentMethods = ['VISA', 'MASTERCARD', 'AMEX', 'DISCOVER', 'CASH', 'DEBIT', 'CREDIT', 'CARD'];
+  if (paymentMethods.some(p => upper.includes(p))) {
+    score += 15;
+    indicators.push('payment method');
+  }
+
+  // 5. Check for date pattern (10 points)
+  if (/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/.test(text)) {
+    score += 10;
+    indicators.push('date');
+  }
+
+  // 6. Check for common grocery sections (5 points)
+  const sections = ['GROCERY', 'PRODUCE', 'DAIRY', 'MEAT', 'DELI', 'BAKERY', 'FROZEN'];
+  if (sections.some(s => upper.includes(s))) {
+    score += 5;
+    indicators.push('grocery sections');
+  }
+
+  const isValid = score >= 40; // Need at least 40 points to pass
+  const confidence = Math.min(score / 100, 1);
+
+  if (!isValid) {
+    return {
+      isValid: false,
+      confidence: 0,
+      reason: `Found: ${indicators.length > 0 ? indicators.join(', ') : 'no receipt indicators'}. Need store name, prices, and totals.`
+    };
+  }
+
+  return {
+    isValid: true,
+    confidence,
+    reason: undefined
+  };
 }
