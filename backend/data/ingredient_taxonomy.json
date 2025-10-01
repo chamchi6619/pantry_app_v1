@@ -1,0 +1,310 @@
+{
+  "taxonomy_version": "1.0.0",
+  "created_at": "2025-01-15",
+  "ingredient_classes": {
+    "milk": {
+      "category": "Dairy",
+      "aliases": ["WHOLE MILK", "2% MILK", "SKIM MILK", "MLK", "MILK GAL", "MILK HALF GAL", "FAT FREE MILK", "LACTOSE FREE MILK"],
+      "storage": "fridge",
+      "shelf_life_days": 7,
+      "perishable": true,
+      "common_units": ["gal", "half_gal", "qt", "L"]
+    },
+    "butter": {
+      "category": "Dairy",
+      "aliases": ["BUTTER", "SALTED BUTTER", "UNSALTED BUTTER", "SWEET BUTTER", "STICK BUTTER"],
+      "storage": "fridge",
+      "shelf_life_days": 30,
+      "perishable": true,
+      "common_units": ["lb", "stick", "pack"]
+    },
+    "eggs": {
+      "category": "Dairy",
+      "aliases": ["EGGS", "LARGE EGGS", "DOZEN EGGS", "EGGS DOZEN", "ORGANIC EGGS", "FREE RANGE EGGS", "EGG"],
+      "storage": "fridge",
+      "shelf_life_days": 21,
+      "perishable": true,
+      "common_units": ["dozen", "half_dozen", "pack"]
+    },
+    "cheese": {
+      "category": "Dairy",
+      "aliases": ["CHEESE", "CHEDDAR", "MOZZARELLA", "SWISS", "PARMESAN", "AMERICAN CHEESE", "CREAM CHEESE"],
+      "storage": "fridge",
+      "shelf_life_days": 30,
+      "perishable": true,
+      "common_units": ["lb", "oz", "slice", "pack"]
+    },
+    "yogurt": {
+      "category": "Dairy",
+      "aliases": ["YOGURT", "GREEK YOGURT", "PLAIN YOGURT", "VANILLA YOGURT", "YOGHURT", "YOPLAIT", "CHOBANI", "DANNON"],
+      "storage": "fridge",
+      "shelf_life_days": 14,
+      "perishable": true,
+      "common_units": ["oz", "cup", "pack"]
+    },
+    "bread": {
+      "category": "Bakery",
+      "aliases": ["BREAD", "WHITE BREAD", "WHEAT BREAD", "WHOLE WHEAT", "LOAF", "SANDWICH BREAD", "TOAST"],
+      "storage": "pantry",
+      "shelf_life_days": 5,
+      "perishable": true,
+      "common_units": ["loaf", "pack", "slice"]
+    },
+    "chicken": {
+      "category": "Meat",
+      "aliases": ["CHICKEN", "CHICKEN BREAST", "CHICKEN THIGH", "CHICKEN WINGS", "WHOLE CHICKEN", "CHKN", "POULTRY"],
+      "storage": "fridge",
+      "shelf_life_days": 2,
+      "perishable": true,
+      "common_units": ["lb", "pack", "whole"]
+    },
+    "beef": {
+      "category": "Meat",
+      "aliases": ["BEEF", "GROUND BEEF", "STEAK", "BEEF ROAST", "HAMBURGER", "SIRLOIN", "RIBEYE", "CHUCK"],
+      "storage": "fridge",
+      "shelf_life_days": 3,
+      "perishable": true,
+      "common_units": ["lb", "pack", "steak"]
+    },
+    "pork": {
+      "category": "Meat",
+      "aliases": ["PORK", "PORK CHOP", "BACON", "HAM", "SAUSAGE", "PORK LOIN", "PORK SHOULDER"],
+      "storage": "fridge",
+      "shelf_life_days": 3,
+      "perishable": true,
+      "common_units": ["lb", "pack", "chop"]
+    },
+    "fish": {
+      "category": "Seafood",
+      "aliases": ["FISH", "SALMON", "TUNA", "TILAPIA", "COD", "HALIBUT", "SEAFOOD", "FILLET"],
+      "storage": "fridge",
+      "shelf_life_days": 1,
+      "perishable": true,
+      "common_units": ["lb", "fillet", "pack"]
+    },
+    "pasta": {
+      "category": "Pantry",
+      "aliases": ["PASTA", "SPAGHETTI", "PENNE", "MACARONI", "NOODLES", "LINGUINE", "FETTUCCINE", "BARILLA"],
+      "storage": "pantry",
+      "shelf_life_days": 365,
+      "perishable": false,
+      "common_units": ["lb", "box", "pack"]
+    },
+    "rice": {
+      "category": "Pantry",
+      "aliases": ["RICE", "WHITE RICE", "BROWN RICE", "JASMINE", "BASMATI", "LONG GRAIN", "MINUTE RICE"],
+      "storage": "pantry",
+      "shelf_life_days": 730,
+      "perishable": false,
+      "common_units": ["lb", "bag", "box"]
+    },
+    "potatoes": {
+      "category": "Produce",
+      "aliases": ["POTATO", "POTATOES", "RUSSET", "RED POTATO", "YUKON GOLD", "SWEET POTATO", "YAMS"],
+      "storage": "pantry",
+      "shelf_life_days": 14,
+      "perishable": true,
+      "common_units": ["lb", "bag", "each"]
+    },
+    "onions": {
+      "category": "Produce",
+      "aliases": ["ONION", "ONIONS", "YELLOW ONION", "RED ONION", "WHITE ONION", "SWEET ONION", "SHALLOT"],
+      "storage": "pantry",
+      "shelf_life_days": 30,
+      "perishable": true,
+      "common_units": ["lb", "each", "bag"]
+    },
+    "tomatoes": {
+      "category": "Produce",
+      "aliases": ["TOMATO", "TOMATOES", "ROMA", "CHERRY TOMATO", "GRAPE TOMATO", "TOM", "BEEFSTEAK"],
+      "storage": "pantry",
+      "shelf_life_days": 7,
+      "perishable": true,
+      "common_units": ["lb", "pack", "each"]
+    },
+    "lettuce": {
+      "category": "Produce",
+      "aliases": ["LETTUCE", "ROMAINE", "ICEBERG", "SALAD", "MIXED GREENS", "SPRING MIX", "SPINACH"],
+      "storage": "fridge",
+      "shelf_life_days": 5,
+      "perishable": true,
+      "common_units": ["head", "bag", "bunch"]
+    },
+    "bananas": {
+      "category": "Produce",
+      "aliases": ["BANANA", "BANANAS", "PLANTAIN", "ORGANIC BANANA"],
+      "storage": "pantry",
+      "shelf_life_days": 5,
+      "perishable": true,
+      "common_units": ["lb", "bunch", "each"]
+    },
+    "apples": {
+      "category": "Produce",
+      "aliases": ["APPLE", "APPLES", "GALA", "FUJI", "GRANNY SMITH", "HONEYCRISP", "RED DELICIOUS"],
+      "storage": "fridge",
+      "shelf_life_days": 30,
+      "perishable": true,
+      "common_units": ["lb", "bag", "each"]
+    },
+    "oranges": {
+      "category": "Produce",
+      "aliases": ["ORANGE", "ORANGES", "NAVEL", "VALENCIA", "CITRUS", "MANDARIN", "TANGERINE"],
+      "storage": "fridge",
+      "shelf_life_days": 14,
+      "perishable": true,
+      "common_units": ["lb", "bag", "each"]
+    },
+    "carrots": {
+      "category": "Produce",
+      "aliases": ["CARROT", "CARROTS", "BABY CARROTS", "ORGANIC CARROTS"],
+      "storage": "fridge",
+      "shelf_life_days": 21,
+      "perishable": true,
+      "common_units": ["lb", "bag", "bunch"]
+    },
+    "broccoli": {
+      "category": "Produce",
+      "aliases": ["BROCCOLI", "BROCOLI", "BROCCOLI CROWN", "BROCCOLI FLORETS"],
+      "storage": "fridge",
+      "shelf_life_days": 7,
+      "perishable": true,
+      "common_units": ["lb", "crown", "bunch"]
+    },
+    "oil": {
+      "category": "Pantry",
+      "aliases": ["OIL", "OLIVE OIL", "VEGETABLE OIL", "CANOLA OIL", "COCONUT OIL", "EVOO", "COOKING OIL"],
+      "storage": "pantry",
+      "shelf_life_days": 365,
+      "perishable": false,
+      "common_units": ["fl_oz", "L", "bottle"]
+    },
+    "flour": {
+      "category": "Pantry",
+      "aliases": ["FLOUR", "ALL PURPOSE", "BREAD FLOUR", "WHEAT FLOUR", "WHITE FLOUR", "AP FLOUR"],
+      "storage": "pantry",
+      "shelf_life_days": 240,
+      "perishable": false,
+      "common_units": ["lb", "bag", "kg"]
+    },
+    "sugar": {
+      "category": "Pantry",
+      "aliases": ["SUGAR", "WHITE SUGAR", "BROWN SUGAR", "GRANULATED", "POWDERED SUGAR", "CANE SUGAR"],
+      "storage": "pantry",
+      "shelf_life_days": 730,
+      "perishable": false,
+      "common_units": ["lb", "bag", "box"]
+    },
+    "cereal": {
+      "category": "Pantry",
+      "aliases": ["CEREAL", "CORN FLAKES", "CHEERIOS", "FROSTED FLAKES", "OATMEAL", "GRANOLA"],
+      "storage": "pantry",
+      "shelf_life_days": 180,
+      "perishable": false,
+      "common_units": ["box", "bag", "oz"]
+    },
+    "coffee": {
+      "category": "Beverages",
+      "aliases": ["COFFEE", "GROUND COFFEE", "COFFEE BEANS", "INSTANT COFFEE", "K-CUPS", "FOLGERS", "STARBUCKS"],
+      "storage": "pantry",
+      "shelf_life_days": 180,
+      "perishable": false,
+      "common_units": ["lb", "oz", "can", "pack"]
+    },
+    "tea": {
+      "category": "Beverages",
+      "aliases": ["TEA", "TEA BAGS", "GREEN TEA", "BLACK TEA", "HERBAL TEA", "LIPTON", "CHAMOMILE"],
+      "storage": "pantry",
+      "shelf_life_days": 365,
+      "perishable": false,
+      "common_units": ["box", "pack", "bag"]
+    },
+    "juice": {
+      "category": "Beverages",
+      "aliases": ["JUICE", "ORANGE JUICE", "APPLE JUICE", "OJ", "GRAPE JUICE", "CRANBERRY"],
+      "storage": "fridge",
+      "shelf_life_days": 7,
+      "perishable": true,
+      "common_units": ["fl_oz", "gal", "bottle"]
+    },
+    "soda": {
+      "category": "Beverages",
+      "aliases": ["SODA", "COKE", "PEPSI", "SPRITE", "SOFT DRINK", "POP", "COLA", "7UP"],
+      "storage": "pantry",
+      "shelf_life_days": 90,
+      "perishable": false,
+      "common_units": ["can", "bottle", "pack", "L"]
+    },
+    "water": {
+      "category": "Beverages",
+      "aliases": ["WATER", "BOTTLED WATER", "SPRING WATER", "SPARKLING", "SELTZER", "AQUAFINA", "DASANI"],
+      "storage": "pantry",
+      "shelf_life_days": 730,
+      "perishable": false,
+      "common_units": ["bottle", "gal", "pack", "case"]
+    },
+    "chips": {
+      "category": "Snacks",
+      "aliases": ["CHIPS", "POTATO CHIPS", "LAYS", "DORITOS", "TORTILLA CHIPS", "PRETZELS", "CHEETOS"],
+      "storage": "pantry",
+      "shelf_life_days": 60,
+      "perishable": false,
+      "common_units": ["bag", "oz", "pack"]
+    },
+    "ice_cream": {
+      "category": "Frozen",
+      "aliases": ["ICE CREAM", "FROZEN YOGURT", "GELATO", "SORBET", "BEN JERRY", "HAAGEN DAZS"],
+      "storage": "freezer",
+      "shelf_life_days": 60,
+      "perishable": true,
+      "common_units": ["pint", "qt", "gal"]
+    },
+    "frozen_vegetables": {
+      "category": "Frozen",
+      "aliases": ["FROZEN VEG", "FROZEN PEAS", "FROZEN CORN", "FROZEN BROCCOLI", "MIXED VEG", "FROZEN SPINACH"],
+      "storage": "freezer",
+      "shelf_life_days": 240,
+      "perishable": false,
+      "common_units": ["bag", "lb", "oz"]
+    },
+    "canned_goods": {
+      "category": "Pantry",
+      "aliases": ["CANNED", "SOUP", "BEANS", "CORN", "TOMATO SAUCE", "CAMPBELL", "PROGRESSO"],
+      "storage": "pantry",
+      "shelf_life_days": 730,
+      "perishable": false,
+      "common_units": ["can", "oz", "pack"]
+    },
+    "condiments": {
+      "category": "Pantry",
+      "aliases": ["KETCHUP", "MUSTARD", "MAYO", "MAYONNAISE", "HOT SAUCE", "BBQ SAUCE", "SOY SAUCE"],
+      "storage": "pantry",
+      "shelf_life_days": 365,
+      "perishable": false,
+      "common_units": ["bottle", "jar", "oz"]
+    },
+    "spices": {
+      "category": "Pantry",
+      "aliases": ["SPICE", "SALT", "PEPPER", "GARLIC", "OREGANO", "BASIL", "PAPRIKA", "CINNAMON"],
+      "storage": "pantry",
+      "shelf_life_days": 730,
+      "perishable": false,
+      "common_units": ["jar", "oz", "container"]
+    },
+    "wine": {
+      "category": "Alcohol",
+      "aliases": ["WINE", "RED WINE", "WHITE WINE", "CHARDONNAY", "MERLOT", "CABERNET", "PINOT"],
+      "storage": "pantry",
+      "shelf_life_days": 1095,
+      "perishable": false,
+      "common_units": ["bottle", "L", "case"]
+    },
+    "beer": {
+      "category": "Alcohol",
+      "aliases": ["BEER", "LAGER", "IPA", "ALE", "BUDWEISER", "COORS", "CORONA", "HEINEKEN"],
+      "storage": "fridge",
+      "shelf_life_days": 120,
+      "perishable": false,
+      "common_units": ["can", "bottle", "pack", "case"]
+    }
+  }
+}

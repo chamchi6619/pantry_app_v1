@@ -1,0 +1,22 @@
+# Recipe Collection Requirements
+# Additional dependencies for recipe collection
+
+# Web scraping
+aiohttp>=3.9.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# PDF processing (for Uruguay INDA)
+pdfplumber>=0.10.0
+
+# Data processing
+pandas>=2.1.0
+
+# Rate limiting
+asyncio-throttle>=1.0.2
+
+# HTML parsing
+html5lib>=1.1
+
+# XML parsing (for sitemaps)
+defusedxml>=0.7.1

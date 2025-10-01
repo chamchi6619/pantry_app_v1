@@ -80,6 +80,7 @@ class Recipe(RecipeBase):
     id: str
     slug: Optional[str]
     ingredients: List[RecipeIngredient] = []
+    ingredients_flat: Optional[str] = None
     nutrition: Optional[RecipeNutrition] = None
     tags: List[str] = []
     source_name: Optional[str] = None

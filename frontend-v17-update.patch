@@ -1,0 +1,18 @@
+--- a/pantry-app/src/services/receiptService.ts
++++ b/pantry-app/src/services/receiptService.ts
+@@ -61,8 +61,15 @@ class ReceiptService {
+       console.log('OCR text length:', ocrText.length);
+       console.log('Options:', options);
+
++      // v17: Detect Costco receipts and route to adaptive parser
++      const isCostco = /COSTCO|WHOLESALE|KIRKLAND/i.test(ocrText);
++      const functionName = isCostco ? 'parse-receipt-v17' : 'parse-receipt';
++
++      console.log(`Using parser: ${functionName}${isCostco ? ' (Costco detected)' : ''}`);
++
+       // Call Edge Function (it calculates hash internally)
+-      const response = await supabase.functions.invoke('parse-receipt', {
++      const response = await supabase.functions.invoke(functionName, {
+         body: {
+           ocr_text: ocrText,
+           household_id: householdId,

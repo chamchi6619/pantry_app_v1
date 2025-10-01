@@ -1,0 +1,5 @@
+# Never commit API keys
+src/services/realOcrService.ts
+
+# MCP configuration with credentials
+.mcp.json

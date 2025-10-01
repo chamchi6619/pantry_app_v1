@@ -57,8 +57,13 @@ async def init_db():
                 # Split by semicolon and execute each statement
                 statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
                 for statement in statements:
-                    if statement:
-                        await conn.execute(text(statement))
+                    if statement and not statement.strip().startswith('--'):
+                        try:
+                            await conn.execute(text(statement + ";"))
+                        except Exception as e:
+                            # Skip if statement is incomplete or causes error
+                            if "incomplete input" not in str(e):
+                                print(f"Warning: Error executing statement: {e}")
 
             # Verify FTS5 support
             result = await conn.execute(

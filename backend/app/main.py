@@ -27,6 +27,8 @@ from .schemas import (
 )
 from .utils.pantry_matcher import match_recipes
 from .utils.rate_limiter import RateLimiter
+from .api.receipts import router as receipts_router
+from .api.gemini_test import router as gemini_test_router
 
 load_dotenv()
 
@@ -75,11 +77,15 @@ except:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=["*"],  # Allow all origins for testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(receipts_router)
+app.include_router(gemini_test_router)
 
 # Rate limiter
 rate_limiter = RateLimiter(
@@ -210,10 +216,10 @@ async def search_recipes(
 
     # Add search filter
     if q:
-        # Use FTS5 for text search
+        # Use FTS5 for text search (match by title)
         query_parts.append("""
-            AND id IN (
-                SELECT rowid FROM recipes_fts
+            AND title IN (
+                SELECT title FROM recipes_fts
                 WHERE recipes_fts MATCH :search_query
             )
         """)
@@ -254,6 +260,7 @@ async def search_recipes(
     for recipe in recipes:
         items.append({
             "id": recipe.id,
+            "slug": recipe.slug if hasattr(recipe, 'slug') else recipe.id,
             "title": recipe.title,
             "summary": recipe.summary,
             "total_time_min": recipe.total_time_min,
@@ -261,7 +268,7 @@ async def search_recipes(
             "image_url": recipe.image_url,
             "attribution_text": recipe.attribution_text,
             "license_code": recipe.license_code,
-            "instructions_allowed": bool(recipe.instructions_allowed)
+            "instructions_allowed": bool(recipe.instructions_allowed) if hasattr(recipe, 'instructions_allowed') else True
         })
 
     next_cursor = items[-1]["id"] if len(items) == limit else None
@@ -330,6 +337,23 @@ async def get_recipe(
     tag_result = await db.execute(tag_query, {"recipe_id": recipe_id})
     tags = [row.name for row in tag_result.fetchall()]
 
+    # Parse ingredients_flat if no structured ingredients
+    ingredient_list = []
+    if ingredients:
+        ingredient_list = [
+            {
+                "ingredient_name": ing.ingredient_name,
+                "qty_value": ing.qty_value,
+                "qty_unit": ing.qty_unit,
+                "raw_text": ing.raw_text,
+                "optional": bool(ing.optional)
+            }
+            for ing in ingredients
+        ]
+    elif recipe.ingredients_flat:
+        # Parse comma-separated ingredients
+        ingredient_list = recipe.ingredients_flat.split(',') if recipe.ingredients_flat else []
+
     # Format response
     return Recipe(
         id=recipe.id,
@@ -341,16 +365,8 @@ async def get_recipe(
         prep_time_min=recipe.prep_time_min,
         servings=recipe.servings,
         image_url=recipe.image_url,
-        ingredients=[
-            {
-                "ingredient_name": ing.ingredient_name,
-                "qty_value": ing.qty_value,
-                "qty_unit": ing.qty_unit,
-                "raw_text": ing.raw_text,
-                "optional": bool(ing.optional)
-            }
-            for ing in ingredients
-        ],
+        ingredients=ingredient_list if (ingredient_list and len(ingredient_list) > 0 and isinstance(ingredient_list[0], dict)) else [{"raw_text": ing.strip()} for ing in ingredient_list] if ingredient_list else [],
+        ingredients_flat=recipe.ingredients_flat,
         tags=tags,
         source_name=recipe.source_name,
         attribution_text=recipe.attribution_text,
