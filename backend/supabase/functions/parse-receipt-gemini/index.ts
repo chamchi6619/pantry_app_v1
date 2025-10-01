@@ -42,6 +42,10 @@ serve(async (req) => {
     console.log('=== GEMINI 2.0 FLASH PARSER ===');
     console.log('Household:', household_id);
     console.log('OCR length:', ocr_text?.length || 0);
+    console.log('📝 RAW OCR TEXT:');
+    console.log('─────────────────────────────────────────────');
+    console.log(ocr_text);
+    console.log('─────────────────────────────────────────────');
 
     if (!ocr_text || !household_id) {
       throw new Error('Missing required fields: ocr_text, household_id');
@@ -97,6 +101,10 @@ serve(async (req) => {
       });
     }
 
+    // Detect store first
+    const storeName = detectStore(ocr_text);
+    console.log('🏪 Detected store:', storeName);
+
     // Call Gemini 2.0 Flash with JSON mode
     console.log('🤖 Calling Gemini 2.0 Flash with normalization...');
 
@@ -126,6 +134,13 @@ Store: ${storeName}
 
 ${ocr_text}`;
 
+    console.log('🤖 GEMINI REQUEST:');
+    console.log('─────────────────────────────────────────────');
+    console.log('Prompt length:', prompt.length);
+    console.log('First 500 chars of prompt:');
+    console.log(prompt.substring(0, 500));
+    console.log('─────────────────────────────────────────────');
+
     const geminiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`,
       {
@@ -153,10 +168,20 @@ ${ocr_text}`;
     const geminiData = await geminiResponse.json();
     console.log('Gemini response received');
 
+    console.log('🤖 GEMINI RAW RESPONSE:');
+    console.log('─────────────────────────────────────────────');
+    console.log(JSON.stringify(geminiData, null, 2));
+    console.log('─────────────────────────────────────────────');
+
     const responseText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!responseText) {
       throw new Error('No response from Gemini');
     }
+
+    console.log('🤖 GEMINI PARSED JSON:');
+    console.log('─────────────────────────────────────────────');
+    console.log(responseText);
+    console.log('─────────────────────────────────────────────');
 
     const result = JSON.parse(responseText);
     console.log(`✅ Parsed ${result.items?.length || 0} items`);
@@ -167,8 +192,15 @@ ${ocr_text}`;
 
     console.log(`Items total: $${itemsTotal.toFixed(2)}, Confidence: ${(confidence * 100).toFixed(0)}%`);
 
-    // Detect store
-    const storeName = detectStore(ocr_text);
+    // Log each parsed item
+    console.log('📦 ITEMS BREAKDOWN:');
+    result.items?.forEach((item: any, idx: number) => {
+      console.log(`  ${idx + 1}. ${item.item_name}`);
+      console.log(`     Raw: "${item.raw_text}"`);
+      console.log(`     Price: $${item.price}`);
+      console.log(`     Qty: ${item.quantity || 1}`);
+      console.log(`     Category: ${item.category || 'other'}`);
+    });
 
     // Create receipt record
     const { data: receipt, error: receiptError } = await supabase
