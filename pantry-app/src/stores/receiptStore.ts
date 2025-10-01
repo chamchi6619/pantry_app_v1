@@ -26,6 +26,7 @@ interface ReceiptState {
   addReceipt: (receipt: Omit<Receipt, 'id' | 'createdAt'>) => void;
   updateReceipt: (id: string, updates: Partial<Receipt>) => void;
   deleteReceipt: (id: string) => void;
+  clearAll: () => void;
 
   // Computed
   getReceiptById: (id: string) => Receipt | undefined;
@@ -66,6 +67,10 @@ export const useReceiptStore = create<ReceiptState>()(
         set((state) => ({
           receipts: state.receipts.filter((receipt) => receipt.id !== id),
         }));
+      },
+
+      clearAll: () => {
+        set({ receipts: [] });
       },
 
       getReceiptById: (id) => {

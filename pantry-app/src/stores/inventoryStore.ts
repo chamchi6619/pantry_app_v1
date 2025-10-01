@@ -30,6 +30,7 @@ interface InventoryState {
   addBatchItems: (items: Array<Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt' | 'normalized'>>) => void;
   updateItem: (id: string, updates: Partial<Omit<InventoryItem, 'normalized'>>) => void;
   deleteItem: (id: string) => void;
+  clearAll: () => void;
   setSearchQuery: (query: string) => void;
   setSelectedCategory: (category: string | null) => void;
   setSelectedLocation: (location: string | null) => void;
@@ -259,6 +260,16 @@ export const useInventoryStore = create<InventoryState>()(
           items: state.items.filter((item) => item.id !== id),
           version: state.version + 1, // Increment version for cache invalidation
         }));
+      },
+
+      clearAll: () => {
+        set({
+          items: [],
+          version: 0,
+          searchQuery: '',
+          selectedCategory: null,
+          selectedLocation: null,
+        });
       },
 
       setSearchQuery: (query) => set({ searchQuery: query }),

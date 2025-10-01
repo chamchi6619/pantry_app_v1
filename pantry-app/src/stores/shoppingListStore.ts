@@ -27,6 +27,7 @@ interface ShoppingListState {
   deleteItem: (id: string) => void;
   toggleItem: (id: string) => void;
   clearCompleted: () => void;
+  clearAll: () => void;
   moveToInventory: (locationAssignments?: Record<string, 'fridge' | 'freezer' | 'pantry'>) => number;
   setSearchQuery: (query: string) => void;
   setShowChecked: (show: boolean) => void;
@@ -276,6 +277,15 @@ export const useShoppingListStore = create<ShoppingListState>()(
         set((state) => ({
           items: state.items.filter((item) => !item.checked),
         }));
+      },
+
+      clearAll: () => {
+        set({
+          items: [],
+          searchQuery: '',
+          showChecked: true,
+          selectedCategory: null,
+        });
       },
 
       setSearchQuery: (query) => set({ searchQuery: query }),

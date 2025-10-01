@@ -4,6 +4,9 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { FEATURE_FLAGS } from '../config/featureFlags';
 import { syncService } from '../services/supabaseSync';
+import { useReceiptStore } from '../stores/receiptStore';
+import { useInventoryStore } from '../stores/inventoryStore';
+import { useShoppingListStore } from '../stores/shoppingListStore';
 
 interface AuthContextType {
   session: Session | null;
@@ -293,6 +296,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Clean up sync before signing out
       syncService.cleanup();
+
+      // Clear all persisted stores to prevent data leakage between users
+      console.log('[Auth] Clearing all persisted stores...');
+      useReceiptStore.getState().clearAll();
+      useInventoryStore.getState().clearAll();
+      useShoppingListStore.getState().clearAll();
 
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
