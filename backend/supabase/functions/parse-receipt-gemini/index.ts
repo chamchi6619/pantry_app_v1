@@ -22,9 +22,10 @@ const receiptSchema = {
           item_name: { type: "string" },
           category: { type: "string" },
           price: { type: "number" },
-          quantity: { type: "number" }
+          quantity: { type: "number" },
+          unit: { type: "string" }
         },
-        required: ["raw_text", "item_name", "price"]
+        required: ["raw_text", "item_name", "price", "quantity", "unit"]
       }
     }
   },
@@ -115,13 +116,23 @@ For each item provide:
 - item_name: Normalized, readable product name
 - category: One of: dairy, produce, meat, seafood, pantry, frozen, beverages, bakery, deli, household, other
 - price: ACTUAL PRICE PAID (use rightmost price, "You Pay" column, or price after discounts)
-- quantity: Number of units (default 1 if not specified)
+- quantity: Number of units (extract from weight lines like "1.09 lb @" or from "2@" prefix, default 1)
+- unit: Unit of measure - "lb" for pounds, "oz" for ounces, "g" for grams, "piece" for count items, "pack", "bunch", "gallon", "liter"
 
 CRITICAL PRICE RULES:
 - If receipt has "Price" and "You Pay" columns, use "You Pay" amount
 - If item has "Member Savings" or discount, use discounted price NOT original price
 - Use the rightmost dollar amount on each item line
 - Ignore original/crossed-out prices
+
+QUANTITY & UNIT RULES:
+- Look for weight lines: "WT 1.09 lb @ $X.XX /lb" means quantity=1.09, unit="lb"
+- Look for count prefix: "2@ LEMONS" means quantity=2, unit="piece"
+- If no quantity specified, use quantity=1
+- Weight units: lb, oz, g, kg
+- Volume units: gallon, liter, ml, fl oz
+- Count units: piece, pack, bunch, dozen
+- Match the unit from the receipt (if it says "lb", use "lb" not "piece")
 
 NORMALIZATION RULES:
 1. Expand abbreviations: ORG→Organic, WHP→Whipped, CHZ→Cheese, MLK→Milk, CHKN→Chicken, GRND→Ground, BNLS→Boneless, LG→Large, SM→Small, CRM→Cream, VEG→Vegetable, BTR→Butter, BRD→Bread
@@ -198,7 +209,7 @@ ${ocr_text}`;
       console.log(`  ${idx + 1}. ${item.item_name}`);
       console.log(`     Raw: "${item.raw_text}"`);
       console.log(`     Price: $${item.price}`);
-      console.log(`     Qty: ${item.quantity || 1}`);
+      console.log(`     Qty: ${item.quantity || 1} ${item.unit || 'piece'}`);
       console.log(`     Category: ${item.category || 'other'}`);
     });
 
@@ -242,7 +253,7 @@ ${ocr_text}`;
       parsed_name: item.item_name,  // Normalized name
       categories: item.category || 'other',  // AI-inferred category
       quantity: item.quantity || 1,
-      unit: 'piece',
+      unit: item.unit || 'piece',  // Use extracted unit, default to piece
       price_cents: Math.round(item.price * 100),
       confidence: confidence,
       needs_review: confidence < 0.8
