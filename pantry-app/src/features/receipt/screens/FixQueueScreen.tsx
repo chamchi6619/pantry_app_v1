@@ -276,7 +276,7 @@ export function FixQueueScreen() {
         <View style={styles.instructions}>
           <Ionicons name="information-circle" size={20} color="#3B82F6" />
           <Text style={styles.instructionText}>
-            Review and edit items below.{'\n'}Assign each item to a storage location.
+            Review and edit items below.{'\n'}Confirm storage locations.
           </Text>
         </View>
       </View>

@@ -6,6 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Modal,
+  ScrollView,
+  Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ReceiptItem } from '../../../services/receiptService';
@@ -23,6 +26,10 @@ export function FixQueueItem({
 }: FixQueueItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+
+  // Available categories - same as inventory
+  const availableCategories = ['Beverages', 'Dairy', 'Essential', 'Frozen', 'Fruits', 'Grains', 'Proteins', 'Snacks', 'Vegetables'].sort();
 
   const confidenceColor =
     item.confidence >= 0.8 ? '#10B981' :
@@ -133,13 +140,47 @@ export function FixQueueItem({
         <View style={styles.expandedContent}>
           <View style={styles.categoryRow}>
             <Text style={styles.label}>Category:</Text>
-            <TextInput
-              style={styles.categoryInput}
-              value={item.categories || ''}
-              onChangeText={(text) => onUpdate('categories', text)}
-              placeholder="e.g., dairy, produce"
-            />
+            <Pressable
+              style={styles.categorySelector}
+              onPress={() => setShowCategoryPicker(true)}
+            >
+              <Text style={[styles.categoryText, !item.categories && styles.categoryPlaceholder]}>
+                {item.categories || 'Select category'}
+              </Text>
+              <Ionicons name="chevron-down" size={16} color="#6B7280" />
+            </Pressable>
           </View>
+
+          {/* Category Picker Modal */}
+          {showCategoryPicker && (
+            <Modal
+              visible={showCategoryPicker}
+              transparent={true}
+              animationType="fade"
+              onRequestClose={() => setShowCategoryPicker(false)}
+            >
+              <Pressable style={styles.modalOverlay} onPress={() => setShowCategoryPicker(false)}>
+                <View style={styles.dropdownModal}>
+                  <ScrollView style={styles.dropdownScroll} showsVerticalScrollIndicator={true}>
+                    {availableCategories.map((cat) => (
+                      <Pressable
+                        key={cat}
+                        style={styles.dropdownOption}
+                        onPress={() => {
+                          onUpdate('categories', cat);
+                          setShowCategoryPicker(false);
+                        }}
+                      >
+                        <Text style={[styles.dropdownOptionText, item.categories === cat && styles.selectedOption]}>
+                          {cat}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                </View>
+              </Pressable>
+            </Modal>
+          )}
 
           <View style={styles.unitRow}>
             <Text style={styles.label}>Unit:</Text>
@@ -347,14 +388,58 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     width: 80,
   },
-  categoryInput: {
+  categorySelector: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
+    backgroundColor: '#fff',
+  },
+  categoryText: {
     fontSize: 14,
+    color: '#111827',
+  },
+  categoryPlaceholder: {
+    color: '#9CA3AF',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dropdownModal: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    width: '80%',
+    maxHeight: 300,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  dropdownScroll: {
+    maxHeight: 300,
+  },
+  dropdownOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  dropdownOptionText: {
+    fontSize: 16,
+    color: '#111827',
+  },
+  selectedOption: {
+    color: '#3B82F6',
+    fontWeight: '600',
   },
   unitRow: {
     flexDirection: 'row',
