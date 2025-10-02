@@ -5,15 +5,28 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../../core/constants/theme';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useHousehold } from '../../../hooks/useHousehold';
+import { useMonthlySpending } from '../../../hooks/useMonthlySpending';
 
 export const ProfileScreen: React.FC = () => {
   const { signOut, user } = useAuth();
   const { currentHousehold, householdMembers } = useHousehold();
+  const { data: spending, loading: spendingLoading } = useMonthlySpending();
+
+  const formatCurrency = (cents: number) => {
+    return `$${(cents / 100).toFixed(2)}`;
+  };
+
+  const getTrendDisplay = (trendPct: number) => {
+    if (trendPct === 0) return { text: 'Same as last month', color: theme.colors.textSecondary, icon: '=' };
+    if (trendPct > 0) return { text: `↑ ${trendPct.toFixed(1)}% vs last month`, color: theme.colors.error, icon: '↑' };
+    return { text: `↓ ${Math.abs(trendPct).toFixed(1)}% vs last month`, color: theme.colors.success, icon: '↓' };
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -42,14 +55,56 @@ export const ProfileScreen: React.FC = () => {
           )}
         </View>
 
-        {/* Placeholder for future cards (Phase 2+) */}
+        {/* Spending This Month Card */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dashboard</Text>
-          <View style={styles.placeholderCard}>
-            <Text style={styles.placeholderIcon}>📊</Text>
-            <Text style={styles.placeholderText}>Spending and waste tracking coming soon!</Text>
-            <Text style={styles.placeholderSubtext}>Continue scanning receipts to build your history.</Text>
-          </View>
+          <Text style={styles.sectionTitle}>💰 Spending This Month</Text>
+
+          {spendingLoading ? (
+            <View style={styles.spendingCard}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+            </View>
+          ) : spending && (spending.trip_count > 0 || spending.total_cents > 0) ? (
+            <View style={styles.spendingCard}>
+              {/* 3-column stats */}
+              <View style={styles.statsRow}>
+                <View style={styles.statBox}>
+                  <Text style={styles.statValue}>{formatCurrency(spending.total_cents)}</Text>
+                  <Text style={styles.statLabel}>Total</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statBox}>
+                  <Text style={styles.statValue}>{spending.trip_count}</Text>
+                  <Text style={styles.statLabel}>Trips</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statBox}>
+                  <Text style={styles.statValue}>{spending.item_count}</Text>
+                  <Text style={styles.statLabel}>Items</Text>
+                </View>
+              </View>
+
+              {/* Trend indicator */}
+              {spending.trip_count > 0 && (
+                <View style={styles.trendContainer}>
+                  <Text style={[styles.trendText, { color: getTrendDisplay(spending.trend_pct).color }]}>
+                    {getTrendDisplay(spending.trend_pct).text}
+                  </Text>
+                </View>
+              )}
+
+              {/* View Details link */}
+              <Pressable style={styles.viewDetailsButton} disabled>
+                <Text style={styles.viewDetailsText}>View Details →</Text>
+                <Text style={styles.comingSoonBadge}>Coming Soon</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <View style={styles.emptySpendingCard}>
+              <Text style={styles.emptyIcon}>📸</Text>
+              <Text style={styles.emptyText}>Scan your first receipt</Text>
+              <Text style={styles.emptySubtext}>Start tracking spending by scanning a receipt</Text>
+            </View>
+          )}
         </View>
 
         {/* Settings Section */}
@@ -158,26 +213,79 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginBottom: theme.spacing.md,
   },
-  placeholderCard: {
+  spendingCard: {
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.lg,
+    borderRadius: theme.borderRadius.lg,
+    ...theme.shadows.sm,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    ...theme.typography.h2,
+    color: theme.colors.primary,
+    fontWeight: '700',
+    marginBottom: theme.spacing.xs,
+  },
+  statLabel: {
+    ...theme.typography.caption,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+  },
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: theme.colors.border,
+    marginHorizontal: theme.spacing.sm,
+  },
+  trendContainer: {
+    marginTop: theme.spacing.md,
+    paddingTop: theme.spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    alignItems: 'center',
+  },
+  trendText: {
+    ...theme.typography.bodySmall,
+    fontWeight: '600',
+  },
+  viewDetailsButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+  },
+  viewDetailsText: {
+    ...theme.typography.body,
+    color: theme.colors.primary,
+    fontWeight: '600',
+  },
+  emptySpendingCard: {
     backgroundColor: theme.colors.surface,
     padding: theme.spacing.xl,
     borderRadius: theme.borderRadius.lg,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderStyle: 'dashed',
+    ...theme.shadows.sm,
   },
-  placeholderIcon: {
+  emptyIcon: {
     fontSize: 48,
     marginBottom: theme.spacing.md,
   },
-  placeholderText: {
+  emptyText: {
     ...theme.typography.body,
     color: theme.colors.text,
-    textAlign: 'center',
+    fontWeight: '600',
     marginBottom: theme.spacing.xs,
   },
-  placeholderSubtext: {
+  emptySubtext: {
     ...theme.typography.caption,
     color: theme.colors.textSecondary,
     textAlign: 'center',
