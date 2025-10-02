@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-console.log('🤖 Gemini 2.0 Flash with Receipt Validation v8 - ' + new Date().toISOString());
+console.log('🤖 Gemini 2.0 Flash with Safeway Price Matching v9 - ' + new Date().toISOString());
 
 // CORS headers
 const corsHeaders = {
@@ -128,10 +128,13 @@ For each item provide:
 - unit: Unit of measure - "lb" for pounds, "oz" for ounces, "g" for grams, "piece" for count items, "pack", "bunch", "gallon", "liter"
 
 CRITICAL PRICE RULES:
-- If receipt has "Price" and "You Pay" columns, use "You Pay" amount
-- If item has "Member Savings" or discount, use discounted price NOT original price
-- Use the rightmost dollar amount on each item line
-- Ignore original/crossed-out prices
+- If receipt has "Price" and "You Pay" columns, use "You Pay" amount (rightmost)
+- If item has "Member Savings" or discount line, use the DISCOUNTED price NOT original price
+- For receipts with separate price sections: Match each item name to its corresponding price line
+- When items are listed first, then prices come after, carefully match item order to price order
+- Use the rightmost dollar amount on price lines (that's the "You Pay" amount)
+- Format: "4.79  3.99 S" means original $4.79, you pay $3.99
+- Ignore original/crossed-out prices, bag charges, and non-food items
 
 QUANTITY & UNIT RULES:
 - Look for weight lines: "WT 1.09 lb @ $X.XX /lb" means quantity=1.09, unit="lb"
@@ -148,6 +151,22 @@ NORMALIZATION RULES:
 3. PRESERVE important attributes: Organic, size, grade, flavor, brand
 4. Use concise names (2-5 words)
 5. DO NOT hallucinate details not on receipt
+
+PRICE MATCHING EXAMPLE (Safeway format):
+If you see:
+  ITEM A
+  ITEM B
+  Member Savings -0.80
+  ITEM C
+  2.79  2.79 S
+  4.79  3.99 S
+  6.99  5.99 S
+  Member Savings -1.00
+
+Then prices are:
+- ITEM C: $2.79 (no discount)
+- ITEM A: $3.99 (was $4.79, saved $0.80)
+- ITEM B: $5.99 (was $6.99, saved $1.00)
 
 Store: ${storeName}
 
