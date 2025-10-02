@@ -247,8 +247,8 @@ export function FixQueueScreen() {
   };
 
   const renderHeader = () => {
-    // FIX: price_cents is already the total price paid for the item, don't multiply by quantity
-    const totalAmount = editedItems.reduce((sum, item) => sum + item.price_cents, 0);
+    // Use receipt total (includes tax) if available, otherwise sum items
+    const totalAmount = receipt?.total_amount_cents || editedItems.reduce((sum, item) => sum + item.price_cents, 0);
 
     return (
       <View style={styles.header}>
@@ -262,7 +262,7 @@ export function FixQueueScreen() {
               Total: ${(totalAmount / 100).toFixed(2)}
             </Text>
             <Text style={styles.itemCount}>
-              {editedItems.length} items
+              {editedItems.length} items + tax
             </Text>
             {receipt.parse_method === 'gemini' && (
               <View style={styles.aiUsedBadge}>
@@ -276,7 +276,7 @@ export function FixQueueScreen() {
         <View style={styles.instructions}>
           <Ionicons name="information-circle" size={20} color="#3B82F6" />
           <Text style={styles.instructionText}>
-            Review and edit items below. Each item can be assigned to a storage location.
+            Review and edit items below.{'\n'}Assign each item to a storage location.
           </Text>
         </View>
       </View>
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EFF6FF',
     padding: 12,
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   instructionText: {
     flex: 1,
