@@ -247,7 +247,8 @@ export function FixQueueScreen() {
   };
 
   const renderHeader = () => {
-    const totalAmount = editedItems.reduce((sum, item) => sum + (item.price_cents * (item.quantity || 1)), 0);
+    // FIX: price_cents is already the total price paid for the item, don't multiply by quantity
+    const totalAmount = editedItems.reduce((sum, item) => sum + item.price_cents, 0);
 
     return (
       <View style={styles.header}>
@@ -272,63 +273,10 @@ export function FixQueueScreen() {
           </View>
         )}
 
-        <View style={styles.quickActions}>
-          <TouchableOpacity
-            style={[styles.inventoryToggle, addToInventory && styles.inventoryToggleActive]}
-            onPress={() => setAddToInventory(!addToInventory)}
-          >
-            <Ionicons
-              name={addToInventory ? "checkbox" : "square-outline"}
-              size={20}
-              color={addToInventory ? "#10B981" : "#6B7280"}
-            />
-            <Text style={[
-              styles.inventoryToggleText,
-              addToInventory && styles.inventoryToggleTextActive
-            ]}>
-              Add to Inventory
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {addToInventory && (
-          <View style={styles.locationSelector}>
-            <Text style={styles.locationLabel}>Add to:</Text>
-            <View style={styles.locationButtons}>
-              {[
-                { key: 'fridge', icon: 'snow', label: 'Fridge' },
-                { key: 'freezer', icon: 'ice-cream', label: 'Freezer' },
-                { key: 'pantry', icon: 'home', label: 'Pantry' },
-              ].map((loc) => (
-                <TouchableOpacity
-                  key={loc.key}
-                  style={[
-                    styles.locationButton,
-                    defaultLocation === loc.key && styles.locationButtonActive
-                  ]}
-                  onPress={() => setDefaultLocation(loc.key as any)}
-                >
-                  <Ionicons
-                    name={loc.icon as any}
-                    size={16}
-                    color={defaultLocation === loc.key ? '#fff' : '#6B7280'}
-                  />
-                  <Text style={[
-                    styles.locationButtonText,
-                    defaultLocation === loc.key && styles.locationButtonTextActive
-                  ]}>
-                    {loc.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
-
         <View style={styles.instructions}>
           <Ionicons name="information-circle" size={20} color="#3B82F6" />
           <Text style={styles.instructionText}>
-            Review and edit items below before confirming.
+            Review and edit items below. Each item can be assigned to a storage location.
           </Text>
         </View>
       </View>
