@@ -347,6 +347,12 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
               recipeText: ing.notes || `${ing.amount || ''} ${ing.unit || ''} ${ing.ingredient_name}`.trim(),
               isOptional: ing.is_optional,
               sortOrder: ing.sort_order,
+              // Add parsed field for RecipeDetailScreen availability check
+              parsed: {
+                ingredient: ing.ingredient_name,
+                quantity: ing.amount,
+                unit: ing.unit,
+              },
             })) || [],
             instructions: Array.isArray(fullRecipe.instructions) ? fullRecipe.instructions :
                          fullRecipe.instructions ? [fullRecipe.instructions] : [],
