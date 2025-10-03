@@ -207,35 +207,16 @@ export const useInventorySupabaseStore = create<InventoryState>()(
           return newItem;
         }
 
-        // Queue for lite sync if configured
-        if (FEATURE_FLAGS.SYNC_MODE_INVENTORY === 'lite') {
-          // Queue the operation for next sync
-          smartSyncService.queueOperation('add', 'pantry_items', {
-            name: item.name,
-            quantity: item.quantity,
-            unit: item.unit,
-            location: item.location,
-            category: item.category,
-            notes: item.notes,
-            expiry_date: item.expirationDate, // Map to correct column name
-            household_id: householdId,
-            status: 'active',
-          });
+        // ALWAYS use Edge Function for canonical matching (skip lite sync for inventory)
+        // Lite sync doesn't support canonical matching, so we must use Edge Function
 
-          // Update local state with pending status
-          newItem.id = Date.now().toString();
-          newItem.syncStatus = 'pending';
-          set({ items: [newItem, ...items] });
-          return newItem;
-        }
-
-        // Sync to Supabase
+        // Sync to Supabase via centralized Edge Function
         set({ isSyncing: true });
 
         try {
-          const { data, error } = await supabase
-            .from('pantry_items')
-            .insert({
+          // Call add-to-pantry Edge Function for canonical matching
+          const { data: response, error: edgeFunctionError } = await supabase.functions.invoke('add-to-pantry', {
+            body: {
               household_id: householdId,
               name: item.name,
               quantity: item.quantity,
@@ -244,12 +225,19 @@ export const useInventorySupabaseStore = create<InventoryState>()(
               category: item.category,
               notes: item.notes,
               expiry_date: item.expirationDate,
-              status: 'active',
-            })
-            .select()
-            .single();
+              source: 'manual',
+            },
+          });
 
-          if (error) throw error;
+          if (edgeFunctionError) throw edgeFunctionError;
+          if (!response?.success) throw new Error(response?.error || 'Failed to add item');
+
+          const data = response.item;
+
+          // Log canonical matching result
+          if (response.canonical_match) {
+            console.log(`✓ Item matched to canonical: ${response.canonical_match.canonical_name}`);
+          }
 
           // Update with real ID from Supabase
           const syncedItem: InventoryItem = {

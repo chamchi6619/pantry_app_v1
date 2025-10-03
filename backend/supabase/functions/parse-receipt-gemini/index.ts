@@ -1,7 +1,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { findMatch, type CanonicalItem } from '../_shared/canonicalMatcher.ts';
 
-console.log('🤖 Gemini 2.0 Flash with Safeway Price Matching v9 - ' + new Date().toISOString());
+console.log('🤖 Gemini 2.0 Flash with Canonical Matching v10 - ' + new Date().toISOString());
 
 // CORS headers
 const corsHeaders = {
@@ -292,19 +293,42 @@ ${ocr_text}`;
         ocr_confidence: confidence
       });
 
-    // Insert items into fix queue
-    const queueItems = result.items?.map((item: any) => ({
-      household_id,
-      receipt_id: receipt.id,
-      raw_text: item.raw_text || item.item_name,  // Original from receipt
-      parsed_name: item.item_name,  // Normalized name
-      categories: item.category || 'other',  // AI-inferred category
-      quantity: item.quantity || 1,
-      unit: item.unit || 'piece',  // Use extracted unit, default to piece
-      price_cents: Math.round(item.price * 100),
-      confidence: confidence,
-      needs_review: confidence < 0.8
-    })) || [];
+    // Load canonical items for matching
+    console.log('📚 Loading canonical items for matching...');
+    const { data: canonicalItems } = await supabase
+      .from('canonical_items')
+      .select('id, canonical_name, aliases, category');
+
+    console.log(`   Loaded ${canonicalItems?.length || 0} canonical items`);
+
+    // Match each item to canonical items
+    let matchedCount = 0;
+    const queueItems = result.items?.map((item: any) => {
+      const match = canonicalItems ? findMatch(item.item_name, canonicalItems as CanonicalItem[]) : null;
+
+      if (match) {
+        matchedCount++;
+        console.log(`   ✓ Matched "${item.item_name}" → "${match.matched_name}" (${match.confidence}, score: ${match.score})`);
+      } else {
+        console.log(`   ✗ No match for "${item.item_name}"`);
+      }
+
+      return {
+        household_id,
+        receipt_id: receipt.id,
+        raw_text: item.raw_text || item.item_name,  // Original from receipt
+        parsed_name: item.item_name,  // Normalized name
+        categories: item.category || 'other',  // AI-inferred category
+        quantity: item.quantity || 1,
+        unit: item.unit || 'piece',  // Use extracted unit, default to piece
+        price_cents: Math.round(item.price * 100),
+        confidence: confidence,
+        needs_review: confidence < 0.8,
+        canonical_item_id: match?.canonical_item_id || null  // ✅ Set canonical item ID!
+      };
+    }) || [];
+
+    console.log(`\n📊 Matching results: ${matchedCount}/${queueItems.length} items matched (${((matchedCount / queueItems.length) * 100).toFixed(1)}%)`);
 
     if (queueItems.length > 0) {
       await supabase

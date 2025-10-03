@@ -1,0 +1,1578 @@
+[
+  {
+    "id": "37864a7a-b2e9-4de7-a033-b2124cefcf8a",
+    "oldName": "all-purpose flour",
+    "newName": "all-purpose flour",
+    "newAliases": [
+      "flour",
+      "white flour"
+    ],
+    "newCategory": "grains",
+    "action": "update",
+    "reason": "Remove incorrect \"wheat flour\" alias - wheat flour is separate item"
+  },
+  {
+    "id": "2ee2241e-d245-4eb7-b021-39b920875c14",
+    "oldName": "allspice berries",
+    "newName": "allspice",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "allspice",
+    "reason": "Allspice berries - merge to base"
+  },
+  {
+    "id": "b39b5d9b-dc84-401b-a788-4a4afea4bd28",
+    "oldName": "baby arugula",
+    "newName": "arugula",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "arugula",
+    "reason": "Baby variant - merge to base"
+  },
+  {
+    "id": "c899ce43-2600-4583-a19c-99ad0683d8f5",
+    "oldName": "baby spinach",
+    "newName": "spinach",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "spinach",
+    "reason": "Baby variant - merge to base"
+  },
+  {
+    "id": "f07908f4-5f9c-4403-a0a8-545b8f567380",
+    "oldName": "baby yukon gold potatoes",
+    "newName": "potatoes",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "potatoes",
+    "reason": "Baby variant - merge to base"
+  },
+  {
+    "id": "034d4431-eb53-4de7-8faf-f53baa14457d",
+    "oldName": "basil leaves",
+    "newName": "basil",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "basil",
+    "reason": "Basil leaves - merge to base"
+  },
+  {
+    "id": "31affb78-8a1a-4801-9423-9e1aa2862fb1",
+    "oldName": "basmati rice",
+    "newName": "basmati rice",
+    "newAliases": [],
+    "newCategory": "grains",
+    "action": "update",
+    "reason": "Remove \"rice\" alias - basmati is specific type"
+  },
+  {
+    "id": "61e3aab3-eebc-4df1-b985-aa8f8b6b16d6",
+    "oldName": "bay leaves",
+    "newName": "bay leaf",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "bay leaf",
+    "reason": "Plural - merge to singular"
+  },
+  {
+    "id": "736a637a-cc9e-4bf3-b50b-72896ee41d3d",
+    "oldName": "bittersweet chocolate",
+    "newName": "dark chocolate",
+    "newAliases": [
+      "bittersweet chocolate"
+    ],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "dark chocolate",
+    "reason": "Bittersweet = dark chocolate"
+  },
+  {
+    "id": "646b5849-73b0-4210-ae50-cf58b8741edb",
+    "oldName": "black mustard seeds",
+    "newName": "mustard seeds",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "mustard seeds",
+    "reason": "Mustard seed color variant - merge to base"
+  },
+  {
+    "id": "e9d3b501-c4d3-42f2-9434-2aeb50ec88bd",
+    "oldName": "black peppercorns",
+    "newName": "black pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "black pepper",
+    "reason": "Pepper grind variation - merge to base"
+  },
+  {
+    "id": "2beca08a-d44b-43a8-92d0-3c7cadfc35e9",
+    "oldName": "blanched almonds",
+    "newName": "almonds",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "almonds",
+    "reason": "Nut processing variant - merge to base"
+  },
+  {
+    "id": "3c958836-417d-4cae-8eb3-d3c0448d15e2",
+    "oldName": "blanched hazelnuts",
+    "newName": "hazelnuts",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "hazelnuts",
+    "reason": "Blanched hazelnuts - merge to base"
+  },
+  {
+    "id": "e3a9f463-e209-4af5-92ba-7fb2f551b120",
+    "oldName": "boiling water",
+    "newName": "water",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "water",
+    "reason": "Water temperature state - merge to base"
+  },
+  {
+    "id": "93234663-3b98-4a99-b38b-90d5941a3522",
+    "oldName": "broccoli florets",
+    "newName": "broccoli",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "broccoli",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "038e0f1e-3d6c-40a2-9d8b-392f5e0caf13",
+    "oldName": "bunch cilantro",
+    "newName": "cilantro",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "cilantro",
+    "reason": "Quantity descriptor - merge to base"
+  },
+  {
+    "id": "b36a43d6-0b14-4a89-a53c-75dccbafa7e3",
+    "oldName": "bunch parsley",
+    "newName": "parsley",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "parsley",
+    "reason": "Quantity descriptor - merge to base"
+  },
+  {
+    "id": "b019775e-ea65-4eca-8988-ad1d9b966785",
+    "oldName": "canola oil",
+    "newName": "canola oil",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "da28b6de-d8d3-4cdd-87ee-fc6821e80830",
+    "oldName": "caraway seeds",
+    "newName": "caraway seeds",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "9037035e-8b9b-4b60-b2df-3201e10a67fb",
+    "oldName": "cardamom pods",
+    "newName": "cardamom pods",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "08a52fe8-add4-471c-9c5b-45d6ef64775f",
+    "oldName": "carrots",
+    "newName": "carrots",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "8eb599ff-15fa-4cc2-a977-e1fc9d854ab3",
+    "oldName": "caster sugar",
+    "newName": "caster sugar",
+    "newAliases": [
+      "superfine sugar"
+    ],
+    "newCategory": "other",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "86963bfd-5e84-4ca8-bcc6-16414dab40a4",
+    "oldName": "cayenne pepper",
+    "newName": "cayenne pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "cd045325-60c0-4e16-bbe7-307eadab34de",
+    "oldName": "celery",
+    "newName": "celery",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "bd87308c-83af-4f12-bde4-1006cb1d42f1",
+    "oldName": "celery stalks",
+    "newName": "celery stalks",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "f42974f5-ee07-456d-beb1-bfd59ece9514",
+    "oldName": "champagne vinegar",
+    "newName": "champagne vinegar",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "d589cccb-59a4-4af9-bfe0-896ca3c2af2a",
+    "oldName": "cherry tomatoes",
+    "newName": "cherry tomatoes",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "715dc782-689e-42e5-92fb-0f5b1875f682",
+    "oldName": "chia seeds",
+    "newName": "chia seeds",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "46a35957-aace-4234-8136-08da82d6eee5",
+    "oldName": "chicken broth",
+    "newName": "chicken broth",
+    "newAliases": [],
+    "newCategory": "protein",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "615b79b9-1587-4e2e-862a-5c2e6591e99f",
+    "oldName": "chicken stock",
+    "newName": "chicken stock",
+    "newAliases": [],
+    "newCategory": "protein",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "3574cc63-d017-405d-bbac-27cc8ed97b23",
+    "oldName": "chicken wings",
+    "newName": "chicken wings",
+    "newAliases": [],
+    "newCategory": "protein",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "33b19951-81a9-40d6-b7e1-94df29c33e6a",
+    "oldName": "chile flakes",
+    "newName": "red pepper flakes",
+    "newAliases": [
+      "chile flakes"
+    ],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "red pepper flakes",
+    "reason": "Chile flakes = red pepper flakes"
+  },
+  {
+    "id": "2c65c3a5-52d5-458e-84ec-870141f80dc0",
+    "oldName": "chiles de arbol",
+    "newName": "arbol chiles",
+    "newAliases": [
+      "chiles de arbol"
+    ],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Normalize name to \"arbol chiles\""
+  },
+  {
+    "id": "6f4395be-8f41-453f-9c6d-2e39ce151aa0",
+    "oldName": "chili powder",
+    "newName": "chili powder",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "4082606b-f3ae-4205-a8cf-35de8b02840c",
+    "oldName": "chives",
+    "newName": "chives",
+    "newAliases": [
+      "fresh chives",
+      "dried chives"
+    ],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "31509ac6-9971-4834-85e4-1a7a5f4cb2c0",
+    "oldName": "cilantro",
+    "newName": "cilantro",
+    "newAliases": [
+      "fresh cilantro",
+      "dried cilantro"
+    ],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "c637b896-65cd-481a-848c-c0577e09d4b3",
+    "oldName": "cilantro leaves",
+    "newName": "cilantro",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "cilantro",
+    "reason": "Cilantro part - merge to base"
+  },
+  {
+    "id": "79d6bf73-bd2e-40f3-be09-9cf9ef13ff38",
+    "oldName": "cilantro leaves with tender stems",
+    "newName": "cilantro",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "cilantro",
+    "reason": "Cilantro part - merge to base"
+  },
+  {
+    "id": "fca2414f-7f16-44c2-a4c4-3dea837174ac",
+    "oldName": "cilantro sprigs",
+    "newName": "cilantro",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "cilantro",
+    "reason": "Cilantro part - merge to base"
+  },
+  {
+    "id": "d16e81c3-ec60-4918-b488-46c59e6799ac",
+    "oldName": "cinnamon",
+    "newName": "cinnamon",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "cf5924ed-80dd-4655-ae0c-dddb72c95cac",
+    "oldName": "cinnamon stick",
+    "newName": "cinnamon",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "cinnamon",
+    "reason": "Cinnamon form - merge to base"
+  },
+  {
+    "id": "252dbf82-177c-4e12-91e6-2c8b36d0cf31",
+    "oldName": "cinnamon sticks",
+    "newName": "cinnamon",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "cinnamon",
+    "reason": "Cinnamon form - merge to base"
+  },
+  {
+    "id": "44a4d398-da65-4e22-b842-962d094ffbea",
+    "oldName": "coarse salt",
+    "newName": "salt",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "salt",
+    "reason": "Salt variant - merge to base"
+  },
+  {
+    "id": "f41d0913-0887-420d-9061-05ddd06feb17",
+    "oldName": "coarsely chopped parsley",
+    "newName": "parsley",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "parsley",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "036e5283-e638-4eef-98b5-5fd1e6611b78",
+    "oldName": "coarsely ground black pepper",
+    "newName": "ground black pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "ground black pepper",
+    "reason": "Pepper grind variation - merge to base"
+  },
+  {
+    "id": "f6466a16-7ed3-4521-878d-a5401fef3d94",
+    "oldName": "coconut cream",
+    "newName": "coconut cream",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "02d71282-d6f0-4f12-8e44-c56f9e098ef5",
+    "oldName": "coconut milk",
+    "newName": "coconut milk",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "1e078aeb-5f09-45cd-89ba-d81327d165da",
+    "oldName": "coconut oil",
+    "newName": "coconut oil",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "305c5966-1378-479f-94bb-35994a6281e4",
+    "oldName": "confectioners sugar",
+    "newName": "powdered sugar",
+    "newAliases": [
+      "confectioners sugar"
+    ],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "powdered sugar",
+    "reason": "Confectioners sugar = powdered sugar"
+  },
+  {
+    "id": "fd075d8e-ed61-4304-8c5f-bfabf34ca327",
+    "oldName": "cooked rice",
+    "newName": "rice",
+    "newAliases": [],
+    "newCategory": "grains",
+    "action": "merge",
+    "mergeInto": "rice",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "017cf7fa-92a5-4fdc-9fff-e170334d512b",
+    "oldName": "coriander seeds",
+    "newName": "coriander seeds",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "c0abd70c-2105-468b-ad39-4c54b758cc10",
+    "oldName": "crumbled feta",
+    "newName": "feta",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "feta",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "3f83f5d8-4972-45c8-b67e-c76ad85bf567",
+    "oldName": "crushed red pepper flakes",
+    "newName": "red pepper flakes",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "red pepper flakes",
+    "reason": "Crushed red pepper flakes - merge to base"
+  },
+  {
+    "id": "3ece6f3d-487e-4109-a402-d9894ca81f70",
+    "oldName": "double-concentrated tomato paste",
+    "newName": "tomato paste",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "tomato paste",
+    "reason": "Quantity descriptor - merge to base"
+  },
+  {
+    "id": "d9cfa548-a331-43ae-8244-45a91311d22e",
+    "oldName": "drained capers",
+    "newName": "capers",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "capers",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "2f293028-9dea-4a71-8ad6-4202713a9ce8",
+    "oldName": "envelope active dry yeast",
+    "newName": "active dry yeast",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "active dry yeast",
+    "reason": "Quantity descriptor - merge to base"
+  },
+  {
+    "id": "84e736c2-1298-4d14-bc65-8e4ac857e506",
+    "oldName": "extra-virgin olive oil",
+    "newName": "olive oil",
+    "newAliases": [
+      "extra-virgin olive oil"
+    ],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "olive oil",
+    "reason": "EVOO variant - merge to olive oil with alias"
+  },
+  {
+    "id": "7688b6eb-8c58-454d-b24a-b0f2772a1997",
+    "oldName": "filtered water",
+    "newName": "water",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "water",
+    "reason": "Water temperature state - merge to base"
+  },
+  {
+    "id": "000c96e5-ecd2-4dcb-9905-4f09aa8859da",
+    "oldName": "fine sea salt",
+    "newName": "sea salt",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "sea salt",
+    "reason": "Salt variant - merge to base"
+  },
+  {
+    "id": "037bb942-b338-4160-9e92-01ea20fa3d6d",
+    "oldName": "finely chopped sage",
+    "newName": "sage",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "sage",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "45d852c6-8809-4ba9-bbe0-1cd7ac20d701",
+    "oldName": "finely grated lemon rind",
+    "newName": "lemon rind",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lemon rind",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "5a563faf-fe0c-46a5-9d21-3cbe7841815d",
+    "oldName": "finely grated lemon zest",
+    "newName": "lemon zest",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lemon zest",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "3237e5cf-a108-467b-b4f2-e5438a8b6fd9",
+    "oldName": "finely grated lime zest",
+    "newName": "lime zest",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lime zest",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "66e0fc14-405e-403d-99f4-9be70995df9d",
+    "oldName": "finely grated orange zest",
+    "newName": "orange zest",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "orange zest",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "a67d0b88-56da-4198-a565-7fa1b5915fcd",
+    "oldName": "finely grated parmesan",
+    "newName": "parmesan",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "parmesan",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "ed2a32fe-b85b-4b94-9cce-fa218ccc327f",
+    "oldName": "finely ground black pepper",
+    "newName": "ground black pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "ground black pepper",
+    "reason": "Pepper grind variation - merge to base"
+  },
+  {
+    "id": "f470a986-aaef-44b5-9980-49be0db992c1",
+    "oldName": "fish sauce",
+    "newName": "fish sauce",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "99174326-a6c2-4878-8605-f46ca03c8157",
+    "oldName": "flaky sea salt",
+    "newName": "sea salt",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "sea salt",
+    "reason": "Salt variant - merge to base"
+  },
+  {
+    "id": "4a7112d4-eda1-4961-96b7-52d92b55c548",
+    "oldName": "flat-leaf parsley",
+    "newName": "parsley",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "parsley",
+    "reason": "Parsley variant - merge to base"
+  },
+  {
+    "id": "053d654f-8328-4bec-8c5e-319588eaeb51",
+    "oldName": "flour",
+    "newName": "all-purpose flour",
+    "newAliases": [],
+    "newCategory": "grains",
+    "action": "merge",
+    "mergeInto": "all-purpose flour",
+    "reason": "Plain flour -> all-purpose flour"
+  },
+  {
+    "id": "5765cec5-9a93-4541-a7ca-2d20c81550e6",
+    "oldName": "freshly cracked black pepper",
+    "newName": "black pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "black pepper",
+    "reason": "\"Freshly\" prefix is meaningless - merge to base"
+  },
+  {
+    "id": "f3994ca3-4a91-4670-b03b-0826379ca14e",
+    "oldName": "freshly grated nutmeg",
+    "newName": "nutmeg",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "nutmeg",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "5e693442-a99c-4482-a55b-4f36de5569f7",
+    "oldName": "freshly ground black pepper",
+    "newName": "ground black pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "ground black pepper",
+    "reason": "\"Freshly\" prefix is meaningless - merge to base"
+  },
+  {
+    "id": "95a1a768-34f6-4825-a049-4348eade15bb",
+    "oldName": "freshly ground pepper",
+    "newName": "ground pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "ground pepper",
+    "reason": "\"Freshly\" prefix is meaningless - merge to base"
+  },
+  {
+    "id": "94739cb7-4236-45f4-9bd7-93c9ee25d910",
+    "oldName": "freshly ground white pepper",
+    "newName": "white pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "white pepper",
+    "reason": "\"Freshly\" prefix is meaningless - merge to base"
+  },
+  {
+    "id": "7565a42a-5124-46fc-aa83-db07dcddd84f",
+    "oldName": "freshly squeezed lemon juice",
+    "newName": "lemon juice",
+    "newAliases": [],
+    "newCategory": "beverages",
+    "action": "merge",
+    "mergeInto": "lemon juice",
+    "reason": "\"Freshly\" prefix is meaningless - merge to base"
+  },
+  {
+    "id": "33e1460b-762c-42a8-b8f2-79360b579d91",
+    "oldName": "freshly squeezed lime juice",
+    "newName": "lime juice",
+    "newAliases": [],
+    "newCategory": "beverages",
+    "action": "merge",
+    "mergeInto": "lime juice",
+    "reason": "\"Freshly\" prefix is meaningless - merge to base"
+  },
+  {
+    "id": "4ffda8ef-e9dc-456f-9590-00cfd62f0803",
+    "oldName": "full-fat coconut milk",
+    "newName": "coconut milk",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "coconut milk",
+    "reason": "Coconut milk variant - merge to base"
+  },
+  {
+    "id": "1a478751-9866-45cb-a9e1-5e4e374114c7",
+    "oldName": "garam masala",
+    "newName": "garam masala",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "b3581a7b-0fec-449c-8fb8-58d1879c8e69",
+    "oldName": "garlic",
+    "newName": "garlic",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "79185080-576d-44fb-a056-b4ab2e4134c4",
+    "oldName": "goat cheese",
+    "newName": "goat cheese",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "update",
+    "reason": "Remove redundant \"fresh goat cheese\" alias"
+  },
+  {
+    "id": "7be7b970-fe10-41a0-a3c3-bd7fee1bf1ed",
+    "oldName": "golden raisins",
+    "newName": "raisins",
+    "newAliases": [
+      "golden raisins"
+    ],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "raisins",
+    "reason": "Golden raisins - merge to base"
+  },
+  {
+    "id": "30b7aae9-abf9-44b9-9d94-452394e815aa",
+    "oldName": "grated lemon zest",
+    "newName": "lemon zest",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lemon zest",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "439484d1-c5f6-4d46-9972-cea8ab02251e",
+    "oldName": "grated parmesan cheese",
+    "newName": "parmesan",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "parmesan",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "3a3e0b8b-2887-4b72-bc51-cdaf9ba92034",
+    "oldName": "hemp seeds",
+    "newName": "hemp seeds",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "d34e07ea-3b29-45d7-a88e-cf98f3f52c56",
+    "oldName": "honey",
+    "newName": "honey",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "2af9c553-e7be-4f7e-b153-cf4f465c6582",
+    "oldName": "hot sauce",
+    "newName": "hot sauce",
+    "newAliases": [
+      "tapatio",
+      "cholula",
+      "franks"
+    ],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "a0f2959c-d1a1-4d69-82c7-53b730a981d3",
+    "oldName": "hot smoked Spanish paprika",
+    "newName": "smoked paprika",
+    "newAliases": [
+      "hot smoked paprika"
+    ],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "smoked paprika",
+    "reason": "Hot smoked paprika - merge to smoked paprika"
+  },
+  {
+    "id": "98f45000-e1da-442b-9869-3094fbac0193",
+    "oldName": "hot water",
+    "newName": "water",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "water",
+    "reason": "Water temperature state - merge to base"
+  },
+  {
+    "id": "729af642-48ac-4d3e-883a-2a531e906509",
+    "oldName": "juniper berries",
+    "newName": "juniper berries",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "ab883731-42f0-4394-ac68-f659c365cf95",
+    "oldName": "ketchup",
+    "newName": "ketchup",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "86e13ead-f3e0-45f4-a13d-50893d8cda39",
+    "oldName": "kosher salt",
+    "newName": "kosher salt",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "a483d1cd-c7cf-405b-b147-386177fbb717",
+    "oldName": "lemon",
+    "newName": "lemon",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "deec9739-c663-458e-87ef-779c7a81918e",
+    "oldName": "lemon juice",
+    "newName": "lemon juice",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "ec7cc552-7682-4f74-938c-230cdc8160ba",
+    "oldName": "lemon wedges",
+    "newName": "lemon",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lemon",
+    "reason": "Quantity descriptor - merge to base"
+  },
+  {
+    "id": "36346d13-5920-49ad-b353-72bc7c217eff",
+    "oldName": "lemons",
+    "newName": "lemon",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lemon",
+    "reason": "Plural - merge to singular"
+  },
+  {
+    "id": "2ab34f6d-76f3-445f-91b7-923bb9b863b1",
+    "oldName": "light brown sugar",
+    "newName": "light brown sugar",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "6d701ea9-c502-4eaf-ab81-3a806dc2ae62",
+    "oldName": "light corn syrup",
+    "newName": "light corn syrup",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "dcc02c08-a719-4f81-82ef-65cb2d76fb80",
+    "oldName": "lime",
+    "newName": "lime",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "0025e82b-03a7-416e-999d-24a62b4595d1",
+    "oldName": "lime juice",
+    "newName": "lime juice",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "a52914a6-887d-4b3d-a34c-4c9aa1e0e1fd",
+    "oldName": "lime wedges",
+    "newName": "lime",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lime",
+    "reason": "Quantity descriptor - merge to base"
+  },
+  {
+    "id": "181309f5-521e-4bf7-8320-03b09811c613",
+    "oldName": "limes",
+    "newName": "lime",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lime",
+    "reason": "Plural - merge to singular"
+  },
+  {
+    "id": "cf994f1a-ece1-48ec-9c8a-d9335bb47191",
+    "oldName": "maldon sea salt",
+    "newName": "sea salt",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "sea salt",
+    "reason": "Salt variant - merge to base"
+  },
+  {
+    "id": "c078d328-6b8f-41a1-a213-9b30b4ee2ff0",
+    "oldName": "maple syrup",
+    "newName": "maple syrup",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "255f76b5-ae09-4854-b346-b93e465706c3",
+    "oldName": "mayonnaise",
+    "newName": "mayonnaise",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "b4c6178c-d239-4148-b56f-518181c2a7f6",
+    "oldName": "mild red pepper flakes",
+    "newName": "mild red pepper flakes",
+    "newAliases": [
+      "aleppo pepper",
+      "maras pepper",
+      "gochugaru",
+      "urfa pepper"
+    ],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "8736db16-dad7-4296-bddc-3f73169a6d3e",
+    "oldName": "milk",
+    "newName": "milk",
+    "newAliases": [
+      "whole milk"
+    ],
+    "newCategory": "dairy",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "ba52770b-d8ed-41dd-af09-ef39a054fbc8",
+    "oldName": "mint",
+    "newName": "mint",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "8b888adc-a261-41e2-b137-77c56b730e87",
+    "oldName": "mint leaves",
+    "newName": "mint",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "mint",
+    "reason": "Mint variant - merge to base"
+  },
+  {
+    "id": "013495ae-7388-48f3-9cc0-e9745ff28efc",
+    "oldName": "mirin",
+    "newName": "mirin",
+    "newAliases": [
+      "sweet japanese rice wine",
+      "japanese rice wine"
+    ],
+    "newCategory": "other",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "5679cc2e-db71-426c-a5f8-df0e68d8cb08",
+    "oldName": "mustard powder",
+    "newName": "mustard powder",
+    "newAliases": [
+      "colman's english mustard"
+    ],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "d7fe46c5-7c18-4f00-b062-78518feb9570",
+    "oldName": "mustard seeds",
+    "newName": "mustard seeds",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "2af19b38-b0a4-49db-b2d4-cf09f6f99d2b",
+    "oldName": "nonstick vegetable oil spray",
+    "newName": "nonstick vegetable oil spray",
+    "newAliases": [
+      "cooking spray"
+    ],
+    "newCategory": "condiments",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "051a104f-5c12-41e5-8da8-8e6e0d8f849f",
+    "oldName": "nutritional yeast",
+    "newName": "nutritional yeast",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "update",
+    "reason": "Remove self-referencing alias"
+  },
+  {
+    "id": "e9cc19b3-b9ff-4316-b90f-e09bd80f98f8",
+    "oldName": "oil-packed anchovy fillets",
+    "newName": "anchovy fillets",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "anchovy fillets",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "83d034c0-77ca-4c39-94cf-b64623c35bf4",
+    "oldName": "old-fashioned oats",
+    "newName": "rolled oats",
+    "newAliases": [
+      "old-fashioned oats"
+    ],
+    "newCategory": "grains",
+    "action": "merge",
+    "mergeInto": "rolled oats",
+    "reason": "Old-fashioned oats = rolled oats"
+  },
+  {
+    "id": "59c7845d-be6e-4351-aa80-706d13ae005c",
+    "oldName": "onion",
+    "newName": "onions",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "onions",
+    "reason": "Singular -> plural"
+  },
+  {
+    "id": "1e120c6d-089f-40dd-8d74-5a76bf8dc33b",
+    "oldName": "oregano leaves",
+    "newName": "oregano",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "oregano",
+    "reason": "Oregano leaves - merge to base"
+  },
+  {
+    "id": "b5b10cc8-00b6-45f2-9ccd-715a1b8d4135",
+    "oldName": "organic plain milk kefir",
+    "newName": "kefir",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "kefir",
+    "reason": "Specific kefir variant - merge to base"
+  },
+  {
+    "id": "e77bb11b-20c0-47c4-9628-635d05fbff39",
+    "oldName": "parsley leaves",
+    "newName": "parsley",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "parsley",
+    "reason": "Parsley variant - merge to base"
+  },
+  {
+    "id": "513d6cdd-ac16-48bb-872a-a32b01aa5793",
+    "oldName": "parsley leaves with tender stems",
+    "newName": "parsley",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "parsley",
+    "reason": "Parsley variant - merge to base"
+  },
+  {
+    "id": "c220143c-3579-4073-a03b-f7a789378ac6",
+    "oldName": "pecan halves",
+    "newName": "pecans",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "pecans",
+    "reason": "Quantity descriptor - merge to base"
+  },
+  {
+    "id": "ace4ec20-c5a3-43d1-9de9-3c9a2205e41a",
+    "oldName": "pinch of cayenne pepper",
+    "newName": "cayenne pepper",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "cayenne pepper",
+    "reason": "Quantity descriptor - merge to base"
+  },
+  {
+    "id": "6232036e-eebb-4827-852c-ba9480f6b0c6",
+    "oldName": "plain Greek yogurt",
+    "newName": "greek yogurt",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "greek yogurt",
+    "reason": "Yogurt variant - merge to greek yogurt"
+  },
+  {
+    "id": "4c3ef7bd-759a-4efa-8831-64b1cd9ebdb9",
+    "oldName": "plain whole-milk Greek yogurt",
+    "newName": "greek yogurt",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "greek yogurt",
+    "reason": "Yogurt variant - merge to greek yogurt"
+  },
+  {
+    "id": "1429cc7e-93be-426b-a1d1-2adf26810dbe",
+    "oldName": "plain whole-milk yogurt",
+    "newName": "greek yogurt",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "greek yogurt",
+    "reason": "Yogurt variant - merge to greek yogurt"
+  },
+  {
+    "id": "6a1f512e-d983-487e-ba3e-2273ab485481",
+    "oldName": "plain yogurt",
+    "newName": "greek yogurt",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "greek yogurt",
+    "reason": "Yogurt variant - merge to greek yogurt"
+  },
+  {
+    "id": "7102846b-6b93-4651-b9c4-68b68272e882",
+    "oldName": "pure maple syrup",
+    "newName": "maple syrup",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "maple syrup",
+    "reason": "Duplicate - maple syrup exists in OTHER"
+  },
+  {
+    "id": "fa9c8595-d15f-4f02-96f4-52a7737189c0",
+    "oldName": "pure vanilla extract",
+    "newName": "vanilla extract",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "vanilla extract",
+    "reason": "Duplicate - vanilla extract exists in OTHER"
+  },
+  {
+    "id": "7bdd1e84-663a-44a1-98a5-4ab0dc251a8a",
+    "oldName": "raw pistachios",
+    "newName": "pistachios",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "pistachios",
+    "reason": "Nut processing variant - merge to base"
+  },
+  {
+    "id": "b7cbc589-5767-40e2-bc85-f871b24d420b",
+    "oldName": "raw pumpkin seeds",
+    "newName": "pumpkin seeds",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "pumpkin seeds",
+    "reason": "Nut processing variant - merge to base"
+  },
+  {
+    "id": "e4e48637-6861-4c2f-b386-8f993fc561db",
+    "oldName": "raw sesame seeds",
+    "newName": "sesame seeds",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "sesame seeds",
+    "reason": "Nut processing variant - merge to base"
+  },
+  {
+    "id": "d7e07ee4-9207-46a0-ac22-b34998a749e4",
+    "oldName": "raw walnuts",
+    "newName": "walnuts",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "walnuts",
+    "reason": "Nut processing variant - merge to base"
+  },
+  {
+    "id": "1395ff4d-0241-4435-9faf-2e8b8fc91bd9",
+    "oldName": "red chile",
+    "newName": "dried red chile",
+    "newAliases": [
+      "red chile"
+    ],
+    "newCategory": "spices",
+    "action": "update",
+    "reason": "Specify dried (since we have fresh chiles too)"
+  },
+  {
+    "id": "4f399a6b-347d-4342-9ca2-06c784ea10ee",
+    "oldName": "sage leaves",
+    "newName": "sage",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "sage",
+    "reason": "Sage leaves - merge to base"
+  },
+  {
+    "id": "4b903eb8-2075-457c-8c18-f4a0d90ec270",
+    "oldName": "scallion",
+    "newName": "scallions",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "scallions",
+    "reason": "Singular -> plural"
+  },
+  {
+    "id": "990555ed-30ba-4a6a-98bf-2f382779ff4a",
+    "oldName": "sea salt flakes",
+    "newName": "sea salt",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "sea salt",
+    "reason": "Salt variant - merge to base"
+  },
+  {
+    "id": "52d7da80-a284-4b90-b5dd-0f9fabb253c5",
+    "oldName": "seasoned rice vinegar",
+    "newName": "rice vinegar",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "rice vinegar",
+    "reason": "Rice vinegar variant - merge to base"
+  },
+  {
+    "id": "c7412f5a-7b67-4c36-bb2e-a870deaa146d",
+    "oldName": "shallot",
+    "newName": "shallots",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "shallots",
+    "reason": "Singular - merge to plural"
+  },
+  {
+    "id": "a8e80eb4-31f5-4823-953c-c79fdb2ae902",
+    "oldName": "skin-on almonds",
+    "newName": "almonds",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "almonds",
+    "reason": "Nut processing variant - merge to base"
+  },
+  {
+    "id": "d353a3c1-f69a-4647-951c-53710fa196e2",
+    "oldName": "sprig rosemary",
+    "newName": "rosemary",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "rosemary",
+    "reason": "Rosemary sprig - merge to base"
+  },
+  {
+    "id": "c7f582f0-9b51-4850-942d-ca057499124b",
+    "oldName": "sprigs thyme",
+    "newName": "thyme",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "thyme",
+    "reason": "Thyme sprigs - merge to base"
+  },
+  {
+    "id": "b87f2742-c77a-4e60-9e85-03769e59ee3d",
+    "oldName": "steamed rice",
+    "newName": "rice",
+    "newAliases": [],
+    "newCategory": "grains",
+    "action": "merge",
+    "mergeInto": "rice",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "8425908a-5b15-402e-a851-0c23bce104ea",
+    "oldName": "strips orange zest",
+    "newName": "orange zest",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "orange zest",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "b7ab0696-4684-4bc5-ba19-22d87fe6a7db",
+    "oldName": "sweetened condensed milk",
+    "newName": "condensed milk",
+    "newAliases": [
+      "sweetened condensed milk"
+    ],
+    "newCategory": "dairy",
+    "action": "update",
+    "reason": "Condensed milk is always sweetened - simplify name"
+  },
+  {
+    "id": "a1117734-430c-4a9a-a2c5-2cb34c3c09fe",
+    "oldName": "tarragon leaves",
+    "newName": "tarragon",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "tarragon",
+    "reason": "Tarragon leaves - merge to base"
+  },
+  {
+    "id": "e0c48afe-5b33-4ff2-914a-9d75e98fdb78",
+    "oldName": "thick slices country-style bread",
+    "newName": "bread",
+    "newAliases": [],
+    "newCategory": "grains",
+    "action": "merge",
+    "mergeInto": "bread",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "c6981ce0-66d1-4e0a-8031-64a8d9ee7ad5",
+    "oldName": "thyme sprigs",
+    "newName": "thyme",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "thyme",
+    "reason": "Thyme sprigs - merge to base"
+  },
+  {
+    "id": "8f41e6d3-2b0a-4637-8f75-f1fe8e99725c",
+    "oldName": "toasted sesame seeds",
+    "newName": "sesame seeds",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "sesame seeds",
+    "reason": "Preparation state - merge to base"
+  },
+  {
+    "id": "a3ff3644-3467-4ac7-8ad3-fb7044b5540b",
+    "oldName": "tomato",
+    "newName": "tomatoes",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "tomatoes",
+    "reason": "Singular - merge to plural"
+  },
+  {
+    "id": "60603abd-42aa-4975-861d-7af288a842cd",
+    "oldName": "torn mint leaves",
+    "newName": "mint",
+    "newAliases": [],
+    "newCategory": "spices",
+    "action": "merge",
+    "mergeInto": "mint",
+    "reason": "Mint variant - merge to base"
+  },
+  {
+    "id": "5de8e679-994d-47c3-8fbb-9ca115cf3fb1",
+    "oldName": "unseasoned rice vinegar",
+    "newName": "rice vinegar",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "rice vinegar",
+    "reason": "Rice vinegar variant - merge to base"
+  },
+  {
+    "id": "dd326266-85a3-46e7-b0f1-ec4a4d1a6f11",
+    "oldName": "unsweetened coconut milk",
+    "newName": "coconut milk",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "coconut milk",
+    "reason": "Coconut milk variant - merge to base"
+  },
+  {
+    "id": "04b86c7a-ba62-4a17-867e-1a9ff86d1676",
+    "oldName": "virgin coconut oil",
+    "newName": "coconut oil",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "coconut oil",
+    "reason": "Virgin coconut oil - merge to base"
+  },
+  {
+    "id": "888b5eef-478d-4aa0-9271-137dd0e05837",
+    "oldName": "warm water",
+    "newName": "water",
+    "newAliases": [],
+    "newCategory": "other",
+    "action": "merge",
+    "mergeInto": "water",
+    "reason": "Water temperature state - merge to base"
+  },
+  {
+    "id": "efa780fd-00f7-453b-85f9-055a837479b4",
+    "oldName": "whole-milk ricotta",
+    "newName": "ricotta",
+    "newAliases": [],
+    "newCategory": "dairy",
+    "action": "merge",
+    "mergeInto": "ricotta",
+    "reason": "Whole-milk ricotta - merge to base"
+  },
+  {
+    "id": "0c271c31-703c-49d5-a750-3cf2ee9d04d1",
+    "oldName": "yellow mustard seeds",
+    "newName": "mustard seeds",
+    "newAliases": [],
+    "newCategory": "condiments",
+    "action": "merge",
+    "mergeInto": "mustard seeds",
+    "reason": "Mustard seed color variant - merge to base"
+  },
+  {
+    "id": "4a1f5cea-e48d-4d37-990c-83a6ba4de08f",
+    "oldName": "zest of 1 lemon",
+    "newName": "lemon zest",
+    "newAliases": [],
+    "newCategory": "produce",
+    "action": "merge",
+    "mergeInto": "lemon zest",
+    "reason": "Preparation state - merge to base"
+  }
+]

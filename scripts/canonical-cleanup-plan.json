@@ -1,0 +1,4479 @@
+[
+  {
+    "original_id": "07883d42-2e16-4f28-9249-aa54fd8fb15c",
+    "cleaned_name": "active dry yeast",
+    "clean_aliases": [
+      "yeast",
+      "dried yeast",
+      "baking yeast"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "71a37fa4-dfae-4e2e-819a-cd3c0ded73e7",
+    "cleaned_name": "deep-fry thermometer",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "kitchen equipment, not an ingredient"
+  },
+  {
+    "original_id": "3afb49dc-ae0e-4f58-8c38-2d07fb14ef0e",
+    "cleaned_name": "agave nectar",
+    "clean_aliases": [
+      "agave"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "d8ff4608-5788-402a-bec6-2daf9b6fecdd",
+    "cleaned_name": "aleppo-style pepper",
+    "clean_aliases": [
+      "aleppo pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "37864a7a-b2e9-4de7-a033-b2124cefcf8a",
+    "cleaned_name": "all-purpose flour",
+    "clean_aliases": [
+      "flour",
+      "white flour",
+      "wheat flour"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "56918aeb-d211-48a3-8e09-86394e198c28",
+    "cleaned_name": "all-purpose flour",
+    "clean_aliases": [
+      "flour",
+      "white flour",
+      "wheat flour"
+    ],
+    "correct_category": "grains",
+    "action": "merge",
+    "merge_into": "all-purpose flour",
+    "reason": "duplicate variation of all-purpose flour"
+  },
+  {
+    "original_id": "8017bfed-a788-4d92-8e29-d8d979a098b2",
+    "cleaned_name": "all-purpose flour",
+    "clean_aliases": [
+      "flour",
+      "white flour",
+      "wheat flour"
+    ],
+    "correct_category": "grains",
+    "action": "merge",
+    "merge_into": "all-purpose flour",
+    "reason": "duplicate variation of all-purpose flour"
+  },
+  {
+    "original_id": "03057fde-d8fb-4ac0-a071-cfed04148b9f",
+    "cleaned_name": "all-purpose flour",
+    "clean_aliases": [
+      "flour",
+      "white flour",
+      "wheat flour"
+    ],
+    "correct_category": "grains",
+    "action": "merge",
+    "merge_into": "all-purpose flour",
+    "reason": "duplicate variation of all-purpose flour"
+  },
+  {
+    "original_id": "615795c0-c814-4133-9a43-28dccc5e5d1e",
+    "cleaned_name": "allspice",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "2ee2241e-d245-4eb7-b021-39b920875c14",
+    "cleaned_name": "allspice berries",
+    "clean_aliases": [
+      "allspice"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "c0d2d04e-82af-4ad3-bd3a-7764eca9c7f5",
+    "cleaned_name": "almond extract",
+    "clean_aliases": [
+      "almond flavoring"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "6dd52556-cc72-4e12-9051-e0383cea4553",
+    "cleaned_name": "almonds",
+    "clean_aliases": [
+      "slivered almonds",
+      "sliced almonds",
+      "chopped almonds"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "9e2e01c3-07a9-45b7-abca-13db624b89c2",
+    "cleaned_name": "lime wedges",
+    "clean_aliases": [
+      "lime"
+    ],
+    "correct_category": "produce",
+    "action": "delete",
+    "reason": "serving instruction, not ingredient"
+  },
+  {
+    "original_id": "87f5609c-3e47-4d5c-92fe-223e75f90212",
+    "cleaned_name": "aperol",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "c1569f12-33ec-499a-8f9d-405bab768eba",
+    "cleaned_name": "apple cider vinegar",
+    "clean_aliases": [
+      "cider vinegar"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "2d9f6ea6-c16e-46f5-a404-e6e0d4114841",
+    "cleaned_name": "arugula",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "232c6fbb-ae8d-4426-bf3b-02a042fb6ea8",
+    "cleaned_name": "spice mill or mortar and pestle",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "kitchen equipment, not an ingredient"
+  },
+  {
+    "original_id": "6eed8aeb-e41c-4312-80e4-dde66b6ad056",
+    "cleaned_name": "avocado",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "7e5c2a55-9fc4-47e8-bd99-52f4e176441c",
+    "cleaned_name": "avocado oil",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "b39b5d9b-dc84-401b-a788-4a4afea4bd28",
+    "cleaned_name": "baby arugula",
+    "clean_aliases": [
+      "arugula"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "c899ce43-2600-4583-a19c-99ad0683d8f5",
+    "cleaned_name": "baby spinach",
+    "clean_aliases": [
+      "spinach"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "f07908f4-5f9c-4403-a0a8-545b8f567380",
+    "cleaned_name": "baby yukon gold potatoes",
+    "clean_aliases": [
+      "yukon gold potatoes",
+      "potatoes"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "31805260-24c6-4d8e-8159-645e1bf4332b",
+    "cleaned_name": "bacon",
+    "clean_aliases": [],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "2f142427-6188-4f2e-9e6f-2e32da4ba08b",
+    "cleaned_name": "baking powder",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "4ea79da9-a3ae-4d7e-ae66-00ca38bf5618",
+    "cleaned_name": "baking soda",
+    "clean_aliases": [
+      "sodium bicarbonate"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "992c73c5-cd3d-405e-8383-771bba10aaae",
+    "cleaned_name": "balsamic vinegar",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "e9c3faa7-ac70-4605-8f33-607875ee4791",
+    "cleaned_name": "basil",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "034d4431-eb53-4de7-8faf-f53baa14457d",
+    "cleaned_name": "basil leaves",
+    "clean_aliases": [
+      "basil"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "7bdd787e-493f-4dd4-91c9-e43b16d99fc8",
+    "cleaned_name": "basil leaves",
+    "clean_aliases": [
+      "basil"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "31affb78-8a1a-4801-9423-9e1aa2862fb1",
+    "cleaned_name": "basmati rice",
+    "clean_aliases": [
+      "rice"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "ec621421-26f0-4638-a2f5-e62b457c8e7a",
+    "cleaned_name": "bay leaf",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "61e3aab3-eebc-4df1-b985-aa8f8b6b16d6",
+    "cleaned_name": "bay leaves",
+    "clean_aliases": [
+      "bay leaf"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "736a637a-cc9e-4bf3-b50b-72896ee41d3d",
+    "cleaned_name": "bittersweet chocolate",
+    "clean_aliases": [
+      "dark chocolate"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "acfb01da-9851-493d-bd6c-0271b75017e8",
+    "cleaned_name": "blackberries",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "646b5849-73b0-4210-ae50-cf58b8741edb",
+    "cleaned_name": "black mustard seeds",
+    "clean_aliases": [
+      "mustard seeds"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "d596b869-9df5-466f-b841-cdbca3f09d58",
+    "cleaned_name": "black pepper",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "e9d3b501-c4d3-42f2-9434-2aeb50ec88bd",
+    "cleaned_name": "black peppercorns",
+    "clean_aliases": [
+      "black pepper",
+      "peppercorns"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "2beca08a-d44b-43a8-92d0-3c7cadfc35e9",
+    "cleaned_name": "blanched almonds",
+    "clean_aliases": [
+      "almonds"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "3c958836-417d-4cae-8eb3-d3c0448d15e2",
+    "cleaned_name": "blanched hazelnuts",
+    "clean_aliases": [
+      "hazelnuts"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "4cbc8aea-40b3-46ef-821d-9ad5e65d7742",
+    "cleaned_name": "blueberries",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "e3a9f463-e209-4af5-92ba-7fb2f551b120",
+    "cleaned_name": "boiling water",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "fc107fd5-7a66-4ef5-9974-bfedfdc4a297",
+    "cleaned_name": "bourbon",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "93234663-3b98-4a99-b38b-90d5941a3522",
+    "cleaned_name": "broccoli florets",
+    "clean_aliases": [
+      "broccoli"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "6450133d-c219-45ed-ae39-aa378e56c594",
+    "cleaned_name": "brown sugar",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "038e0f1e-3d6c-40a2-9d8b-392f5e0caf13",
+    "cleaned_name": "bunch cilantro",
+    "clean_aliases": [
+      "cilantro"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "b36a43d6-0b14-4a89-a53c-75dccbafa7e3",
+    "cleaned_name": "bunch parsley",
+    "clean_aliases": [
+      "parsley"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "36778ad3-bf9a-411e-ad22-c6f37947f6b3",
+    "cleaned_name": "butter",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "5078e581-c045-4d4b-8f2a-40fa4e543076",
+    "cleaned_name": "buttermilk",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "07fd6f72-98d2-4205-9936-07e0136cc1e7",
+    "cleaned_name": "butternut squash",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "3f00cc08-37d4-46a6-81ac-51cc0c1ba72b",
+    "cleaned_name": "campari",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "b019775e-ea65-4eca-8988-ad1d9b966785",
+    "cleaned_name": "canola oil",
+    "clean_aliases": [
+      "canola oil"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "da28b6de-d8d3-4cdd-87ee-fc6821e80830",
+    "cleaned_name": "caraway seeds",
+    "clean_aliases": [
+      "caraway seeds"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "9037035e-8b9b-4b60-b2df-3201e10a67fb",
+    "cleaned_name": "cardamom pods",
+    "clean_aliases": [
+      "cardamom pods"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "08a52fe8-add4-471c-9c5b-45d6ef64775f",
+    "cleaned_name": "carrots",
+    "clean_aliases": [
+      "carrots"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "8eb599ff-15fa-4cc2-a977-e1fc9d854ab3",
+    "cleaned_name": "caster sugar",
+    "clean_aliases": [
+      "caster sugar",
+      "superfine sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "86963bfd-5e84-4ca8-bcc6-16414dab40a4",
+    "cleaned_name": "cayenne pepper",
+    "clean_aliases": [
+      "cayenne pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "cd045325-60c0-4e16-bbe7-307eadab34de",
+    "cleaned_name": "celery",
+    "clean_aliases": [
+      "celery"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "bd87308c-83af-4f12-bde4-1006cb1d42f1",
+    "cleaned_name": "celery stalks",
+    "clean_aliases": [
+      "celery stalks"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "16548d85-41a7-4c9b-aa1e-3600502bc88b",
+    "cleaned_name": "celery stalks finely chopped",
+    "clean_aliases": [
+      "celery stalks"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "f42974f5-ee07-456d-beb1-bfd59ece9514",
+    "cleaned_name": "champagne vinegar",
+    "clean_aliases": [
+      "champagne vinegar"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "e59be28e-f670-4e4b-a4dd-ce183853150d",
+    "cleaned_name": "champagne vinegar or white wine vinegar",
+    "clean_aliases": [
+      "champagne vinegar",
+      "white wine vinegar"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "d589cccb-59a4-4af9-bfe0-896ca3c2af2a",
+    "cleaned_name": "cherry tomatoes",
+    "clean_aliases": [
+      "cherry tomatoes"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "f49e60cd-6aa1-4833-95ed-44adee8db48c",
+    "cleaned_name": "cherry tomatoes halved",
+    "clean_aliases": [
+      "cherry tomatoes"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "715dc782-689e-42e5-92fb-0f5b1875f682",
+    "cleaned_name": "chia seeds",
+    "clean_aliases": [
+      "chia seeds"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "2399a375-f8ab-42b5-bc37-656ec052f1d2",
+    "cleaned_name": "chicken",
+    "clean_aliases": [
+      "whole chicken"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "46a35957-aace-4234-8136-08da82d6eee5",
+    "cleaned_name": "chicken broth",
+    "clean_aliases": [
+      "chicken broth"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "615b79b9-1587-4e2e-862a-5c2e6591e99f",
+    "cleaned_name": "chicken stock",
+    "clean_aliases": [
+      "chicken stock"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "3574cc63-d017-405d-bbac-27cc8ed97b23",
+    "cleaned_name": "chicken wings",
+    "clean_aliases": [
+      "chicken wings"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "fae974f4-1027-4da6-a222-51112611b8e2",
+    "cleaned_name": "chickpeas drained and rinsed",
+    "clean_aliases": [
+      "chickpeas",
+      "drained chickpeas",
+      "rinsed chickpeas"
+    ],
+    "correct_category": "canned",
+    "action": "keep"
+  },
+  {
+    "original_id": "d9bd303d-c78a-4df8-9285-09bf61baa6ba",
+    "cleaned_name": "chickpeas rinsed",
+    "clean_aliases": [
+      "chickpeas",
+      "rinsed chickpeas"
+    ],
+    "correct_category": "canned",
+    "action": "merge",
+    "merge_into": "chickpeas drained and rinsed",
+    "reason": "duplicate variation of chickpeas"
+  },
+  {
+    "original_id": "33b19951-81a9-40d6-b7e1-94df29c33e6a",
+    "cleaned_name": "chile flakes",
+    "clean_aliases": [
+      "chile flakes",
+      "dried chile flakes"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "2c65c3a5-52d5-458e-84ec-870141f80dc0",
+    "cleaned_name": "chiles de arbol",
+    "clean_aliases": [
+      "dried chiles de arbol"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "6f4395be-8f41-453f-9c6d-2e39ce151aa0",
+    "cleaned_name": "chili powder",
+    "clean_aliases": [
+      "chili powder"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "34d9c300-9b78-4d63-a2f3-07f258ff713d",
+    "cleaned_name": "chilled heavy cream",
+    "clean_aliases": [
+      "heavy cream"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "15bb4698-d820-418f-abcc-7e907a26149b",
+    "cleaned_name": "chilled unsalted butter cut into pieces",
+    "clean_aliases": [
+      "chilled unsalted butter",
+      "unsalted butter"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "4082606b-f3ae-4205-a8cf-35de8b02840c",
+    "cleaned_name": "chives",
+    "clean_aliases": [
+      "chives",
+      "fresh chives",
+      "dried chives"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "31509ac6-9971-4834-85e4-1a7a5f4cb2c0",
+    "cleaned_name": "cilantro",
+    "clean_aliases": [
+      "cilantro",
+      "fresh cilantro",
+      "dried cilantro"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "c637b896-65cd-481a-848c-c0577e09d4b3",
+    "cleaned_name": "cilantro leaves",
+    "clean_aliases": [
+      "cilantro leaves",
+      "fresh cilantro leaves"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "79d6bf73-bd2e-40f3-be09-9cf9ef13ff38",
+    "cleaned_name": "cilantro leaves with tender stems",
+    "clean_aliases": [
+      "cilantro leaves",
+      "cilantro stems"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "fca2414f-7f16-44c2-a4c4-3dea837174ac",
+    "cleaned_name": "cilantro sprigs",
+    "clean_aliases": [
+      "cilantro sprigs"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "d16e81c3-ec60-4918-b488-46c59e6799ac",
+    "cleaned_name": "cinnamon",
+    "clean_aliases": [
+      "cinnamon"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "cf5924ed-80dd-4655-ae0c-dddb72c95cac",
+    "cleaned_name": "cinnamon stick",
+    "clean_aliases": [
+      "cinnamon stick"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "252dbf82-177c-4e12-91e6-2c8b36d0cf31",
+    "cleaned_name": "cinnamon sticks",
+    "clean_aliases": [
+      "cinnamon sticks"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "a8a984b0-30be-4670-88c1-096fe0923977",
+    "cleaned_name": "clove garlic",
+    "clean_aliases": [
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "f441f519-aa87-4adc-91eb-b863a8da128f",
+    "cleaned_name": "clove garlic crushed",
+    "clean_aliases": [
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "merge",
+    "merge_into": "clove garlic",
+    "reason": "duplicate variation of clove garlic"
+  },
+  {
+    "original_id": "512c8f4c-3828-4f12-8c9f-ec470ee6eaae",
+    "cleaned_name": "cloves",
+    "clean_aliases": [
+      "whole cloves"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "3f25395b-393b-4011-9406-7f52cb093e54",
+    "cleaned_name": "cloves garlic",
+    "clean_aliases": [
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "b5fbf1e5-43a2-448a-b4e6-4e1421303bf7",
+    "cleaned_name": "cloves garlic finely chopped",
+    "clean_aliases": [
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "e8fcb88d-cd3c-47a3-9baf-1ae9b28bb412",
+    "cleaned_name": "coarsely",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "not an ingredient"
+  },
+  {
+    "original_id": "961b491d-d5ce-4bce-bdcb-248476512572",
+    "cleaned_name": "coarsely chopped cilantro",
+    "clean_aliases": [
+      "cilantro"
+    ],
+    "correct_category": "spices",
+    "action": "merge",
+    "merge_into": "cilantro",
+    "reason": "duplicate variation of cilantro"
+  },
+  {
+    "original_id": "036e5283-e638-4eef-98b5-5fd1e6611b78",
+    "cleaned_name": "coarsely ground black pepper",
+    "clean_aliases": [
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f41d0913-0887-420d-9061-05ddd06feb17",
+    "cleaned_name": "coarsely chopped parsley",
+    "clean_aliases": [
+      "parsley"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "44a4d398-da65-4e22-b842-962d094ffbea",
+    "cleaned_name": "coarse salt",
+    "clean_aliases": [
+      "coarse salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f6466a16-7ed3-4521-878d-a5401fef3d94",
+    "cleaned_name": "coconut cream",
+    "clean_aliases": [
+      "coconut cream"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "02d71282-d6f0-4f12-8e44-c56f9e098ef5",
+    "cleaned_name": "coconut milk",
+    "clean_aliases": [
+      "coconut milk"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "1e078aeb-5f09-45cd-89ba-d81327d165da",
+    "cleaned_name": "coconut oil",
+    "clean_aliases": [
+      "coconut oil"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "9e660a32-f9d8-463c-ab87-fc40b3323ac8",
+    "cleaned_name": "cold unsalted butter",
+    "clean_aliases": [
+      "unsalted butter"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "305c5966-1378-479f-94bb-35994a6281e4",
+    "cleaned_name": "confectioners sugar",
+    "clean_aliases": [
+      "confectioners sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "fd075d8e-ed61-4304-8c5f-bfabf34ca327",
+    "cleaned_name": "cooked rice",
+    "clean_aliases": [
+      "cooked rice"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "017cf7fa-92a5-4fdc-9fff-e170334d512b",
+    "cleaned_name": "coriander seeds",
+    "clean_aliases": [
+      "coriander seeds"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "94bc599b-dc94-40cd-a32c-daa13bddad3a",
+    "cleaned_name": "corn kernels",
+    "clean_aliases": [
+      "fresh corn kernels",
+      "canned corn kernels",
+      "frozen corn kernels"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "c5ebcc46-8812-4b70-8379-62e5ccbb1d6e",
+    "cleaned_name": "cornmeal",
+    "clean_aliases": [],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "4658f31f-ce58-48eb-8ba9-9ef9e6026e55",
+    "cleaned_name": "cornstarch",
+    "clean_aliases": [],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "c8e30240-e12b-43be-aa25-7f0f9e2ad956",
+    "cleaned_name": "corn tortillas",
+    "clean_aliases": [
+      "small corn tortillas"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "a02a1f29-94e2-4db5-9478-c5dd6b3ab087",
+    "cleaned_name": "cranberries",
+    "clean_aliases": [
+      "fresh cranberries",
+      "dried cranberries",
+      "frozen cranberries"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "853c5b32-0956-472d-a5c4-2d648240779a",
+    "cleaned_name": "cream cheese",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "6af94717-a83b-4fa9-a7ba-b1e4b338d9c4",
+    "cleaned_name": "cream cheese, at room temperature",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "cream cheese",
+    "reason": "preparation of cream cheese"
+  },
+  {
+    "original_id": "da772817-33d2-406f-9817-c8eefe71fa9e",
+    "cleaned_name": "cream cheese, room temperature",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "cream cheese",
+    "reason": "preparation of cream cheese"
+  },
+  {
+    "original_id": "4aad6ae1-0ac4-47d3-a4cb-32b5520b496e",
+    "cleaned_name": "cream cheese, softened",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "cream cheese",
+    "reason": "preparation of cream cheese"
+  },
+  {
+    "original_id": "29039663-8a23-48ab-9432-c029db9f6059",
+    "cleaned_name": "cream of tartar",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "713c8116-dbc3-4b34-baf1-521e244942cf",
+    "cleaned_name": "crème fraîche",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "c0abd70c-2105-468b-ad39-4c54b758cc10",
+    "cleaned_name": "crumbled feta",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "3f83f5d8-4972-45c8-b67e-c76ad85bf567",
+    "cleaned_name": "crushed red pepper flakes",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "505bd245-b726-407f-87cd-e4e56ee74ff7",
+    "cleaned_name": "crushed tomatoes",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "061e73c2-c2fe-4f80-b25a-feb406088c47",
+    "cleaned_name": "cumin seeds",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "d027eef3-1f81-4578-b39c-8913bf959210",
+    "cleaned_name": "currants",
+    "clean_aliases": [
+      "dried currants"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "9de17ee0-6f5f-4fb1-9a4c-ef68a432e83b",
+    "cleaned_name": "curry leaves",
+    "clean_aliases": [
+      "fresh curry leaves"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "0ebe50b6-0430-41c7-bd99-d7b8bfc67859",
+    "cleaned_name": "curry powder",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "b3ad02ac-0d5d-4408-9420-da5c6b7b354d",
+    "cleaned_name": "cut into pieces",
+    "clean_aliases": [
+      "cut into pieces"
+    ],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "preparation, not ingredient"
+  },
+  {
+    "original_id": "1755690e-9e2b-49c6-bd49-478207dbf0de",
+    "cleaned_name": "dark brown sugar",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "208d037c-b4bf-4d4b-8d25-cf490e41a349",
+    "cleaned_name": "dark chocolate",
+    "clean_aliases": [
+      "chopped dark chocolate"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "09196107-ff8b-4b2c-ad24-9d07ce21220c",
+    "cleaned_name": "dark rum",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "5f3593be-e9dc-4bc9-aca9-1292095510f9",
+    "cleaned_name": "Diamond Crystal kosher salt",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f7d3e66c-94d7-40bc-bb31-ca0a5f17691f",
+    "cleaned_name": "Diamond Crystal or Morton kosher salt",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "2538ba6f-2791-42f2-aa71-515f03eb9b1c",
+    "cleaned_name": "Diamond Crystal or Morton kosher salt",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "merge",
+    "merge_into": "Diamond Crystal or Morton kosher salt",
+    "reason": "duplicate"
+  },
+  {
+    "original_id": "02206fcf-fa4b-44f1-a861-3e42be29cf69",
+    "cleaned_name": "Dijon mustard",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "37a1e30a-4c13-4db8-ab66-9772b9d23814",
+    "cleaned_name": "dill",
+    "clean_aliases": [
+      "fresh dill",
+      "dried dill",
+      "chopped dill",
+      "minced dill"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "5db00531-5544-4d3d-b580-2935bf1aaf0f",
+    "cleaned_name": "distilled white vinegar",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "5c707400-3985-44dd-8fb7-05688779b56e",
+    "cleaned_name": "divided",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "instruction, not ingredient"
+  },
+  {
+    "original_id": "3ece6f3d-487e-4109-a402-d9894ca81f70",
+    "cleaned_name": "double-concentrated tomato paste",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "d9cfa548-a331-43ae-8244-45a91311d22e",
+    "cleaned_name": "drained capers",
+    "clean_aliases": [
+      "chopped drained capers"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "71ae026e-d1ba-42ca-9016-6132cb25480e",
+    "cleaned_name": "dry white wine",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "416b4e24-a72a-4593-9f81-abf499662595",
+    "cleaned_name": "egg",
+    "clean_aliases": [
+      "large egg",
+      "whole egg"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "408a0524-d159-4e31-9e2b-c0f43b3d08d1",
+    "cleaned_name": "egg, beaten",
+    "clean_aliases": [
+      "beaten egg",
+      "large egg, beaten",
+      "medium egg, beaten"
+    ],
+    "correct_category": "protein",
+    "action": "merge",
+    "merge_into": "egg, beaten",
+    "reason": "duplicate"
+  },
+  {
+    "original_id": "68d71e16-176a-4c83-bc5c-36a19398e5af",
+    "cleaned_name": "egg, beaten to blend",
+    "clean_aliases": [
+      "large egg, beaten to blend"
+    ],
+    "correct_category": "protein",
+    "action": "merge",
+    "merge_into": "egg, beaten",
+    "reason": "duplicate"
+  },
+  {
+    "original_id": "53fe3007-f906-463b-b724-67583ee0158f",
+    "cleaned_name": "eggs",
+    "clean_aliases": [
+      "large eggs"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "a4ecd9f0-79fc-42cd-be12-3578f8dda01c",
+    "cleaned_name": "eggs, at room temperature",
+    "clean_aliases": [
+      "large eggs, at room temperature"
+    ],
+    "correct_category": "protein",
+    "action": "merge",
+    "merge_into": "eggs",
+    "reason": "preparation of eggs"
+  },
+  {
+    "original_id": "9d74f79b-0e35-4460-840b-f2910ae5dbf9",
+    "cleaned_name": "eggs, beaten",
+    "clean_aliases": [
+      "large eggs, beaten"
+    ],
+    "correct_category": "protein",
+    "action": "merge",
+    "merge_into": "eggs, beaten",
+    "reason": "duplicate"
+  },
+  {
+    "original_id": "5c8e259e-3be6-4af8-b347-e8c0916445c5",
+    "cleaned_name": "eggs, beaten to blend",
+    "clean_aliases": [
+      "large eggs, beaten to blend"
+    ],
+    "correct_category": "protein",
+    "action": "merge",
+    "merge_into": "eggs, beaten",
+    "reason": "duplicate"
+  },
+  {
+    "original_id": "1d506008-bb2d-4e1b-962f-c064e5302f8a",
+    "cleaned_name": "eggs, lightly beaten",
+    "clean_aliases": [
+      "large eggs, lightly beaten"
+    ],
+    "correct_category": "protein",
+    "action": "merge",
+    "merge_into": "eggs, beaten",
+    "reason": "duplicate"
+  },
+  {
+    "original_id": "d9145d56-9f03-4b8d-b139-ca3493dc95fd",
+    "cleaned_name": "eggs, room temperature",
+    "clean_aliases": [
+      "large eggs, room temperature"
+    ],
+    "correct_category": "protein",
+    "action": "merge",
+    "merge_into": "eggs",
+    "reason": "preparation of eggs"
+  },
+  {
+    "original_id": "a6b116a9-f562-42ce-8afa-9b0fa6e36b1f",
+    "cleaned_name": "egg white",
+    "clean_aliases": [
+      "large egg white"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "d1c1cfab-9fad-4ae1-a5b2-430f43c86ed3",
+    "cleaned_name": "egg whites",
+    "clean_aliases": [
+      "large egg whites"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "9c952415-ec08-46c6-a428-7f7b89e01614",
+    "cleaned_name": "egg yolk",
+    "clean_aliases": [
+      "medium egg yolk",
+      "large egg yolk"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "161e9f24-594e-4779-a698-0d6bebf67fd7",
+    "cleaned_name": "egg yolks",
+    "clean_aliases": [
+      "large egg yolks"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "2f293028-9dea-4a71-8ad6-4202713a9ce8",
+    "cleaned_name": "envelope active dry yeast",
+    "clean_aliases": [
+      "active dry yeast"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "84e736c2-1298-4d14-bc65-8e4ac857e506",
+    "cleaned_name": "extra-virgin olive oil",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "9c56e80f-1238-4f73-b44e-06321e719580",
+    "cleaned_name": "extra-virgin olive oil, divided",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "merge",
+    "merge_into": "extra-virgin olive oil",
+    "reason": "preparation of extra-virgin olive oil"
+  },
+  {
+    "original_id": "39fa26dc-d0a1-4450-bd81-f470372feb5a",
+    "cleaned_name": "extra-virgin olive oil, divided, plus more for drizzling",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "merge",
+    "merge_into": "extra-virgin olive oil",
+    "reason": "preparation of extra-virgin olive oil"
+  },
+  {
+    "original_id": "2357dfac-e7b7-45f2-ba1e-dabf1bd311e9",
+    "cleaned_name": "extra-virgin olive oil, plus more for drizzling",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "merge",
+    "merge_into": "extra-virgin olive oil",
+    "reason": "preparation of extra-virgin olive oil"
+  },
+  {
+    "original_id": "65f8ace2-1104-4889-89ef-f26c31bbde03",
+    "cleaned_name": "fennel seeds",
+    "clean_aliases": [
+      "fennel"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "684f7503-b27e-4e0d-b6d6-ad2802fb3aa6",
+    "cleaned_name": "fenugreek seeds",
+    "clean_aliases": [
+      "fenugreek"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "7688b6eb-8c58-454d-b24a-b0f2772a1997",
+    "cleaned_name": "filtered water",
+    "clean_aliases": [
+      "water"
+    ],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "cb3ceb71-2851-4302-8560-d50f005a2b6a",
+    "cleaned_name": "finely chopped chives",
+    "clean_aliases": [
+      "chives"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "1ec4fa45-de79-492c-96b5-267f05c047ea",
+    "cleaned_name": "finely chopped cilantro",
+    "clean_aliases": [
+      "cilantro"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "bc0bf9c9-d4bf-46e5-b570-951d27b7efa9",
+    "cleaned_name": "finely chopped dill",
+    "clean_aliases": [
+      "dill"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "bd533189-11a0-4577-98e0-5fecf49014ae",
+    "cleaned_name": "finely grated ginger",
+    "clean_aliases": [
+      "ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "45d852c6-8809-4ba9-bbe0-1cd7ac20d701",
+    "cleaned_name": "finely grated lemon rind",
+    "clean_aliases": [
+      "lemon rind"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "5a563faf-fe0c-46a5-9d21-3cbe7841815d",
+    "cleaned_name": "finely grated lemon zest",
+    "clean_aliases": [
+      "lemon zest"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "3237e5cf-a108-467b-b4f2-e5438a8b6fd9",
+    "cleaned_name": "finely grated lime zest",
+    "clean_aliases": [
+      "lime zest"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "66e0fc14-405e-403d-99f4-9be70995df9d",
+    "cleaned_name": "finely grated orange zest",
+    "clean_aliases": [
+      "orange zest"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "a67d0b88-56da-4198-a565-7fa1b5915fcd",
+    "cleaned_name": "finely grated parmesan",
+    "clean_aliases": [
+      "parmesan"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "d4167868-60c9-47ee-a840-c041c6879001",
+    "cleaned_name": "finely grated parmesan plus more for serving",
+    "clean_aliases": [
+      "parmesan"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "finely grated parmesan",
+    "reason": "duplicate variation of finely grated parmesan"
+  },
+  {
+    "original_id": "b36c9ccc-f50a-4c0a-8d7f-3d15af2d1bcf",
+    "cleaned_name": "finely grated peeled ginger",
+    "clean_aliases": [
+      "peeled ginger",
+      "ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "ed2a32fe-b85b-4b94-9cce-fa218ccc327f",
+    "cleaned_name": "finely ground black pepper",
+    "clean_aliases": [
+      "black pepper",
+      "ground black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "127f0bdd-27c9-4e94-ac28-152b292d9aa2",
+    "cleaned_name": "finely chopped mint",
+    "clean_aliases": [
+      "mint"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "eea24e6d-177c-412b-aedd-00c4b134cffc",
+    "cleaned_name": "finely chopped onion",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "4cc1fe45-1072-4908-8ce5-74487b183504",
+    "cleaned_name": "finely chopped oregano",
+    "clean_aliases": [
+      "oregano"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "842d0abc-17b3-407c-b981-36b43eb5238f",
+    "cleaned_name": "finely chopped parsley",
+    "clean_aliases": [
+      "parsley"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "cbd56af1-0939-4153-b70a-861b434298f9",
+    "cleaned_name": "finely chopped rosemary",
+    "clean_aliases": [
+      "rosemary"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "037bb942-b338-4160-9e92-01ea20fa3d6d",
+    "cleaned_name": "finely chopped sage",
+    "clean_aliases": [
+      "sage"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "8d306e8e-962f-467e-a1b7-e4588c2c1212",
+    "cleaned_name": "finely chopped tender herbs",
+    "clean_aliases": [
+      "tender herbs",
+      "mixed herbs"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "d4f4fa07-c4a4-4ba0-8f8e-b8490f600f4e",
+    "cleaned_name": "finely chopped thyme",
+    "clean_aliases": [
+      "thyme"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "000c96e5-ecd2-4dcb-9905-4f09aa8859da",
+    "cleaned_name": "fine sea salt",
+    "clean_aliases": [
+      "sea salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f470a986-aaef-44b5-9980-49be0db992c1",
+    "cleaned_name": "fish sauce",
+    "clean_aliases": [
+      "fish sauce"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "1612e313-cd6b-452a-a284-3d9fdcf2e999",
+    "cleaned_name": "five-spice powder",
+    "clean_aliases": [
+      "five-spice"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "99174326-a6c2-4878-8605-f46ca03c8157",
+    "cleaned_name": "flaky sea salt",
+    "clean_aliases": [
+      "sea salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "4a7112d4-eda1-4961-96b7-52d92b55c548",
+    "cleaned_name": "flat-leaf parsley",
+    "clean_aliases": [
+      "flat-leaf parsley",
+      "parsley"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "053d654f-8328-4bec-8c5e-319588eaeb51",
+    "cleaned_name": "flour",
+    "clean_aliases": [
+      "flour"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "9ec53b6a-4a00-4768-90d4-678666d58ac3",
+    "cleaned_name": "for garnish",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "serving instruction, not ingredient"
+  },
+  {
+    "original_id": "e7e2bcfe-c540-4bdc-95fe-2de261c64049",
+    "cleaned_name": "for serving",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "serving instruction, not ingredient"
+  },
+  {
+    "original_id": "5765cec5-9a93-4541-a7ca-2d20c81550e6",
+    "cleaned_name": "freshly cracked black pepper",
+    "clean_aliases": [
+      "cracked black pepper",
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f3994ca3-4a91-4670-b03b-0826379ca14e",
+    "cleaned_name": "freshly grated nutmeg",
+    "clean_aliases": [
+      "nutmeg"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "5e693442-a99c-4482-a55b-4f36de5569f7",
+    "cleaned_name": "freshly ground black pepper",
+    "clean_aliases": [
+      "ground black pepper",
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "320b4748-c734-41ee-943c-5ffc8c9da6ea",
+    "cleaned_name": "freshly ground black pepper divided",
+    "clean_aliases": [
+      "ground black pepper",
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "c15ef49b-7a56-4f8a-8954-91bf8bfa7c25",
+    "cleaned_name": "freshly ground black pepper plus more",
+    "clean_aliases": [
+      "ground black pepper",
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "35a50d6e-d078-4ef4-b5e9-f7024a07b8d7",
+    "cleaned_name": "freshly ground black pepper to taste",
+    "clean_aliases": [
+      "ground black pepper",
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "95a1a768-34f6-4825-a049-4348eade15bb",
+    "cleaned_name": "freshly ground pepper",
+    "clean_aliases": [
+      "ground pepper",
+      "black pepper",
+      "pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "94739cb7-4236-45f4-9bd7-93c9ee25d910",
+    "cleaned_name": "freshly ground white pepper",
+    "clean_aliases": [
+      "ground white pepper",
+      "white pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "7565a42a-5124-46fc-aa83-db07dcddd84f",
+    "cleaned_name": "freshly squeezed lemon juice",
+    "clean_aliases": [
+      "lemon juice"
+    ],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "33e1460b-762c-42a8-b8f2-79360b579d91",
+    "cleaned_name": "freshly squeezed lime juice",
+    "clean_aliases": [
+      "lime juice"
+    ],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "4ffda8ef-e9dc-456f-9590-00cfd62f0803",
+    "cleaned_name": "full-fat coconut milk",
+    "clean_aliases": [
+      "coconut milk"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "1a478751-9866-45cb-a9e1-5e4e374114c7",
+    "cleaned_name": "garam masala",
+    "clean_aliases": [
+      "garam masala"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "b3581a7b-0fec-449c-8fb8-58d1879c8e69",
+    "cleaned_name": "garlic",
+    "clean_aliases": [
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "964c859f-7fd9-481c-8013-28ba5e6a64d6",
+    "cleaned_name": "garlic clove",
+    "clean_aliases": [
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "784f3a81-2fc6-4ff3-9512-56beec988ed0",
+    "cleaned_name": "garlic clove crushed",
+    "clean_aliases": [
+      "crushed garlic",
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "5c13a22c-d092-420a-89ab-ea8b166fe214",
+    "cleaned_name": "garlic clove finely chopped",
+    "clean_aliases": [
+      "finely chopped garlic",
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "36cb43f8-a441-4aa3-9dc1-dd219707db10",
+    "cleaned_name": "garlic clove finely grated",
+    "clean_aliases": [
+      "finely grated garlic",
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "712180f4-2f76-4a5e-a6ce-dbc7472de27a",
+    "cleaned_name": "garlic cloves",
+    "clean_aliases": [
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "0d0892de-5e63-4b7d-81ba-6532f57d1a88",
+    "cleaned_name": "garlic cloves coarsely chopped",
+    "clean_aliases": [
+      "coarsely chopped garlic",
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "7c166c67-f2e0-4836-b6cb-7a29d3620305",
+    "cleaned_name": "garlic cloves, crushed",
+    "clean_aliases": [
+      "crushed garlic",
+      "crushed garlic cloves"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "492f4b83-1f89-403d-9006-1f901ee3040a",
+    "cleaned_name": "garlic cloves, divided",
+    "clean_aliases": [
+      "divided garlic",
+      "divided garlic cloves"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "c278a564-f7e9-477f-9df5-bf2270325b86",
+    "cleaned_name": "garlic cloves, finely chopped",
+    "clean_aliases": [
+      "finely chopped garlic",
+      "finely chopped garlic cloves",
+      "finely minced garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "3f005e56-ecb5-47a4-9b94-e602e2157dcc",
+    "cleaned_name": "garlic cloves, finely grated",
+    "clean_aliases": [
+      "finely grated garlic",
+      "finely grated garlic cloves"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "c939da45-653e-411a-be7a-d527c88096b9",
+    "cleaned_name": "garlic cloves, lightly crushed",
+    "clean_aliases": [
+      "lightly crushed garlic",
+      "lightly crushed garlic cloves"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "645c80f5-8dc9-4598-b97f-ca3273af2ceb",
+    "cleaned_name": "garlic cloves, peeled",
+    "clean_aliases": [
+      "peeled garlic",
+      "peeled garlic cloves"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "ce62caaf-211e-4da5-850e-53456093624d",
+    "cleaned_name": "garlic cloves, smashed",
+    "clean_aliases": [
+      "smashed garlic",
+      "smashed garlic cloves"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "d7ebff88-57f9-496a-96e9-0c82a77fe779",
+    "cleaned_name": "garlic cloves, thinly sliced",
+    "clean_aliases": [
+      "thinly sliced garlic",
+      "thinly sliced garlic cloves"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "5905d600-698a-4e02-9094-740282188e5e",
+    "cleaned_name": "garlic powder",
+    "clean_aliases": [
+      "powdered garlic"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "3927cc4c-aa98-4f02-9200-472cf1c3a541",
+    "cleaned_name": "gin",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "c1e023da-d420-415f-84d2-531ff35bf55b",
+    "cleaned_name": "ginger",
+    "clean_aliases": [
+      "fresh ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "79185080-576d-44fb-a056-b4ab2e4134c4",
+    "cleaned_name": "goat cheese",
+    "clean_aliases": [
+      "fresh goat cheese"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "1af012e6-74b1-40aa-9fc6-dbde5074cc6a",
+    "cleaned_name": "gochujang",
+    "clean_aliases": [
+      "korean red chili paste",
+      "korean hot pepper paste"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "7be7b970-fe10-41a0-a3c3-bd7fee1bf1ed",
+    "cleaned_name": "golden raisins",
+    "clean_aliases": [
+      "raisins"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "3c1b866f-bc31-4311-b531-94d61c4a6388",
+    "cleaned_name": "graham crackers",
+    "clean_aliases": [],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "c45ff065-37d2-414e-9816-031553d1f13f",
+    "cleaned_name": "grain mustard",
+    "clean_aliases": [
+      "whole grain mustard"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "17f3220a-5826-4aef-9a2a-1725df820636",
+    "cleaned_name": "granulated sugar",
+    "clean_aliases": [
+      "white sugar",
+      "sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "d6c79715-5c19-4ea6-8e9f-b50496ec806a",
+    "cleaned_name": "granulated sugar, divided",
+    "clean_aliases": [
+      "divided granulated sugar",
+      "divided white sugar",
+      "divided sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "acc769c1-2e16-43f4-9fd5-a1b1c5e0139a",
+    "cleaned_name": "grapefruit juice",
+    "clean_aliases": [
+      "fresh grapefruit juice"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "a3ce1056-fb41-4f71-b3b1-d6d70ba5aa58",
+    "cleaned_name": "grapeseed or vegetable oil",
+    "clean_aliases": [
+      "grapeseed oil",
+      "vegetable oil"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "34499040-ca81-44c9-b05c-aaf243caa5d7",
+    "cleaned_name": "grated ginger",
+    "clean_aliases": [
+      "fresh grated ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "30b7aae9-abf9-44b9-9d94-452394e815aa",
+    "cleaned_name": "grated lemon zest",
+    "clean_aliases": [
+      "lemon zest"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "954601f7-8c48-4d1c-92c3-ab5afabf77d0",
+    "cleaned_name": "grated parmesan",
+    "clean_aliases": [
+      "parmesan"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "grated parmesan cheese",
+    "reason": "duplicate variation of grated parmesan cheese"
+  },
+  {
+    "original_id": "439484d1-c5f6-4d46-9972-cea8ab02251e",
+    "cleaned_name": "grated parmesan cheese",
+    "clean_aliases": [
+      "parmesan cheese"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "9181c781-821d-4f23-abfe-a9e2d4d6fdae",
+    "cleaned_name": "grated peeled ginger",
+    "clean_aliases": [
+      "peeled grated ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "b1734da9-58ef-435d-a256-d3acb14e9a9d",
+    "cleaned_name": "greek yogurt",
+    "clean_aliases": [
+      "yogurt"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "cfc9fb24-3d87-4b75-9567-71da4c6679d8",
+    "cleaned_name": "green beans, trimmed",
+    "clean_aliases": [
+      "trimmed green beans"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "48ce5229-644e-4974-bc69-ce72daf68f0b",
+    "cleaned_name": "ground allspice",
+    "clean_aliases": [
+      "allspice"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f27a8465-5516-452e-94db-828d8cf1b68e",
+    "cleaned_name": "ground beef",
+    "clean_aliases": [
+      "beef"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "0065a37c-36da-49f5-8c27-12a25b1c7c03",
+    "cleaned_name": "ground black pepper",
+    "clean_aliases": [
+      "black pepper",
+      "pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "0e9e848c-2427-42a7-9c97-b5cad14cc805",
+    "cleaned_name": "ground cardamom",
+    "clean_aliases": [
+      "cardamom"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "b139fa71-e6dd-4043-8e54-8e1d6a3eb89d",
+    "cleaned_name": "ground chicken",
+    "clean_aliases": [
+      "chicken"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "296fde2d-89e0-4215-9c75-df101f61b612",
+    "cleaned_name": "ground cinnamon",
+    "clean_aliases": [
+      "cinnamon"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "1aa32f1b-c593-48d2-ae5b-513df525b2e1",
+    "cleaned_name": "ground cloves",
+    "clean_aliases": [
+      "cloves"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f9ed935f-4806-4fa1-b400-e83e0f43a76b",
+    "cleaned_name": "ground coriander",
+    "clean_aliases": [
+      "coriander"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "1d81f579-77ae-4e6b-b940-e02136115b6e",
+    "cleaned_name": "ground cumin",
+    "clean_aliases": [
+      "cumin"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "e777a315-48b5-428c-9c6a-cafb56b5fd17",
+    "cleaned_name": "ground ginger",
+    "clean_aliases": [
+      "ginger"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "45a00359-2774-4edc-aa65-0c1b383ad95f",
+    "cleaned_name": "ground lamb",
+    "clean_aliases": [
+      "lamb"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "36cf970b-07f6-40d2-af02-01b4f834fd48",
+    "cleaned_name": "ground nutmeg",
+    "clean_aliases": [
+      "nutmeg"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "3020500d-e9e1-4c5f-beb5-7f6bfba91625",
+    "cleaned_name": "ground pork",
+    "clean_aliases": [
+      "pork"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "df2aa4cf-655a-4b39-83a3-39975b608211",
+    "cleaned_name": "ground turkey",
+    "clean_aliases": [
+      "turkey"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "aae2b7c4-1262-4ceb-a37e-85d305ae1445",
+    "cleaned_name": "ground turmeric",
+    "clean_aliases": [
+      "turmeric"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "ff4b1bad-6410-47c2-8128-8bd4121b8cc0",
+    "cleaned_name": "guajillo chiles, seeds removed",
+    "clean_aliases": [
+      "guajillo chiles",
+      "dried guajillo chiles",
+      "chiles"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "718023f7-b493-4c45-8d59-3101e69c5841",
+    "cleaned_name": "half-and-half",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "036eecfd-ce0a-40ce-a4d3-d16808f12e29",
+    "cleaned_name": "halved",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "preparation instruction, not ingredient"
+  },
+  {
+    "original_id": "574ebe41-f0e0-4642-be72-b8833908ad8b",
+    "cleaned_name": "harissa paste",
+    "clean_aliases": [
+      "moroccan red chile paste"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "2addf26f-74be-40c5-abfb-438a0ff8d88a",
+    "cleaned_name": "head of garlic",
+    "clean_aliases": [
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "eab16993-5fdf-4fde-b0db-d537c6c640a9",
+    "cleaned_name": "head of garlic, halved crosswise",
+    "clean_aliases": [
+      "halved garlic",
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "4ca8fc09-8cab-49a4-a3d5-89afc8325f9b",
+    "cleaned_name": "heads of garlic, halved crosswise",
+    "clean_aliases": [
+      "halved garlic",
+      "garlic"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "5eb6154b-cc9c-4a86-8467-4297cda29b6d",
+    "cleaned_name": "heavy cream",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "4dc18f80-b9b6-4644-a8c1-41e709f6e566",
+    "cleaned_name": "heavy cream",
+    "clean_aliases": [
+      "heavy cream"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "3a3e0b8b-2887-4b72-bc51-cdaf9ba92034",
+    "cleaned_name": "hemp seeds",
+    "clean_aliases": [
+      "hemp seeds"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "d34e07ea-3b29-45d7-a88e-cf98f3f52c56",
+    "cleaned_name": "honey",
+    "clean_aliases": [
+      "honey"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "2af9c553-e7be-4f7e-b153-cf4f465c6582",
+    "cleaned_name": "hot sauce",
+    "clean_aliases": [
+      "hot sauce",
+      "tapatio",
+      "cholula",
+      "franks"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "a0f2959c-d1a1-4d69-82c7-53b730a981d3",
+    "cleaned_name": "hot smoked Spanish paprika",
+    "clean_aliases": [
+      "hot smoked spanish paprika",
+      "smoked paprika"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "98f45000-e1da-442b-9869-3094fbac0193",
+    "cleaned_name": "hot water",
+    "clean_aliases": [
+      "hot water"
+    ],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "ace87852-2cbc-444f-ba59-e6d101f46e18",
+    "cleaned_name": "juice of 1 lemon",
+    "clean_aliases": [
+      "lemon juice"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "419823c7-abb1-4dd7-b9a8-4fffcf4dfeeb",
+    "cleaned_name": "juice of 1 lime",
+    "clean_aliases": [
+      "lime juice"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "729af642-48ac-4d3e-883a-2a531e906509",
+    "cleaned_name": "juniper berries",
+    "clean_aliases": [
+      "juniper berries"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "ab883731-42f0-4394-ac68-f659c365cf95",
+    "cleaned_name": "ketchup",
+    "clean_aliases": [
+      "ketchup"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "86e13ead-f3e0-45f4-a13d-50893d8cda39",
+    "cleaned_name": "kosher salt",
+    "clean_aliases": [
+      "kosher salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "45c54784-1376-45f9-89c1-6a3b5ead0637",
+    "cleaned_name": "kosher salt and freshly ground black pepper",
+    "clean_aliases": [
+      "kosher salt and pepper",
+      "salt and pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "726ad1d7-681a-44d1-a3de-2da89913a367",
+    "cleaned_name": "kosher salt, divided",
+    "clean_aliases": [
+      "kosher salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "c0ec2bc5-4e9b-4f2b-8045-4785935abb0d",
+    "cleaned_name": "kosher salt, divided, plus more",
+    "clean_aliases": [
+      "kosher salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "ca4795f0-01e0-4885-a9c8-8e4c5127bafd",
+    "cleaned_name": "kosher salt, freshly ground pepper",
+    "clean_aliases": [
+      "kosher salt and pepper",
+      "salt and pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "ad628cde-7086-494c-89d9-74e4666d72eb",
+    "cleaned_name": "kosher salt, plus more",
+    "clean_aliases": [
+      "kosher salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "a483d1cd-c7cf-405b-b147-386177fbb717",
+    "cleaned_name": "lemon",
+    "clean_aliases": [
+      "lemon"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "02ea92c8-419e-475f-b6cf-5586758dada7",
+    "cleaned_name": "lemon, halved",
+    "clean_aliases": [
+      "lemon"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "deec9739-c663-458e-87ef-779c7a81918e",
+    "cleaned_name": "lemon juice",
+    "clean_aliases": [
+      "lemon juice"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "fc5b89e4-857b-412c-9855-f57b305406f8",
+    "cleaned_name": "lemon juice, divided",
+    "clean_aliases": [
+      "lemon juice"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "36346d13-5920-49ad-b353-72bc7c217eff",
+    "cleaned_name": "lemons",
+    "clean_aliases": [
+      "lemons"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "eef4e00d-ab54-4ea0-9bd1-ad7b88a49c4e",
+    "cleaned_name": "lemons, divided",
+    "clean_aliases": [
+      "lemons"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "ec7cc552-7682-4f74-938c-230cdc8160ba",
+    "cleaned_name": "lemon wedges",
+    "clean_aliases": [
+      "lemon wedges"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "2ab34f6d-76f3-445f-91b7-923bb9b863b1",
+    "cleaned_name": "light brown sugar",
+    "clean_aliases": [
+      "light brown sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "6d701ea9-c502-4eaf-ab81-3a806dc2ae62",
+    "cleaned_name": "light corn syrup",
+    "clean_aliases": [
+      "light corn syrup"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "7f10942a-24d5-445a-93eb-176e60febee3",
+    "cleaned_name": "light or dark brown sugar",
+    "clean_aliases": [
+      "brown sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "dcc02c08-a719-4f81-82ef-65cb2d76fb80",
+    "cleaned_name": "lime",
+    "clean_aliases": [
+      "lime"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "0025e82b-03a7-416e-999d-24a62b4595d1",
+    "cleaned_name": "lime juice",
+    "clean_aliases": [
+      "lime juice"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "19e654c8-5021-4bcb-89f1-1df5f1de7eab",
+    "cleaned_name": "lime juice, divided",
+    "clean_aliases": [
+      "lime juice"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "181309f5-521e-4bf7-8320-03b09811c613",
+    "cleaned_name": "limes",
+    "clean_aliases": [
+      "limes"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "a52914a6-887d-4b3d-a34c-4c9aa1e0e1fd",
+    "cleaned_name": "lime wedges",
+    "clean_aliases": [
+      "lime wedges"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "0b956e32-54da-401e-b592-c0b648389c6c",
+    "cleaned_name": "littleneck clams, scrubbed",
+    "clean_aliases": [
+      "littleneck clams"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "16ef8266-feeb-4d1e-acbe-396284b887cb",
+    "cleaned_name": "low-sodium chicken broth",
+    "clean_aliases": [
+      "low sodium chicken broth",
+      "chicken broth"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "1636c14f-d28e-4253-ab89-bf9f595c3efb",
+    "cleaned_name": "low-sodium soy sauce",
+    "clean_aliases": [
+      "low sodium soy sauce",
+      "soy sauce"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "495e68c9-af2a-4636-9167-ed8673e79b3a",
+    "cleaned_name": "low-sodium soy sauce or tamari",
+    "clean_aliases": [
+      "low sodium soy sauce",
+      "tamari",
+      "soy sauce"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "cf994f1a-ece1-48ec-9c8a-d9335bb47191",
+    "cleaned_name": "maldon sea salt",
+    "clean_aliases": [
+      "maldon sea salt",
+      "sea salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "c078d328-6b8f-41a1-a213-9b30b4ee2ff0",
+    "cleaned_name": "maple syrup",
+    "clean_aliases": [
+      "maple syrup"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "255f76b5-ae09-4854-b346-b93e465706c3",
+    "cleaned_name": "mayonnaise",
+    "clean_aliases": [
+      "mayonnaise"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "b4c6178c-d239-4148-b56f-518181c2a7f6",
+    "cleaned_name": "mild red pepper flakes",
+    "clean_aliases": [
+      "mild red pepper flakes",
+      "aleppo pepper",
+      "maras pepper",
+      "gochugaru",
+      "urfa pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "8736db16-dad7-4296-bddc-3f73169a6d3e",
+    "cleaned_name": "milk",
+    "clean_aliases": [
+      "milk",
+      "whole milk"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "efa780fd-00f7-453b-85f9-055a837479b4",
+    "cleaned_name": "whole-milk ricotta",
+    "clean_aliases": [
+      "whole milk ricotta",
+      "ricotta"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "ba52770b-d8ed-41dd-af09-ef39a054fbc8",
+    "cleaned_name": "mint",
+    "clean_aliases": [
+      "mint"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "8b888adc-a261-41e2-b137-77c56b730e87",
+    "cleaned_name": "mint leaves",
+    "clean_aliases": [
+      "mint leaves"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "06f78fa4-ba0e-4af8-8a8d-f397267069ce",
+    "cleaned_name": "mint leaves, torn if large",
+    "clean_aliases": [
+      "mint leaves"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "013495ae-7388-48f3-9cc0-e9745ff28efc",
+    "cleaned_name": "mirin",
+    "clean_aliases": [
+      "mirin",
+      "sweet japanese rice wine",
+      "japanese rice wine"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "5679cc2e-db71-426c-a5f8-df0e68d8cb08",
+    "cleaned_name": "mustard powder",
+    "clean_aliases": [
+      "mustard powder",
+      "colman's english mustard"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "d7fe46c5-7c18-4f00-b062-78518feb9570",
+    "cleaned_name": "mustard seeds",
+    "clean_aliases": [
+      "mustard seeds"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "2af19b38-b0a4-49db-b2d4-cf09f6f99d2b",
+    "cleaned_name": "nonstick vegetable oil spray",
+    "clean_aliases": [
+      "nonstick vegetable oil spray",
+      "cooking spray"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "051a104f-5c12-41e5-8da8-8e6e0d8f849f",
+    "cleaned_name": "nutritional yeast",
+    "clean_aliases": [
+      "nutritional yeast"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "ace4ec20-c5a3-43d1-9de9-3c9a2205e41a",
+    "cleaned_name": "pinch of cayenne pepper",
+    "clean_aliases": [
+      "cayenne pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "184dc6dc-98b7-4108-b3e2-10f5275238a7",
+    "cleaned_name": "crushed red pepper flakes",
+    "clean_aliases": [
+      "red pepper flakes",
+      "crushed pepper flakes"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "4c5593df-354b-476d-b7bc-1434df801991",
+    "cleaned_name": "kosher salt",
+    "clean_aliases": [
+      "salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "3a68d155-24e2-475b-b62b-e21e12df8396",
+    "cleaned_name": "salt",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "423aeb89-6641-40ea-a995-d5b43aa813cd",
+    "cleaned_name": "sea salt",
+    "clean_aliases": [
+      "salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "9bcba479-6931-410d-b937-564339f8ad02",
+    "cleaned_name": "sugar",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "e9cc19b3-b9ff-4316-b90f-e09bd80f98f8",
+    "cleaned_name": "oil-packed anchovy fillets",
+    "clean_aliases": [
+      "anchovy fillets",
+      "anchovies"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "99b2581b-63fe-43c8-96e1-9f5a3b273bc1",
+    "cleaned_name": "Old Bay seasoning",
+    "clean_aliases": [
+      "Old Bay"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "83d034c0-77ca-4c39-94cf-b64623c35bf4",
+    "cleaned_name": "old-fashioned oats",
+    "clean_aliases": [
+      "rolled oats"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "3456c4e8-6dee-4d8b-866a-684b9523c83a",
+    "cleaned_name": "olive oil",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "9bc6dd59-aab4-4ede-8e3b-90fbac222c31",
+    "cleaned_name": "olive oil, divided",
+    "clean_aliases": [
+      "olive oil"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "855e096e-e9f5-466e-9043-3c2183ad1f77",
+    "cleaned_name": "olive oil, plus more for drizzling",
+    "clean_aliases": [
+      "olive oil"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "59c7845d-be6e-4351-aa80-706d13ae005c",
+    "cleaned_name": "onion",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "649d05d1-b37d-4224-b095-ec8100da6dd1",
+    "cleaned_name": "onion, coarsely chopped",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "4c590eff-12b0-4fbc-a201-add1e0532cb2",
+    "cleaned_name": "onion, finely chopped",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "62b87b5d-1a08-4f6a-99fc-550251e0e1ce",
+    "cleaned_name": "onion powder",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "1b61b3f3-69e9-4b8e-939b-22064da1e754",
+    "cleaned_name": "onions",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "64ee5452-0642-4e87-84fb-ab8e09400a08",
+    "cleaned_name": "onions, finely diced",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "1faba77c-6a9e-4b96-b81e-6625a5b2195b",
+    "cleaned_name": "onion, thinly sliced",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "9ed07023-193b-46e8-8c0a-d0613428defb",
+    "cleaned_name": "orange",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "8aa5d2a3-c203-4348-ba0c-8bfa17f7034d",
+    "cleaned_name": "orange juice",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "eefad482-90b8-45c3-af51-d6b53f9a8767",
+    "cleaned_name": "oregano",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "1e120c6d-089f-40dd-8d74-5a76bf8dc33b",
+    "cleaned_name": "oregano leaves",
+    "clean_aliases": [
+      "oregano"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "b5b10cc8-00b6-45f2-9ccd-715a1b8d4135",
+    "cleaned_name": "organic plain milk kefir",
+    "clean_aliases": [
+      "kefir"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "b5e894c1-0216-41e2-8929-53aa7ae209f3",
+    "cleaned_name": "oyster sauce",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "90a80645-9ca9-482c-bab8-a9d8b66e3d6f",
+    "cleaned_name": "packed brown sugar",
+    "clean_aliases": [
+      "brown sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "f6179068-f21a-448a-9c8a-e62b7a010477",
+    "cleaned_name": "packed light brown sugar",
+    "clean_aliases": [
+      "light brown sugar",
+      "brown sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "2285dc87-d1d2-4f5a-9137-2a3bbcda6b12",
+    "cleaned_name": "panko",
+    "clean_aliases": [
+      "Japanese breadcrumbs"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "81545090-4127-40b5-b8c4-49752b0d8e18",
+    "cleaned_name": "paprika",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "afe7ef9d-201f-42b9-9b93-2e6c12ffe3b3",
+    "cleaned_name": "Parmesan, finely grated",
+    "clean_aliases": [
+      "Parmesan"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "dc6c08d7-0f33-45c2-b879-5c33b045fdd4",
+    "cleaned_name": "Parmesan, finely grated, plus more for serving",
+    "clean_aliases": [
+      "Parmesan"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "7c384cc7-6634-4b89-a4ca-a0d5a0702593",
+    "cleaned_name": "parsley",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "e77bb11b-20c0-47c4-9628-635d05fbff39",
+    "cleaned_name": "parsley leaves",
+    "clean_aliases": [
+      "parsley"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "513d6cdd-ac16-48bb-872a-a32b01aa5793",
+    "cleaned_name": "parsley leaves with tender stems",
+    "clean_aliases": [
+      "parsley"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "d0c407b0-95cd-43d5-8682-2f6a579f5514",
+    "cleaned_name": "peas",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "c220143c-3579-4073-a03b-f7a789378ac6",
+    "cleaned_name": "pecan halves",
+    "clean_aliases": [
+      "pecans"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "de5368d8-ed1d-4408-9339-48176e4f7b36",
+    "cleaned_name": "pecans",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "b6dcacf6-8974-45bb-8c1b-fb09e6f0ded4",
+    "cleaned_name": "peeled ginger",
+    "clean_aliases": [
+      "ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "907824c2-6518-404a-8dc5-222e0d1d8401",
+    "cleaned_name": "Persian cucumbers",
+    "clean_aliases": [
+      "cucumber"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "fca67da7-981f-4b33-9f7b-4edde51dfe13",
+    "cleaned_name": "Persian cucumbers, thinly sliced",
+    "clean_aliases": [
+      "cucumber"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "8753c844-ed74-402f-869e-a439002083da",
+    "cleaned_name": "piece ginger, peeled",
+    "clean_aliases": [
+      "ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "4a48072b-918f-406f-973e-4d92e5c663ca",
+    "cleaned_name": "piece ginger, peeled, finely chopped",
+    "clean_aliases": [
+      "ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "042c4fa6-746c-493f-b50a-be2f2d2fcf0a",
+    "cleaned_name": "piece ginger, peeled, finely grated",
+    "clean_aliases": [
+      "ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "f155d9ba-d026-4940-80d0-c4cc52df798f",
+    "cleaned_name": "piece ginger, peeled, thinly sliced",
+    "clean_aliases": [
+      "ginger"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "b04df7d2-0a6e-4a69-8c10-2e03e1a61bb8",
+    "cleaned_name": "pineapple juice",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "2078fa2e-4bbb-413e-bc11-d4a21248498b",
+    "cleaned_name": "pine nuts",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "4193eb65-d664-46db-8f1f-94a0d4374ecb",
+    "cleaned_name": "pint cherry tomatoes",
+    "clean_aliases": [
+      "cherry tomatoes"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "354fd7a0-7f7e-436b-a324-a634fd874064",
+    "cleaned_name": "pint cherry tomatoes, halved",
+    "clean_aliases": [
+      "cherry tomatoes"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "6232036e-eebb-4827-852c-ba9480f6b0c6",
+    "cleaned_name": "plain Greek yogurt",
+    "clean_aliases": [
+      "Greek yogurt",
+      "yogurt"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "4c3ef7bd-759a-4efa-8831-64b1cd9ebdb9",
+    "cleaned_name": "plain whole-milk Greek yogurt",
+    "clean_aliases": [
+      "Greek yogurt",
+      "yogurt"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "1429cc7e-93be-426b-a1d1-2adf26810dbe",
+    "cleaned_name": "plain whole-milk yogurt",
+    "clean_aliases": [
+      "yogurt"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "6a1f512e-d983-487e-ba3e-2273ab485481",
+    "cleaned_name": "plain yogurt",
+    "clean_aliases": [
+      "yogurt"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "872de397-e511-4dc3-956d-7ff1e73f7b49",
+    "cleaned_name": "plus sugar",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "not an ingredient"
+  },
+  {
+    "original_id": "5eee1801-a069-4549-942a-01575cb7fd4b",
+    "cleaned_name": "plus extra virgin olive oil",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "delete",
+    "reason": "not an ingredient"
+  },
+  {
+    "original_id": "ade297b7-042c-48fd-af2c-5150af531da0",
+    "cleaned_name": "plus honey",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "delete",
+    "reason": "not an ingredient"
+  },
+  {
+    "original_id": "97a99c46-04c4-48d5-8fe5-2dd60c0a909c",
+    "cleaned_name": "plus lemon juice",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "delete",
+    "reason": "not an ingredient"
+  },
+  {
+    "original_id": "ebb8189d-aac6-48c5-92ae-a3ffa680e175",
+    "cleaned_name": "plus sugar",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "not an ingredient"
+  },
+  {
+    "original_id": "d94b09e8-a59d-45f5-b6d5-63f0535ebbea",
+    "cleaned_name": "plus more for serving",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "delete",
+    "reason": "serving instruction, not ingredient"
+  },
+  {
+    "original_id": "3db9c681-8df3-483a-a9d6-0ea1e160ccd5",
+    "cleaned_name": "polenta",
+    "clean_aliases": [
+      "coarse cornmeal"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "59378b46-7d4c-4776-922e-de5ad7978624",
+    "cleaned_name": "pomegranate juice",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "653871b8-aa5e-4e3e-84b9-e7e165ef3a35",
+    "cleaned_name": "pomegranate molasses",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "d9ad87d7-817b-4293-8163-852a3c89cb66",
+    "cleaned_name": "pomegranate seeds",
+    "clean_aliases": [
+      "arils"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "049e76f4-afc6-4409-b683-f892909cf192",
+    "cleaned_name": "poppy seeds",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "a9c5b2ef-e627-4b71-af33-b7b91d06b2dd",
+    "cleaned_name": "pork tenderloins",
+    "clean_aliases": [
+      "pork tenderloin"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "0cde23f8-74aa-40fc-9c63-bd3498b0e694",
+    "cleaned_name": "powdered sugar",
+    "clean_aliases": [
+      "confectioners sugar"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "eded560f-5294-4915-9109-3e19f442128b",
+    "cleaned_name": "prepared horseradish",
+    "clean_aliases": [
+      "horseradish"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "7102846b-6b93-4651-b9c4-68b68272e882",
+    "cleaned_name": "pure maple syrup",
+    "clean_aliases": [
+      "maple syrup"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "fa9c8595-d15f-4f02-96f4-52a7737189c0",
+    "cleaned_name": "pure vanilla extract",
+    "clean_aliases": [
+      "vanilla extract"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "81722080-5de7-484f-88db-d818f0b0b233",
+    "cleaned_name": "radishes trimmed thinly",
+    "clean_aliases": [
+      "radishes"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "f861e4fa-ec03-46e9-8925-e40a71373ff6",
+    "cleaned_name": "raisins",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "18489549-4ff4-4601-abff-8032f12a5f94",
+    "cleaned_name": "raspberries",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "7bdd1e84-663a-44a1-98a5-4ab0dc251a8a",
+    "cleaned_name": "raw pistachios",
+    "clean_aliases": [
+      "pistachios"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "b7cbc589-5767-40e2-bc85-f871b24d420b",
+    "cleaned_name": "raw pumpkin seeds",
+    "clean_aliases": [
+      "pumpkin seeds",
+      "pepitas"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "e4e48637-6861-4c2f-b386-8f993fc561db",
+    "cleaned_name": "raw sesame seeds",
+    "clean_aliases": [
+      "sesame seeds"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "d7e07ee4-9207-46a0-ac22-b34998a749e4",
+    "cleaned_name": "raw walnuts",
+    "clean_aliases": [
+      "walnuts"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "187ef8e9-0de6-48a0-b3f4-193bdeecfa2d",
+    "cleaned_name": "red bell pepper",
+    "clean_aliases": [
+      "bell pepper"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "1395ff4d-0241-4435-9faf-2e8b8fc91bd9",
+    "cleaned_name": "red chile",
+    "clean_aliases": [
+      "dried red chile"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "ea65cef4-b2b6-43e6-bd69-d222fbdf6af5",
+    "cleaned_name": "red onion",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "15afde0b-9e93-4dbf-b99a-b5254b62afa1",
+    "cleaned_name": "red onion finely chopped",
+    "clean_aliases": [
+      "red onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "92f23ea1-c600-49ec-9092-4b0824b31f44",
+    "cleaned_name": "red onion thinly sliced",
+    "clean_aliases": [
+      "red onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "08ed6239-7b7c-452f-840a-9eb62f053935",
+    "cleaned_name": "red onion very thinly sliced",
+    "clean_aliases": [
+      "red onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "fbf9cdbd-9a65-4fe5-9aa5-e66679f74e29",
+    "cleaned_name": "red pepper flakes",
+    "clean_aliases": [
+      "dried red pepper flakes"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "e8ad533b-efb7-45ad-8337-afc9ad701e09",
+    "cleaned_name": "red wine vinegar",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "32ba8b73-fcb3-493f-aaee-69fe4e0afe48",
+    "cleaned_name": "rice flour",
+    "clean_aliases": [],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "0b4d3fda-1e9f-400d-b73e-c8b7ccb07f69",
+    "cleaned_name": "rice vinegar",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "5bcf9f8f-4dc1-4a21-89a6-2d36aff08d97",
+    "cleaned_name": "ricotta",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "993821ec-f06a-45a9-a956-2750c4eb8f01",
+    "cleaned_name": "rolled oats",
+    "clean_aliases": [
+      "oats"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "6b0dde1e-764e-4180-b520-a21c12938ea6",
+    "cleaned_name": "rosemary",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "aa5afb67-fc87-456a-9792-c81bd9da5db5",
+    "cleaned_name": "rosewater",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "4f399a6b-347d-4342-9ca2-06c784ea10ee",
+    "cleaned_name": "sage leaves",
+    "clean_aliases": [
+      "sage"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "4ff1ae29-e81f-4a6b-a111-d4466fbdc79c",
+    "cleaned_name": "sake",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "1bf501e2-c4ad-4cb9-bc9e-9164bf058e1d",
+    "cleaned_name": "salt",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "e588f211-c370-4922-83d2-359f6780eaca",
+    "cleaned_name": "salt and freshly ground black pepper",
+    "clean_aliases": [
+      "salt",
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "857f536c-b35d-41bf-be47-5360c3771c52",
+    "cleaned_name": "salt and pepper",
+    "clean_aliases": [
+      "salt",
+      "pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "4b903eb8-2075-457c-8c18-f4a0d90ec270",
+    "cleaned_name": "scallion",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "2cad4431-d22b-4e58-98cf-4ea4178a6ce1",
+    "cleaned_name": "scallions",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "d2ca5ba0-0014-4319-a61f-772bf97cc76f",
+    "cleaned_name": "scallions thinly sliced",
+    "clean_aliases": [
+      "scallions"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "72261b65-e390-436b-a5d8-e17bca7c8a8d",
+    "cleaned_name": "scallions thinly sliced on a diagonal",
+    "clean_aliases": [
+      "scallions"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "61529b26-7216-4dad-94bd-93ced160caa8",
+    "cleaned_name": "sea salt",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "e05ecea8-284a-4187-91dd-5ca9a7bff49f",
+    "cleaned_name": "sea salt and cracked black pepper",
+    "clean_aliases": [
+      "sea salt",
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "0ff8d647-51fe-4095-a59e-33871354a0c1",
+    "cleaned_name": "sea salt and freshly ground black pepper",
+    "clean_aliases": [
+      "sea salt",
+      "black pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "990555ed-30ba-4a6a-98bf-2f382779ff4a",
+    "cleaned_name": "sea salt flakes",
+    "clean_aliases": [
+      "sea salt"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "52d7da80-a284-4b90-b5dd-0f9fabb253c5",
+    "cleaned_name": "seasoned rice vinegar",
+    "clean_aliases": [
+      "rice vinegar"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "075d3b8e-2d1d-4a3d-84f7-9434914f229a",
+    "cleaned_name": "semi-sweet chocolate",
+    "clean_aliases": [
+      "semi-sweet chocolate chips",
+      "chocolate"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "87eafe5d-0b1d-49ec-9f96-3656db1429d8",
+    "cleaned_name": "semi-sweet chocolate chips",
+    "clean_aliases": [
+      "semi-sweet chocolate",
+      "chocolate chips"
+    ],
+    "correct_category": "other",
+    "action": "merge",
+    "merge_into": "semi-sweet chocolate",
+    "reason": "duplicate variation of semi-sweet chocolate"
+  },
+  {
+    "original_id": "65a6ac16-720d-4665-a25f-a3c28abecb81",
+    "cleaned_name": "serrano chiles",
+    "clean_aliases": [
+      "serrano chile"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "cff69620-fb25-42ac-befa-54a61dee1634",
+    "cleaned_name": "serrano chile, thinly sliced",
+    "clean_aliases": [
+      "serrano chile"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "d85e2275-cc89-4cbf-8979-fbccc5adb845",
+    "cleaned_name": "sesame seeds",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "c7412f5a-7b67-4c36-bb2e-a870deaa146d",
+    "cleaned_name": "shallot",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "9a856144-ed50-4740-bd42-44338da15710",
+    "cleaned_name": "shallot, finely chopped",
+    "clean_aliases": [
+      "shallot"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "5c66f081-5ed3-41bc-a893-936769e618ef",
+    "cleaned_name": "shallots",
+    "clean_aliases": [
+      "shallot"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "a665563e-c1b9-4873-8a3b-88cfbd853270",
+    "cleaned_name": "shallots, finely chopped",
+    "clean_aliases": [
+      "shallot",
+      "finely chopped shallots"
+    ],
+    "correct_category": "produce",
+    "action": "merge",
+    "merge_into": "shallot, finely chopped",
+    "reason": "duplicate variation of shallot, finely chopped"
+  },
+  {
+    "original_id": "b9212416-c48b-4c12-afbc-839d31f1e32f",
+    "cleaned_name": "shallots, thinly sliced",
+    "clean_aliases": [
+      "shallot",
+      "thinly sliced shallots"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "cba15a55-7c8b-4c87-89ec-7fd5c1c925e1",
+    "cleaned_name": "shallots, thinly sliced into rings",
+    "clean_aliases": [
+      "shallot",
+      "thinly sliced shallots"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "b080a440-6a31-45c5-b9a9-6b4543327a11",
+    "cleaned_name": "shallot, thinly sliced",
+    "clean_aliases": [
+      "shallot"
+    ],
+    "correct_category": "produce",
+    "action": "merge",
+    "merge_into": "shallots, thinly sliced",
+    "reason": "duplicate variation of shallots, thinly sliced"
+  },
+  {
+    "original_id": "a1949f9a-e282-497e-b6e5-6a605f072563",
+    "cleaned_name": "shallot, thinly sliced into rings",
+    "clean_aliases": [
+      "shallot",
+      "thinly sliced shallots"
+    ],
+    "correct_category": "produce",
+    "action": "merge",
+    "merge_into": "shallots, thinly sliced into rings",
+    "reason": "duplicate variation of shallots, thinly sliced into rings"
+  },
+  {
+    "original_id": "d2897d72-9c6e-4267-9c8a-d4c85b7e0969",
+    "cleaned_name": "sherry vinegar",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "62e4178e-6822-424e-bf18-91a95109d94c",
+    "cleaned_name": "sherry vinegar or red wine vinegar",
+    "clean_aliases": [
+      "sherry vinegar",
+      "red wine vinegar"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "2422632b-190e-4673-954f-db18917610f5",
+    "cleaned_name": "shrimp, peeled and deveined",
+    "clean_aliases": [
+      "shrimp"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "2eca7c72-f097-48bf-907a-a9bb6b55aacc",
+    "cleaned_name": "sichuan peppercorns",
+    "clean_aliases": [
+      "sichuan pepper"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "ef531325-5af5-4757-86d5-31b9a3389c1d",
+    "cleaned_name": "sifted all-purpose flour",
+    "clean_aliases": [
+      "all-purpose flour",
+      "sifted flour"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "4da56316-b34d-4ec3-99fb-c0d985404c83",
+    "cleaned_name": "skinless, boneless chicken breasts",
+    "clean_aliases": [
+      "chicken breast"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "120636cb-ff62-4ff2-b99e-358bce847b3a",
+    "cleaned_name": "skinless, boneless chicken thighs",
+    "clean_aliases": [
+      "chicken thighs"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "a8e80eb4-31f5-4823-953c-c79fdb2ae902",
+    "cleaned_name": "skin-on almonds",
+    "clean_aliases": [
+      "almonds"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "e4dc3aae-ef2e-4ec5-93b2-be11071fd12f",
+    "cleaned_name": "skin-on, bone-in chicken thighs",
+    "clean_aliases": [
+      "chicken thighs"
+    ],
+    "correct_category": "protein",
+    "action": "keep"
+  },
+  {
+    "original_id": "ad523b27-8ca8-4f94-af3b-beec425d5457",
+    "cleaned_name": "smoked paprika",
+    "clean_aliases": [
+      "paprika"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "e8b8abdf-7a0f-4edd-a56e-896895b3fcbc",
+    "cleaned_name": "sour cream",
+    "clean_aliases": [],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "7c98d195-c56f-45e3-a33c-0d305c3ba82d",
+    "cleaned_name": "soy sauce",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "7ae9e29f-10b4-406a-b57b-ac9bdddf58f2",
+    "cleaned_name": "soy sauce or tamari",
+    "clean_aliases": [
+      "soy sauce",
+      "tamari"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "bf147cb0-c58e-4702-beb3-80601ce9b708",
+    "cleaned_name": "spinach",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "d353a3c1-f69a-4647-951c-53710fa196e2",
+    "cleaned_name": "sprig rosemary",
+    "clean_aliases": [
+      "rosemary"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "78609f45-1dd8-4395-bfde-d205eefdf72e",
+    "cleaned_name": "sprigs rosemary",
+    "clean_aliases": [
+      "rosemary"
+    ],
+    "correct_category": "spices",
+    "action": "merge",
+    "merge_into": "sprig rosemary",
+    "reason": "duplicate variation of rosemary"
+  },
+  {
+    "original_id": "c7f582f0-9b51-4850-942d-ca057499124b",
+    "cleaned_name": "sprigs thyme",
+    "clean_aliases": [
+      "thyme"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f5df1466-f301-402f-991e-bd02ba88a2cc",
+    "cleaned_name": "sriracha",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "e16dfb1e-6045-420e-a904-69e826a3a63e",
+    "cleaned_name": "star anise",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "9a0515da-ed92-4c4a-9e2f-a0352d17c616",
+    "cleaned_name": "star anise pods",
+    "clean_aliases": [
+      "star anise"
+    ],
+    "correct_category": "spices",
+    "action": "merge",
+    "merge_into": "star anise",
+    "reason": "duplicate variation of star anise"
+  },
+  {
+    "original_id": "b87f2742-c77a-4e60-9e85-03769e59ee3d",
+    "cleaned_name": "steamed rice",
+    "clean_aliases": [
+      "rice"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "8425908a-5b15-402e-a851-0c23bce104ea",
+    "cleaned_name": "strips orange zest",
+    "clean_aliases": [
+      "orange zest"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "4ea30b3b-8f70-4190-a9dc-2dcce3821dd8",
+    "cleaned_name": "sugar",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "a38c6f89-dbe0-4c20-8c65-5ecce9982d5e",
+    "cleaned_name": "sugar, divided",
+    "clean_aliases": [
+      "sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "ffa3271a-b146-4f3d-ae1e-b91424fd5dad",
+    "cleaned_name": "sugar, plus more for sprinkling",
+    "clean_aliases": [
+      "sugar"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "357464d6-6d45-41fa-a15a-49472159f6c0",
+    "cleaned_name": "sumac",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "b7ab0696-4684-4bc5-ba19-22d87fe6a7db",
+    "cleaned_name": "sweetened condensed milk",
+    "clean_aliases": [
+      "condensed milk"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "28e9da0f-40c9-4d06-84df-010b80d2114b",
+    "cleaned_name": "sweet potatoes",
+    "clean_aliases": [
+      "sweet potato"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "e75a0163-2a4d-46b6-a02f-70c8ffcbe7e3",
+    "cleaned_name": "tahini",
+    "clean_aliases": [
+      "sesame paste"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "a1117734-430c-4a9a-a2c5-2cb34c3c09fe",
+    "cleaned_name": "tarragon leaves",
+    "clean_aliases": [
+      "tarragon"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "e0c48afe-5b33-4ff2-914a-9d75e98fdb78",
+    "cleaned_name": "thick slices country-style bread",
+    "clean_aliases": [
+      "country-style bread",
+      "bread"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "815fadd5-5e5a-41e7-aebd-2213cbad746a",
+    "cleaned_name": "thinly sliced",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "17d5f48f-fb11-4305-bfd9-6d4b3446ba5c",
+    "cleaned_name": "thinly sliced scallions",
+    "clean_aliases": [
+      "scallions"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "4b403290-8d32-41f9-81cb-d3d2ccb919bb",
+    "cleaned_name": "thyme",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "9c52057e-ac76-4197-94c0-80026c9f7c04",
+    "cleaned_name": "thyme leaves",
+    "clean_aliases": [
+      "thyme"
+    ],
+    "correct_category": "spices",
+    "action": "merge",
+    "merge_into": "thyme",
+    "reason": "duplicate variation of thyme"
+  },
+  {
+    "original_id": "c6981ce0-66d1-4e0a-8031-64a8d9ee7ad5",
+    "cleaned_name": "thyme sprigs",
+    "clean_aliases": [
+      "thyme"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "ead4259d-5805-4d76-990a-dd6f1265564a",
+    "cleaned_name": "toasted sesame oil",
+    "clean_aliases": [
+      "sesame oil"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "8f41e6d3-2b0a-4637-8f75-f1fe8e99725c",
+    "cleaned_name": "toasted sesame seeds",
+    "clean_aliases": [
+      "sesame seeds"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "a3ff3644-3467-4ac7-8ad3-fb7044b5540b",
+    "cleaned_name": "tomato",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "4336ca3b-b92a-48ab-b90c-d1994687294d",
+    "cleaned_name": "tomatoes",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "b9925c9a-4dd1-4242-8304-0c42404334d1",
+    "cleaned_name": "tomato paste",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "78dcd57d-83c0-4989-b1d0-d41b90ad0e3b",
+    "cleaned_name": "tomato sauce",
+    "clean_aliases": [],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "60603abd-42aa-4975-861d-7af288a842cd",
+    "cleaned_name": "torn mint leaves",
+    "clean_aliases": [
+      "mint leaves",
+      "mint"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "f6879c93-85f5-4412-b689-fe528ac4ddd3",
+    "cleaned_name": "turmeric",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "6c00580d-cb58-4b6f-83ef-45ebf420a251",
+    "cleaned_name": "unbleached all-purpose flour",
+    "clean_aliases": [
+      "all-purpose flour",
+      "flour"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "f662f734-35ae-4c91-a136-19d2c7a42b99",
+    "cleaned_name": "unsalted butter",
+    "clean_aliases": [
+      "butter"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "93c2acaf-97b1-4279-8dec-7155aad22bd5",
+    "cleaned_name": "unsalted butter, at room temperature",
+    "clean_aliases": [
+      "butter",
+      "room temperature butter"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "unsalted butter",
+    "reason": "duplicate variation of unsalted butter"
+  },
+  {
+    "original_id": "47702a1a-ef35-4d2b-9c6b-b4f19662993b",
+    "cleaned_name": "unsalted butter, cut into pieces",
+    "clean_aliases": [
+      "butter"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "unsalted butter",
+    "reason": "duplicate variation of unsalted butter"
+  },
+  {
+    "original_id": "4cad16bc-0487-4860-bf06-7b36fa8badae",
+    "cleaned_name": "unsalted butter, divided",
+    "clean_aliases": [
+      "butter"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "unsalted butter",
+    "reason": "duplicate variation of unsalted butter"
+  },
+  {
+    "original_id": "41efdaee-1189-4662-8f3f-9aeea38f494d",
+    "cleaned_name": "unsalted butter, melted",
+    "clean_aliases": [
+      "butter",
+      "melted butter"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "unsalted butter",
+    "reason": "duplicate variation of unsalted butter"
+  },
+  {
+    "original_id": "78f20d9f-6b47-44e2-a853-d4aacf423d89",
+    "cleaned_name": "unsalted butter, plus more for pan",
+    "clean_aliases": [
+      "butter"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "unsalted butter",
+    "reason": "duplicate variation of unsalted butter"
+  },
+  {
+    "original_id": "6320ef13-675f-4bb8-845f-1ff5018d092f",
+    "cleaned_name": "unsalted butter, room temperature",
+    "clean_aliases": [
+      "butter",
+      "room temperature butter"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "unsalted butter",
+    "reason": "duplicate variation of unsalted butter"
+  },
+  {
+    "original_id": "0f22d568-3b59-4e1a-9024-74ce3ab4d070",
+    "cleaned_name": "unsalted butter, room temperature, cut into pieces",
+    "clean_aliases": [
+      "butter",
+      "room temperature butter"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "unsalted butter",
+    "reason": "duplicate variation of unsalted butter"
+  },
+  {
+    "original_id": "0299bb50-6b6d-4d7c-8e42-f1411fcef854",
+    "cleaned_name": "unsalted butter, softened",
+    "clean_aliases": [
+      "butter",
+      "softened butter"
+    ],
+    "correct_category": "dairy",
+    "action": "merge",
+    "merge_into": "unsalted butter",
+    "reason": "duplicate variation of unsalted butter"
+  },
+  {
+    "original_id": "5de8e679-994d-47c3-8fbb-9ca115cf3fb1",
+    "cleaned_name": "unseasoned rice vinegar",
+    "clean_aliases": [
+      "rice vinegar"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "5604768a-a1cb-40c8-bcf7-f3f6a91510ba",
+    "cleaned_name": "unsweetened applesauce",
+    "clean_aliases": [
+      "applesauce"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "290e4fa9-690c-457c-9199-b1389444c518",
+    "cleaned_name": "unsweetened cocoa powder",
+    "clean_aliases": [
+      "cocoa powder"
+    ],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "68bd93f2-fae1-4c55-837e-f4cff2ce1a59",
+    "cleaned_name": "unsweetened coconut flakes",
+    "clean_aliases": [
+      "coconut flakes"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "dd326266-85a3-46e7-b0f1-ec4a4d1a6f11",
+    "cleaned_name": "unsweetened coconut milk",
+    "clean_aliases": [
+      "coconut milk"
+    ],
+    "correct_category": "dairy",
+    "action": "keep"
+  },
+  {
+    "original_id": "108ff60b-7211-4238-9bd2-65d29ee98833",
+    "cleaned_name": "unsweetened shredded coconut",
+    "clean_aliases": [
+      "shredded coconut",
+      "coconut"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "18882069-9305-4b44-b8ee-84b1a38fec74",
+    "cleaned_name": "vanilla",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "1ef090f6-cb2b-4ca1-a7ad-a19904fd77e0",
+    "cleaned_name": "vanilla bean paste",
+    "clean_aliases": [
+      "vanilla paste"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "76c81e1c-a2a7-4ed1-902d-89c09d5b26ce",
+    "cleaned_name": "vanilla bean paste or vanilla extract",
+    "clean_aliases": [
+      "vanilla bean paste",
+      "vanilla extract"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "658af823-c178-47fc-9a5a-7bac81fbd038",
+    "cleaned_name": "vanilla extract",
+    "clean_aliases": [
+      "vanilla"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "f12c1a76-9901-4b87-8878-310ba177e3b9",
+    "cleaned_name": "vegetable oil",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "5d482d50-a47a-46c5-9676-023798ed6a72",
+    "cleaned_name": "vegetable oil, divided",
+    "clean_aliases": [
+      "vegetable oil"
+    ],
+    "correct_category": "condiments",
+    "action": "merge",
+    "merge_into": "vegetable oil",
+    "reason": "duplicate variation of vegetable oil"
+  },
+  {
+    "original_id": "67ad4498-b5e2-403a-9ada-84d1292254f5",
+    "cleaned_name": "vegetable oil, plus more for grill",
+    "clean_aliases": [
+      "vegetable oil"
+    ],
+    "correct_category": "condiments",
+    "action": "merge",
+    "merge_into": "vegetable oil",
+    "reason": "duplicate variation of vegetable oil"
+  },
+  {
+    "original_id": "04b86c7a-ba62-4a17-867e-1a9ff86d1676",
+    "cleaned_name": "virgin coconut oil",
+    "clean_aliases": [
+      "coconut oil"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "1404cac0-b42f-439a-bf6a-a2452f4faa5e",
+    "cleaned_name": "vodka",
+    "clean_aliases": [],
+    "correct_category": "beverages",
+    "action": "keep"
+  },
+  {
+    "original_id": "7fe6ee06-6560-4ffa-bcdb-f722c54f9f8c",
+    "cleaned_name": "walnuts",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "888b5eef-478d-4aa0-9271-137dd0e05837",
+    "cleaned_name": "warm water",
+    "clean_aliases": [
+      "water"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "01900752-0670-49ce-adbd-9c1ee8ecb1a6",
+    "cleaned_name": "water",
+    "clean_aliases": [],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "bc28ac76-c549-4ade-9a28-505dc825333e",
+    "cleaned_name": "wheat flour",
+    "clean_aliases": [
+      "whole wheat flour"
+    ],
+    "correct_category": "grains",
+    "action": "keep"
+  },
+  {
+    "original_id": "39e851b3-9c13-47ae-8603-22c07da10a55",
+    "cleaned_name": "white miso",
+    "clean_aliases": [
+      "miso"
+    ],
+    "correct_category": "other",
+    "action": "keep"
+  },
+  {
+    "original_id": "7942faf2-fb69-4f64-85db-69350487feeb",
+    "cleaned_name": "white onion",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "36fd51ca-325d-4b8a-b382-862c6073d5d4",
+    "cleaned_name": "white onion, thinly sliced",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "merge",
+    "merge_into": "white onion",
+    "reason": "duplicate variation of white onion"
+  },
+  {
+    "original_id": "4a97e035-061f-48ef-915f-bb324cf523ad",
+    "cleaned_name": "white vinegar",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "af1669f5-ba1c-4cbf-8341-7b9c077a4522",
+    "cleaned_name": "white wine vinegar",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "6a5568d8-aa1d-477b-b88f-97a8e40a4ea9",
+    "cleaned_name": "worcestershire sauce",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "64a5f49d-1e40-4f2d-8063-612561fdea0a",
+    "cleaned_name": "yellow mustard",
+    "clean_aliases": [],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "0c271c31-703c-49d5-a750-3cf2ee9d04d1",
+    "cleaned_name": "yellow mustard seeds",
+    "clean_aliases": [
+      "mustard seeds"
+    ],
+    "correct_category": "condiments",
+    "action": "keep"
+  },
+  {
+    "original_id": "25625a86-d22b-45b1-85cf-4f1627f14a5c",
+    "cleaned_name": "yellow onion",
+    "clean_aliases": [
+      "onion"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "d63ebf31-e6ad-40e6-95ed-3c70f050d359",
+    "cleaned_name": "zaatar",
+    "clean_aliases": [],
+    "correct_category": "spices",
+    "action": "keep"
+  },
+  {
+    "original_id": "57ac42e5-ccc0-4ecf-8660-73fed47e7236",
+    "cleaned_name": "zest and juice of 1 lemon",
+    "clean_aliases": [
+      "lemon zest",
+      "lemon juice"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  },
+  {
+    "original_id": "4a1f5cea-e48d-4d37-990c-83a6ba4de08f",
+    "cleaned_name": "zest of 1 lemon",
+    "clean_aliases": [
+      "lemon zest"
+    ],
+    "correct_category": "produce",
+    "action": "keep"
+  }
+]
