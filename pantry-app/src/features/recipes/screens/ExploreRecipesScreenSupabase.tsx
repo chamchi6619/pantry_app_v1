@@ -141,9 +141,8 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
 
         // Dynamic thresholds based on matchable pantry size
         // Count only items that can be matched (have canonical_item_id in DB)
-        // Note: We can't check this client-side, so we'll use total active count as proxy
-        // and rely on Edge Function to return the actual matchable count
-        const totalPantryItems = items?.filter(i => i.status === 'active').length || 0;
+        // Note: Store already filters to active items in loadFromSupabase()
+        const totalPantryItems = items?.length || 0;
 
         // Use very lenient thresholds for small pantries
         // As users add more items, we can be more selective
