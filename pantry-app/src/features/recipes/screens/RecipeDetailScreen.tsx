@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { theme } from '../../../core/constants/theme';
 import { Recipe, RecipeIngredient } from '../types';
-import { useInventoryStore } from '../../../stores/inventoryStore';
+import { useInventorySupabaseStore } from '../../../stores/inventorySupabaseStore';
 import { useShoppingListStore } from '../../../stores/shoppingListStore';
 import { shoppingListMerger } from '../utils/shoppingListMerger';
 import { matchIngredientToInventory } from '../utils/simpleMatcher';
@@ -85,8 +85,8 @@ export const RecipeDetailScreen: React.FC = () => {
   const [availabilityLoading, setAvailabilityLoading] = useState(true);
   const [ingredientAvailability, setIngredientAvailability] = useState<Record<string, boolean>>({});
 
-  const inventory = useInventoryStore((state) => state.items);
-  const inventoryVersion = useInventoryStore((state) => state.version || 0);
+  const inventory = useInventorySupabaseStore((state) => state.items);
+  const inventoryVersion = useInventorySupabaseStore((state) => state.lastSync || 0);
   const shoppingItems = useShoppingListStore((state) => state.items);
   const addShoppingItem = useShoppingListStore((state) => state.addItem);
   const updateShoppingItem = useShoppingListStore((state) => state.updateItem);
@@ -447,37 +447,56 @@ export const RecipeDetailScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Instructions</Text>
 
-          {recipe.instructions.map((instruction, index) => (
-            <Pressable
-              key={index}
-              style={styles.instructionItem}
-              onPress={() => handleToggleStep(index)}
-            >
-              <View
-                style={[
-                  styles.stepNumber,
-                  checkedSteps.has(index) && styles.stepNumberChecked,
-                ]}
+          {recipe.instructions.length === 1 && recipe.instructions[0]?.toLowerCase().includes('see source') ? (
+            <View style={styles.sourceInstructionsContainer}>
+              <Text style={styles.sourceInstructionsText}>
+                Instructions are available at the original source
+              </Text>
+              {recipe.source_url && (
+                <TouchableOpacity
+                  style={styles.sourceButton}
+                  onPress={() => {
+                    // Open URL - you can add Linking.openURL here if needed
+                    console.log('Open URL:', recipe.source_url);
+                  }}
+                >
+                  <Text style={styles.sourceButtonText}>View Recipe Source</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          ) : (
+            recipe.instructions.map((instruction, index) => (
+              <Pressable
+                key={index}
+                style={styles.instructionItem}
+                onPress={() => handleToggleStep(index)}
               >
-                <Text
+                <View
                   style={[
-                    styles.stepNumberText,
-                    checkedSteps.has(index) && styles.stepNumberTextChecked,
+                    styles.stepNumber,
+                    checkedSteps.has(index) && styles.stepNumberChecked,
                   ]}
                 >
-                  {index + 1}
+                  <Text
+                    style={[
+                      styles.stepNumberText,
+                      checkedSteps.has(index) && styles.stepNumberTextChecked,
+                    ]}
+                  >
+                    {index + 1}
+                  </Text>
+                </View>
+                <Text
+                  style={[
+                    styles.instructionText,
+                    checkedSteps.has(index) && styles.instructionTextChecked,
+                  ]}
+                >
+                  {instruction}
                 </Text>
-              </View>
-              <Text
-                style={[
-                  styles.instructionText,
-                  checkedSteps.has(index) && styles.instructionTextChecked,
-                ]}
-              >
-                {instruction}
-              </Text>
-            </Pressable>
-          ))}
+              </Pressable>
+            ))
+          )}
         </View>
 
         {/* Nutrition (if available) */}
@@ -817,6 +836,30 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: theme.colors.primary,
     fontSize: 16,
+    fontWeight: '600',
+  },
+  sourceInstructionsContainer: {
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.lg,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    gap: theme.spacing.md,
+  },
+  sourceInstructionsText: {
+    fontSize: 15,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  sourceButton: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.sm,
+  },
+  sourceButtonText: {
+    color: 'white',
+    fontSize: 15,
     fontWeight: '600',
   },
 });

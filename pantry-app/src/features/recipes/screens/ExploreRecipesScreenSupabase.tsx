@@ -363,6 +363,7 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
             difficulty: fullRecipe.difficulty || 'medium',
             category: fullRecipe.category || 'general',
             description: fullRecipe.description || recipe.description || '',
+            source_url: fullRecipe.source_url || null,
           };
 
           console.log('🎯 Navigating with ingredients:', recipeWithIngredients.ingredients.length);
