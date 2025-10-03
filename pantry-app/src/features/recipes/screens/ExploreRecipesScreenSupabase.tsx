@@ -170,11 +170,19 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
           },
         });
 
+        console.log('🔍 Edge Function Response:', {
+          hasError: !!error,
+          success: data?.success,
+          recipeCount: data?.recipes?.length,
+          pantryCount: data?.pantry_item_count
+        });
+
         if (error) {
-          console.error('Recipe search error:', error);
+          console.error('❌ Recipe search error:', error);
           fetchedRecipes = [];
         } else if (data.success) {
           const edgeFunctionRecipes = data.recipes || [];
+          console.log('📊 First recipe raw data:', edgeFunctionRecipes[0]);
 
           // Transform Edge Function results to UI format
           fetchedRecipes = edgeFunctionRecipes.map((r: any) => ({
@@ -194,6 +202,8 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
             matchedIngredients: r.matched_ingredient_names || [],
             missingIngredients: r.missing_ingredient_names || [],
           }));
+
+          console.log('✅ Transformed first recipe:', fetchedRecipes[0]);
 
           // Filter by category
           if (activeCategory === 'Use Soon') {
@@ -221,9 +231,10 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
         fetchedRecipes = searchResults.map(r => recipeServiceSupabase.transformToUIFormat(r));
       }
 
+      console.log(`📝 Setting ${fetchedRecipes.length} recipes to state`);
       setRecipes(fetchedRecipes);
     } catch (error) {
-      console.error('Error loading recipes:', error);
+      console.error('❌ Error loading recipes:', error);
       setRecipes([]);
     } finally {
       setLoading(false);
@@ -389,6 +400,15 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
   const pantryItemCount = items?.length || 0;
   const matchedRecipeCount = recipes.length;
   const bestMatchPercent = recipes.length > 0 ? Math.max(...recipes.map(r => r.matchPercentage || 0)) : 0;
+
+  console.log('📊 Pantry Summary Stats:', {
+    pantryItemCount,
+    matchedRecipeCount,
+    bestMatchPercent,
+    recipesArrayLength: recipes.length,
+    firstRecipeMatch: recipes[0]?.matchPercentage,
+    firstRecipeCounts: recipes[0] ? `${recipes[0].matchedCount}/${recipes[0].totalIngredients}` : 'N/A'
+  });
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
