@@ -354,8 +354,14 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
                 unit: ing.unit,
               },
             })) || [],
-            instructions: Array.isArray(fullRecipe.instructions) ? fullRecipe.instructions :
-                         fullRecipe.instructions ? [fullRecipe.instructions] : [],
+            instructions: Array.isArray(fullRecipe.instructions)
+              ? fullRecipe.instructions
+              : fullRecipe.instructions
+                ? fullRecipe.instructions
+                    .split(/\r?\n\r?\n/)  // Split by double newlines (paragraph breaks)
+                    .map((step: string) => step.replace(/^STEP \d+\r?\n?/i, '').trim())  // Remove "STEP X" prefix
+                    .filter((step: string) => step.length > 0)  // Remove empty steps
+                : [],
             tags: fullRecipe.tags || [],
             prepTime: fullRecipe.prep_time_minutes || 0,
             cookTime: fullRecipe.total_time_minutes || fullRecipe.cook_time_minutes || 0,
