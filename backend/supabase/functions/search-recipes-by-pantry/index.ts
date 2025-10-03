@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
     // 2. Find recipes with their ingredient counts
     console.log('\n🍳 Searching recipes...');
 
-    const { data: recipeMatches, error: searchError } = await supabase.rpc('match_recipes_to_pantry', {
+    const { data: recipeMatches, error: searchError } = await supabase.rpc('search_recipes_by_canonical_items', {
       p_canonical_item_ids: userCanonicalIds,
       p_min_match_percent: min_match_percent,
       p_max_missing: max_missing,

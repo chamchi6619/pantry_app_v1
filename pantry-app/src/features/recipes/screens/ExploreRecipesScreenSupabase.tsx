@@ -139,12 +139,34 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
           return;
         }
 
+        // Dynamic thresholds based on matchable pantry size
+        // Count only items that can be matched (have canonical_item_id in DB)
+        // Note: We can't check this client-side, so we'll use total active count as proxy
+        // and rely on Edge Function to return the actual matchable count
+        const totalPantryItems = items?.filter(i => i.status === 'active').length || 0;
+
+        // Use very lenient thresholds for small pantries
+        // As users add more items, we can be more selective
+        const minMatch = activeCategory === 'High Match' ? 70 :
+                        totalPantryItems < 5 ? 5 :   // Tiny pantry: match if ANY ingredient matches
+                        totalPantryItems < 10 ? 20 :  // Small pantry: low threshold
+                        totalPantryItems < 20 ? 40 :  // Medium pantry: moderate threshold
+                        50;  // Large pantry: reasonable threshold
+
+        const maxMissing = activeCategory === 'High Match' ? 3 :
+                          totalPantryItems < 5 ? 25 :   // Tiny pantry: allow lots of missing ingredients
+                          totalPantryItems < 10 ? 15 :  // Small pantry: moderately lenient
+                          totalPantryItems < 20 ? 10 :
+                          7;
+
+        console.log(`🔍 Recipe search: totalPantry=${totalPantryItems}, minMatch=${minMatch}%, maxMissing=${maxMissing}`);
+
         // Call search-recipes-by-pantry Edge Function
         const { data, error } = await supabase.functions.invoke('search-recipes-by-pantry', {
           body: {
             household_id: householdId,
-            min_match_percent: activeCategory === 'High Match' ? 80 : 60,
-            max_missing: activeCategory === 'High Match' ? 2 : 5,
+            min_match_percent: minMatch,
+            max_missing: maxMissing,
             limit: 50,
           },
         });

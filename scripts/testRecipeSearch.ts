@@ -79,28 +79,50 @@ async function testRecipeSearch() {
     console.log(`     Matched ingredients: ${r.matched_ingredient_names?.slice(0, 3).join(', ')}`);
   });
 
-  // 5. Test via Edge Function
-  console.log('\n5️⃣ Testing via Edge Function (search-recipes-by-pantry)...');
+  // 5. Check ALL active pantry items
+  console.log('\n5️⃣ Checking ALL active pantry items with canonical IDs...');
+  const { data: allActive } = await supabase
+    .from('pantry_items')
+    .select('id, name, canonical_item_id')
+    .eq('household_id', 'aeefe34a-a1b7-494e-97cc-b7418a314aee')
+    .eq('status', 'active')
+    .not('canonical_item_id', 'is', null);
+
+  console.log(`Found ${allActive?.length || 0} active items with canonical IDs`);
+  allActive?.slice(0, 5).forEach((item: any) => {
+    console.log(`  - ${item.name}: ${item.canonical_item_id}`);
+  });
+
+  // 6. Test via Edge Function with real app parameters
+  console.log('\n6️⃣ Testing Edge Function with REAL app parameters...');
   const { data: edgeResponse, error: edgeError } = await supabase.functions.invoke('search-recipes-by-pantry', {
     body: {
-      household_id: pantryItems[0].household_id || 'aeefe34a-a1b7-494e-97cc-b7418a314aee',
-      min_match_percent: 0,
-      max_missing: 100,
-      limit: 5,
+      household_id: 'aeefe34a-a1b7-494e-97cc-b7418a314aee',
+      min_match_percent: 60,  // Real app uses 60
+      max_missing: 5,         // Real app uses 5
+      limit: 50,              // Real app uses 50
     },
   });
 
   if (edgeError) {
-    console.error('Edge function error:', edgeError);
+    console.error('\n❌ Edge function error:');
+    console.error(JSON.stringify(edgeError, null, 2));
     return;
   }
 
-  console.log(`Edge function success: ${edgeResponse.success}`);
-  console.log(`Pantry item count: ${edgeResponse.pantry_item_count}`);
-  console.log(`Recipes found: ${edgeResponse.recipes?.length || 0}`);
+  console.log(`\n✅ Edge function success: ${edgeResponse.success}`);
+  console.log(`   Pantry item count: ${edgeResponse.pantry_item_count}`);
+  console.log(`   Recipes found: ${edgeResponse.recipes?.length || 0}`);
+
   if (edgeResponse.recipes?.length > 0) {
-    console.log('\nFirst recipe:');
-    console.log(JSON.stringify(edgeResponse.recipes[0], null, 2));
+    console.log('\n   First 3 recipes:');
+    edgeResponse.recipes.slice(0, 3).forEach((r: any, i: number) => {
+      console.log(`\n   ${i + 1}. ${r.title}`);
+      console.log(`      matched_ingredients: ${r.matched_ingredients}`);
+      console.log(`      total_ingredients: ${r.total_ingredients}`);
+      console.log(`      missing_ingredients: ${r.missing_ingredients}`);
+      console.log(`      match_percent: ${r.match_percent}%`);
+    });
   }
 }
 
