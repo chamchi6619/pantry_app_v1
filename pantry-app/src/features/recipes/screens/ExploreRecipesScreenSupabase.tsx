@@ -128,6 +128,8 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
   const loadRecipes = async () => {
     if (loading) return;
 
+    console.log(`📥 loadRecipes EXECUTING: activeMode="${activeMode}", activeCategory="${activeCategory}"`);
+
     setLoading(true);
     try {
       let fetchedRecipes: any[];
@@ -248,9 +250,12 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
     setRefreshing(true);
     await canonicalItemsService.syncFromSupabase();
     await loadRecipes();
-    await loadInitialData();
+    // Only reload initial data if in Explore mode
+    if (activeMode === 'Explore') {
+      await loadInitialData();
+    }
     setRefreshing(false);
-  }, [activeCategory]);
+  }, [activeCategory, activeMode]);
 
   // Get expiring ingredients
   const getExpiringIngredients = useCallback(() => {
