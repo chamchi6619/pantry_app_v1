@@ -264,16 +264,23 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
 
       const expiringItems = items
         .filter(item => {
-          if (!item || !item.expirationDate) return false;
-          const dateParts = item.expirationDate.split('-');
-          if (dateParts.length !== 3) return false;
+          try {
+            if (!item || !item.expirationDate) return false;
+            if (typeof item.expirationDate !== 'string') return false;
 
-          const [year, month, day] = dateParts.map(Number);
-          if (isNaN(year) || isNaN(month) || isNaN(day)) return false;
+            const dateParts = item.expirationDate.split('-');
+            if (!dateParts || dateParts.length !== 3) return false;
 
-          const expiry = new Date(year, month - 1, day);
-          const daysUntil = Math.ceil((expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-          return daysUntil <= 7 && daysUntil > 0;
+            const [year, month, day] = dateParts.map(Number);
+            if (isNaN(year) || isNaN(month) || isNaN(day)) return false;
+
+            const expiry = new Date(year, month - 1, day);
+            const daysUntil = Math.ceil((expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            return daysUntil <= 7 && daysUntil > 0;
+          } catch (err) {
+            console.error('Error processing expiration date for item:', item?.name, err);
+            return false;
+          }
         })
         .map(item => item.name || 'Unknown Item');
       return expiringItems;
