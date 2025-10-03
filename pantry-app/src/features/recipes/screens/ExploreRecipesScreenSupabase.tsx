@@ -265,8 +265,56 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
   }, [items]);
 
   // Navigation functions
-  const handleRecipePress = (recipe: any) => {
+  const handleRecipePress = async (recipe: any) => {
     if (!recipe) return;
+
+    // If recipe doesn't have ingredients array, fetch full details from database
+    if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+      try {
+        const { data: fullRecipe, error } = await supabase
+          .from('recipes')
+          .select(`
+            *,
+            recipe_ingredients (
+              id,
+              ingredient_name,
+              amount,
+              unit,
+              notes,
+              is_optional,
+              sort_order
+            )
+          `)
+          .eq('id', recipe.id)
+          .single();
+
+        if (error) throw error;
+
+        if (fullRecipe) {
+          // Transform to expected format
+          const recipeWithIngredients = {
+            ...recipe,
+            id: fullRecipe.id,
+            ingredients: fullRecipe.recipe_ingredients?.map((ing: any) => ({
+              id: ing.id,
+              name: ing.ingredient_name,
+              amount: ing.amount,
+              unit: ing.unit,
+              recipeText: ing.notes || `${ing.amount} ${ing.unit} ${ing.ingredient_name}`,
+              isOptional: ing.is_optional,
+              sortOrder: ing.sort_order,
+            })) || [],
+            instructions: fullRecipe.instructions || [],
+          };
+
+          navigation.navigate('RecipeDetail', { recipe: recipeWithIngredients });
+          return;
+        }
+      } catch (error) {
+        console.error('Error fetching recipe details:', error);
+      }
+    }
+
     navigation.navigate('RecipeDetail', { recipe });
   };
 
