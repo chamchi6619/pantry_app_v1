@@ -88,12 +88,15 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
 
   // Load recipes when category or mode changes
   useEffect(() => {
+    console.log(`🔄 loadRecipes triggered: mode=${activeMode}, category=${activeCategory}`);
     loadRecipes();
   }, [activeCategory, activeMode]);
 
-  // Load initial data
+  // Load initial data (only for Explore mode)
   useEffect(() => {
-    loadInitialData();
+    if (activeMode === 'Explore') {
+      loadInitialData();
+    }
   }, []);
 
   const loadInitialData = async () => {
