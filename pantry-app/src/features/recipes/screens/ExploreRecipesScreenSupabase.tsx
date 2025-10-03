@@ -151,17 +151,25 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
 
         // Use very lenient thresholds for small pantries
         // As users add more items, we can be more selective
-        const minMatch = activeCategory === 'High Match' ? 70 :
-                        totalPantryItems < 5 ? 5 :   // Tiny pantry: match if ANY ingredient matches
-                        totalPantryItems < 10 ? 20 :  // Small pantry: low threshold
-                        totalPantryItems < 20 ? 40 :  // Medium pantry: moderate threshold
-                        50;  // Large pantry: reasonable threshold
+        // High Match mode: aim for best possible matches given pantry size
+        const baseMinMatch = totalPantryItems < 5 ? 5 :   // Tiny pantry: match if ANY ingredient matches
+                            totalPantryItems < 10 ? 20 :  // Small pantry: low threshold
+                            totalPantryItems < 20 ? 40 :  // Medium pantry: moderate threshold
+                            50;  // Large pantry: reasonable threshold
 
-        const maxMissing = activeCategory === 'High Match' ? 3 :
-                          totalPantryItems < 5 ? 25 :   // Tiny pantry: allow lots of missing ingredients
-                          totalPantryItems < 10 ? 15 :  // Small pantry: moderately lenient
-                          totalPantryItems < 20 ? 10 :
-                          7;
+        const baseMaxMissing = totalPantryItems < 5 ? 25 :   // Tiny pantry: allow lots of missing ingredients
+                              totalPantryItems < 10 ? 15 :  // Small pantry: moderately lenient
+                              totalPantryItems < 20 ? 10 :
+                              7;
+
+        // High Match: Use stricter thresholds, but still adaptive to pantry size
+        const minMatch = activeCategory === 'High Match'
+          ? Math.min(baseMinMatch + 30, 70)  // Add 30% to base, cap at 70%
+          : baseMinMatch;
+
+        const maxMissing = activeCategory === 'High Match'
+          ? Math.max(Math.floor(baseMaxMissing / 3), 2)  // 1/3 of base, minimum 2
+          : baseMaxMissing;
 
         console.log(`🔍 Recipe search: totalPantry=${totalPantryItems}, minMatch=${minMatch}%, maxMissing=${maxMissing}`);
 
@@ -294,9 +302,12 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
   const handleRecipePress = async (recipe: any) => {
     if (!recipe) return;
 
+    console.log('🔘 Recipe tapped:', recipe.title, 'Has ingredients?', !!recipe.ingredients);
+
     // If recipe doesn't have ingredients array, fetch full details from database
     if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) {
       try {
+        console.log('📡 Fetching full recipe details for:', recipe.id);
         const { data: fullRecipe, error } = await supabase
           .from('recipes')
           .select(`
@@ -314,33 +325,51 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
           .eq('id', recipe.id)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Error fetching recipe:', error);
+          throw error;
+        }
 
         if (fullRecipe) {
-          // Transform to expected format
+          console.log('✅ Got full recipe, ingredients count:', fullRecipe.recipe_ingredients?.length);
+
+          // Transform to expected format - merge database recipe with existing recipe data
           const recipeWithIngredients = {
             ...recipe,
+            ...fullRecipe, // Include all database fields
             id: fullRecipe.id,
+            name: fullRecipe.title || recipe.title || recipe.name,
             ingredients: fullRecipe.recipe_ingredients?.map((ing: any) => ({
               id: ing.id,
               name: ing.ingredient_name,
               amount: ing.amount,
               unit: ing.unit,
-              recipeText: ing.notes || `${ing.amount} ${ing.unit} ${ing.ingredient_name}`,
+              recipeText: ing.notes || `${ing.amount || ''} ${ing.unit || ''} ${ing.ingredient_name}`.trim(),
               isOptional: ing.is_optional,
               sortOrder: ing.sort_order,
             })) || [],
-            instructions: fullRecipe.instructions || [],
+            instructions: Array.isArray(fullRecipe.instructions) ? fullRecipe.instructions :
+                         fullRecipe.instructions ? [fullRecipe.instructions] : [],
+            tags: fullRecipe.tags || [],
+            prepTime: fullRecipe.prep_time_minutes || 0,
+            cookTime: fullRecipe.total_time_minutes || fullRecipe.cook_time_minutes || 0,
+            servings: fullRecipe.servings || 4,
+            difficulty: fullRecipe.difficulty || 'medium',
+            category: fullRecipe.category || 'general',
+            description: fullRecipe.description || recipe.description || '',
           };
 
+          console.log('🎯 Navigating with ingredients:', recipeWithIngredients.ingredients.length);
           navigation.navigate('RecipeDetail', { recipe: recipeWithIngredients });
           return;
         }
       } catch (error) {
-        console.error('Error fetching recipe details:', error);
+        console.error('❌ Error fetching recipe details:', error);
+        return;
       }
     }
 
+    console.log('🎯 Navigating with existing ingredients:', recipe.ingredients?.length);
     navigation.navigate('RecipeDetail', { recipe });
   };
 
