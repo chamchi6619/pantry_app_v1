@@ -8,11 +8,11 @@
     "seed:canonical": "tsx seedCanonicalItems.ts",
     "setup:free": "npm run extract:canonical && npm run ingest:local",
     "setup:manual": "npm run seed:canonical && npm run ingest:local",
-    "clean:ingredients": "tsx cleanIngredients.ts",
-    "clean:ingredients:edge": "tsx cleanIngredientsViaEdge.ts",
-    "link:pantry": "tsx linkPantryItems.ts"
+    "link:pantry": "tsx linkPantryItems.ts",
+    "dedupe:recipes": "tsx deduplicateRecipes.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0",
     "@google/generative-ai": "^0.21.0",
     "@supabase/supabase-js": "^2.58.0",
     "dotenv": "^16.4.7"

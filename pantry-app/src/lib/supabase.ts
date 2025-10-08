@@ -189,6 +189,19 @@ export type Database = {
           created_at: string;
         };
       };
+      canonical_items: {
+        Row: {
+          id: string;
+          canonical_name: string;
+          aliases: string[] | null;
+          category: string | null;
+          typical_unit: string | null;
+          typical_location: string | null;
+          is_perishable: boolean;
+          typical_shelf_life_days: number | null;
+          created_at: string;
+        };
+      };
       receipts: {
         Row: {
           id: string;

@@ -54,6 +54,8 @@ class RecipeServiceSupabase {
    * Search recipes with filters
    */
   async searchRecipes(options: SearchRecipesOptions = {}): Promise<RecipeWithIngredients[]> {
+    console.log('🔍 searchRecipes called with options:', options);
+
     const {
       query = '',
       category,
@@ -62,13 +64,33 @@ class RecipeServiceSupabase {
       offset = 0,
     } = options;
 
+    // Step 0: Get recipe IDs that have ingredients (data quality filter)
+    // This ensures we only show recipes with valid ingredient data
+    const { data: recipeIdsWithIngredients, error: idsError } = await supabase
+      .from('recipe_ingredients')
+      .select('recipe_id')
+      .limit(10000); // Get a large pool of valid recipe IDs
+
+    if (idsError) {
+      console.error('Error fetching recipe IDs with ingredients:', idsError);
+      return [];
+    }
+
+    if (!recipeIdsWithIngredients || recipeIdsWithIngredients.length === 0) {
+      console.log('  - No recipes with ingredients found');
+      return [];
+    }
+
+    // Extract unique recipe IDs
+    const validRecipeIds = [...new Set(recipeIdsWithIngredients.map(r => r.recipe_id))];
+    console.log(`  - Step 0: Found ${validRecipeIds.length} recipes with ingredients`);
+
+    // Step 1: Fetch recipes only (no join), filtered to only those with ingredients
     let queryBuilder = supabase
       .from('recipes')
-      .select(`
-        *,
-        recipe_ingredients (*)
-      `)
+      .select('*')
       .eq('is_public', true)
+      .in('id', validRecipeIds)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -82,14 +104,56 @@ class RecipeServiceSupabase {
       queryBuilder = queryBuilder.lte('total_time_minutes', maxTime);
     }
 
-    const { data, error } = await queryBuilder;
+    const { data: recipes, error } = await queryBuilder;
+
+    console.log(`  - Step 1: Fetched ${recipes?.length || 0} recipes from database`);
 
     if (error) {
       console.error('Error searching recipes:', error);
       return [];
     }
 
-    return (data as RecipeWithIngredients[]) || [];
+    if (!recipes || recipes.length === 0) {
+      console.log('  - No recipes found, returning empty array');
+      return [];
+    }
+
+    // Step 2: Fetch ingredients for these recipes
+    const recipeIds = recipes.map(r => r.id);
+    console.log(`  - Recipe IDs to fetch ingredients for:`, recipeIds.slice(0, 3));
+
+    const { data: ingredients, error: ingredientsError } = await supabase
+      .from('recipe_ingredients')
+      .select('*')
+      .in('recipe_id', recipeIds)
+      .order('sort_order', { ascending: true });
+
+    console.log(`  - Step 2: Fetched ${ingredients?.length || 0} total ingredients for ${recipeIds.length} recipes`);
+    if (ingredientsError) {
+      console.error('  - Ingredients fetch error:', ingredientsError);
+    }
+
+    if (ingredientsError) {
+      console.error('Error fetching ingredients:', ingredientsError);
+      return recipes.map(r => ({ ...r, recipe_ingredients: [] }));
+    }
+
+    // Step 3: Merge ingredients with recipes
+    const recipesWithIngredients = recipes.map(recipe => {
+      const recipeIngs = ingredients?.filter(ing => ing.recipe_id === recipe.id) || [];
+      return {
+        ...recipe,
+        recipe_ingredients: recipeIngs
+      };
+    }) as RecipeWithIngredients[];
+
+    console.log(`  - Step 3: After merge, ingredient counts:`,
+      recipesWithIngredients.map(r => `${r.title}: ${r.recipe_ingredients.length}`).slice(0, 5)
+    );
+
+    console.log(`  - ✅ Final result: ${recipesWithIngredients.length} recipes returned`);
+
+    return recipesWithIngredients;
   }
 
   /**
@@ -117,12 +181,10 @@ class RecipeServiceSupabase {
    * Get popular recipes
    */
   async getPopularRecipes(limit: number = 20): Promise<RecipeWithIngredients[]> {
-    const { data, error } = await supabase
+    // Step 1: Fetch recipes only
+    const { data: recipes, error } = await supabase
       .from('recipes')
-      .select(`
-        *,
-        recipe_ingredients (*)
-      `)
+      .select('*')
       .eq('is_public', true)
       .order('times_cooked', { ascending: false })
       .limit(limit);
@@ -132,7 +194,28 @@ class RecipeServiceSupabase {
       return [];
     }
 
-    return (data as RecipeWithIngredients[]) || [];
+    if (!recipes || recipes.length === 0) {
+      return [];
+    }
+
+    // Step 2: Fetch ingredients
+    const recipeIds = recipes.map(r => r.id);
+    const { data: ingredients, error: ingredientsError } = await supabase
+      .from('recipe_ingredients')
+      .select('*')
+      .in('recipe_id', recipeIds)
+      .order('sort_order', { ascending: true });
+
+    if (ingredientsError) {
+      console.error('Error fetching ingredients:', ingredientsError);
+      return recipes.map(r => ({ ...r, recipe_ingredients: [] }));
+    }
+
+    // Step 3: Merge
+    return recipes.map(recipe => ({
+      ...recipe,
+      recipe_ingredients: ingredients?.filter(ing => ing.recipe_id === recipe.id) || []
+    })) as RecipeWithIngredients[];
   }
 
   /**
@@ -146,12 +229,10 @@ class RecipeServiceSupabase {
    * Get recipes by source
    */
   async getRecipesBySource(source: string, limit: number = 50): Promise<RecipeWithIngredients[]> {
-    const { data, error } = await supabase
+    // Step 1: Fetch recipes only
+    const { data: recipes, error } = await supabase
       .from('recipes')
-      .select(`
-        *,
-        recipe_ingredients (*)
-      `)
+      .select('*')
       .eq('source', source)
       .eq('is_public', true)
       .limit(limit);
@@ -161,7 +242,28 @@ class RecipeServiceSupabase {
       return [];
     }
 
-    return (data as RecipeWithIngredients[]) || [];
+    if (!recipes || recipes.length === 0) {
+      return [];
+    }
+
+    // Step 2: Fetch ingredients
+    const recipeIds = recipes.map(r => r.id);
+    const { data: ingredients, error: ingredientsError } = await supabase
+      .from('recipe_ingredients')
+      .select('*')
+      .in('recipe_id', recipeIds)
+      .order('sort_order', { ascending: true });
+
+    if (ingredientsError) {
+      console.error('Error fetching ingredients:', ingredientsError);
+      return recipes.map(r => ({ ...r, recipe_ingredients: [] }));
+    }
+
+    // Step 3: Merge
+    return recipes.map(recipe => ({
+      ...recipe,
+      recipe_ingredients: ingredients?.filter(ing => ing.recipe_id === recipe.id) || []
+    })) as RecipeWithIngredients[];
   }
 
   /**
@@ -188,15 +290,12 @@ class RecipeServiceSupabase {
       return [];
     }
 
-    // Fetch full recipe details for matched recipes
+    // Fetch full recipe details for matched recipes (recipes only, no join)
     const recipeIds = matchedRecipes.map((r: any) => r.recipe_id);
 
     const { data: recipes, error: recipesError } = await supabase
       .from('recipes')
-      .select(`
-        *,
-        recipe_ingredients (*)
-      `)
+      .select('*')
       .in('id', recipeIds);
 
     if (recipesError) {
@@ -204,8 +303,29 @@ class RecipeServiceSupabase {
       return [];
     }
 
+    if (!recipes || recipes.length === 0) {
+      return [];
+    }
+
+    // Fetch ingredients for these recipes
+    const { data: ingredients, error: ingredientsError } = await supabase
+      .from('recipe_ingredients')
+      .select('*')
+      .in('recipe_id', recipeIds)
+      .order('sort_order', { ascending: true });
+
+    if (ingredientsError) {
+      console.error('Error fetching ingredients:', ingredientsError);
+    }
+
+    // Merge ingredients with recipes
+    const recipesWithIngredients = recipes.map(recipe => ({
+      ...recipe,
+      recipe_ingredients: ingredients?.filter(ing => ing.recipe_id === recipe.id) || []
+    })) as RecipeWithIngredients[];
+
     // Map match percentages to recipes
-    const recipesWithMatch = (recipes as RecipeWithIngredients[]).map(recipe => {
+    const recipesWithMatch = recipesWithIngredients.map(recipe => {
       const match = matchedRecipes.find((m: any) => m.recipe_id === recipe.id);
       return {
         ...recipe,
@@ -332,6 +452,9 @@ class RecipeServiceSupabase {
    * Transform recipe to UI format (compatible with existing RecipeCard)
    */
   transformToUIFormat(recipe: RecipeWithIngredients): any {
+    console.log('🔄 transformToUIFormat called for:', recipe.title);
+    console.log('  - recipe_ingredients count:', recipe.recipe_ingredients?.length || 0);
+
     // Determine cuisine from title or source
     const text = `${recipe.title} ${recipe.description || ''}`.toLowerCase();
     let cuisine = 'International';

@@ -3,14 +3,15 @@ import {
   View,
   ScrollView,
   StyleSheet,
-  FlatList,
   Text,
   Pressable,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { shallow } from 'zustand/shallow';
+import { FlashList } from '@shopify/flash-list';
 
 // Components
 import { HeroCard } from '../components/HeroCard';
@@ -22,8 +23,8 @@ import { CuisineChips } from '../components/CuisineChips';
 import { PantryCTA } from '../components/PantryCTA';
 import { PantryMatchingBanner } from '../components/PantryMatchingBanner';
 
-// Data
-import { placeholderRecipes } from '../data/placeholderRecipes';
+// Hooks
+import { useSupabaseRecipes } from '../../../hooks/useSupabaseRecipes';
 
 // Stores
 import { useInventoryStore } from '../../../stores/inventoryStore';
@@ -32,74 +33,14 @@ import { theme } from '../../../core/constants/theme';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-// Sample hero recipes
-const heroRecipes = [
-  {
-    id: 'hero-1',
-    title: 'Mediterranean Bowl',
-    subtitle: "Editor's Choice",
-    imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800',
-    creator: 'Chef Maria',
-  },
-  {
-    id: 'hero-2',
-    title: 'Asian Fusion Stir-fry',
-    subtitle: 'Trending Now',
-    imageUrl: 'https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=800',
-    creator: 'Chef Lin',
-  },
-  {
-    id: 'hero-3',
-    title: 'Farm Fresh Salad',
-    subtitle: 'Seasonal Special',
-    imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800',
-    creator: 'Chef Sophie',
-  },
-];
+// Hero recipes now come from Supabase (v5.2 RuleChef recipes)
+// Use the first 3 categoryRecipes as hero recipes
+const heroRecipes = categoryRecipes.slice(0, 3).map(recipe => ({
+  ...recipe,
+  subtitle: 'Featured Recipe',
+}));
 
-// Default ingredients for recipes - properly formatted
-const DEFAULT_INGREDIENTS = [
-  {
-    id: 'ing-1',
-    recipeText: '2 tbsp olive oil',
-    parsed: { quantity: 2, unit: 'tbsp', ingredient: 'olive oil' },
-    name: 'Olive Oil',
-    amount: 2,
-    unit: 'tbsp'
-  },
-  {
-    id: 'ing-2',
-    recipeText: '3 cloves garlic',
-    parsed: { quantity: 3, unit: 'cloves', ingredient: 'garlic' },
-    name: 'Garlic',
-    amount: 3,
-    unit: 'cloves'
-  },
-  {
-    id: 'ing-3',
-    recipeText: '1 medium onion',
-    parsed: { quantity: 1, unit: 'medium', ingredient: 'onion' },
-    name: 'Onion',
-    amount: 1,
-    unit: 'medium'
-  },
-  {
-    id: 'ing-4',
-    recipeText: '1 tsp salt',
-    parsed: { quantity: 1, unit: 'tsp', ingredient: 'salt' },
-    name: 'Salt',
-    amount: 1,
-    unit: 'tsp'
-  },
-  {
-    id: 'ing-5',
-    recipeText: '0.5 tsp black pepper',
-    parsed: { quantity: 0.5, unit: 'tsp', ingredient: 'black pepper' },
-    name: 'Black Pepper',
-    amount: 0.5,
-    unit: 'tsp'
-  },
-];
+// Note: Ingredients now come from Supabase recipes (v5.2)
 
 export const ExploreRecipesScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -131,7 +72,31 @@ export const ExploreRecipesScreen: React.FC = () => {
   // Get current categories based on mode
   const currentCategories = activeMode === 'From Your Pantry' ? pantryCategories : exploreCategories;
 
+  // Map app categories to database categories
+  const mapCategoryToDb = (category: string): string => {
+    const categoryMap: Record<string, string> = {
+      'Popular': 'all',
+      'Quick & Easy': 'quick',
+      'Healthy': 'healthy',
+      'Vegetarian': 'healthy',
+      'Comfort Food': 'comfort',
+      'Desserts': 'dessert',
+      'Breakfast': 'breakfast',
+      'Use Soon': 'all',
+      'High Match': 'all'
+    };
+    return categoryMap[category] || 'all';
+  };
+
+  // Fetch real recipes from Supabase (v5.2)
+  const { recipes: supabaseRecipes, loading: recipesLoading, error: recipesError } = useSupabaseRecipes({
+    category: mapCategoryToDb(activeCategory),
+    limit: 50,
+    enabled: activeMode === 'Explore' // Only fetch for Explore mode for now
+  });
+
   // Safe recipe transformation with null checks
+  // Note: Supabase recipes are already properly formatted, this is just for fallback
   const transformRecipes = (recipes: any[]): any[] => {
     if (!recipes || !Array.isArray(recipes)) {
       return [];
@@ -140,49 +105,29 @@ export const ExploreRecipesScreen: React.FC = () => {
     return recipes
       .filter(recipe => recipe && typeof recipe === 'object' && recipe.id) // Filter out null/undefined/invalid recipes
       .map(recipe => ({
+        ...recipe, // Keep all existing fields (including ingredients from Supabase)
         id: recipe.id || `recipe-${Math.random()}`,
         name: recipe.name || 'Unnamed Recipe',
-        imageUrl: recipe.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500',
-        creator: recipe.creator || 'Community Chef',
-        cookTime: recipe.cookTime || '30 min',
+        imageUrl: recipe.imageUrl || recipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500',
+        creator: recipe.creator || recipe.author || 'Community Chef',
+        cookTime: recipe.cookTime || recipe.totalTime || '30 min',
         difficulty: recipe.difficulty || 'Medium',
         category: recipe.category || 'Popular',
-        matchPercentage: recipe.matchPercentage,
-        ingredients: DEFAULT_INGREDIENTS,
-        cuisine: recipe.category === 'Italian' ? 'Italian' :
-                 recipe.category === 'Asian' ? 'Asian' :
-                 'American',
+        // Ingredients already come from Supabase recipes
       }));
   };
 
   // Get recipes based on category with robust error handling
   const getCategoryRecipes = (): any[] => {
     try {
-      const categoryKey = activeMode === 'From Your Pantry' && (activeCategory === 'Use Soon' || activeCategory === 'High Match')
-        ? activeCategory
-        : activeCategory;
-
-      const rawRecipes = placeholderRecipes?.[categoryKey];
-
-      // Fallback to Popular if category doesn't exist
-      if (!rawRecipes || !Array.isArray(rawRecipes) || rawRecipes.length === 0) {
-        const fallbackRecipes = placeholderRecipes?.['Popular'];
-        if (!fallbackRecipes || !Array.isArray(fallbackRecipes)) {
-          // Return empty array with one default recipe if everything fails
-          return transformRecipes([{
-            id: 'default-1',
-            name: 'Sample Recipe',
-            imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500',
-            creator: 'Chef',
-            cookTime: '30 min',
-            difficulty: 'Easy',
-            category: 'Popular'
-          }]);
-        }
-        return transformRecipes(fallbackRecipes);
+      // Use real Supabase recipes for Explore mode
+      if (activeMode === 'Explore' && supabaseRecipes && supabaseRecipes.length > 0) {
+        return supabaseRecipes;
       }
 
-      return transformRecipes(rawRecipes);
+      // For pantry mode or if no Supabase recipes, return empty for now
+      // TODO: Implement pantry matching with Supabase recipes
+      return [];
     } catch (error) {
       console.error('Error getting category recipes:', error);
       return [];
@@ -218,39 +163,58 @@ export const ExploreRecipesScreen: React.FC = () => {
     }
   }, [items]);
 
-  // Start matching when entering pantry mode or when inventory changes
+  // Create pantry fingerprint to detect actual changes (not just reference changes)
+  const pantryFingerprint = React.useMemo(() => {
+    if (!items || items.length === 0) return '';
+    return items
+      .map(item => item.normalized || item.name.toLowerCase().replace(/[^a-z0-9]/g, ''))
+      .sort()
+      .join('|');
+  }, [items]);
+
+  // Start matching when entering pantry mode or when pantry fingerprint changes
   useEffect(() => {
-    if (activeMode === 'From Your Pantry' && categoryRecipes.length > 0) {
-      // Cancel any existing job and restart with updated inventory
-      cancelJob();
-      // Small delay to ensure cancel completes
+    if (activeMode === 'From Your Pantry' && categoryRecipes.length > 0 && pantryFingerprint) {
+      // Debounce to prevent rapid re-matching
       const timeout = setTimeout(() => {
         startJob(categoryRecipes, items || [], invVersion);
-      }, 100);
+      }, 500);
       return () => clearTimeout(timeout);
     }
-  }, [activeMode, categoryRecipes.length, items, invVersion, startJob, cancelJob]);
+  }, [activeMode, categoryRecipes.length, pantryFingerprint, invVersion, startJob]);
 
   // Navigation functions
   const handleRecipePress = (recipeId: string) => {
     if (!recipeId) return;
-    // For now, navigate with a placeholder recipe since we don't have a store to fetch from
-    // In a real app, you'd fetch the recipe from a store or API
+
+    // Find recipe from all available sources
     const recipe = categoryRecipes.find(r => r.id === recipeId) ||
-                   trendingRecipes.find(r => r.id === recipeId) ||
-                   fiveIngredientRecipes.find(r => r.id === recipeId) ||
+                   trendingRecipes.find(r => r?.id === recipeId) ||
+                   fiveIngredientRecipes.find(r => r?.id === recipeId) ||
                    heroRecipes.find(r => r.id === recipeId);
 
     if (recipe) {
-      // Convert to the format RecipeDetailScreen expects
+      console.log('=== PASSING RECIPE TO DETAIL ===');
+      console.log('Recipe ID:', recipe.id);
+      console.log('Recipe Name:', recipe.name);
+      console.log('Recipe ingredients:', recipe.ingredients);
+      console.log('Ingredients count:', recipe.ingredients?.length || 0);
+
+      // Supabase recipes already have ingredients, just ensure required fields exist
       const detailRecipe = {
         ...recipe,
-        ingredients: recipe.ingredients || DEFAULT_INGREDIENTS,
-        instructions: ['Step 1', 'Step 2', 'Step 3'], // Placeholder instructions
-        tags: ['Popular'],
-        nutrition: { calories: 350, protein: 20, carbs: 40, fat: 15 }
+        ingredients: recipe.ingredients || [], // Use Supabase ingredients or empty array
+        instructions: recipe.instructions || [],
+        tags: recipe.tags || [],
+        nutrition: recipe.nutrition || { calories: 0, protein: 0, carbs: 0, fat: 0 }
       };
+
+      console.log('Detail recipe ingredients:', detailRecipe.ingredients);
+      console.log('Detail ingredients count:', detailRecipe.ingredients?.length || 0);
+
       navigation.navigate('RecipeDetail', { recipe: detailRecipe });
+    } else {
+      console.warn(`Recipe ${recipeId} not found`);
     }
   };
 
@@ -279,7 +243,7 @@ export const ExploreRecipesScreen: React.FC = () => {
         name: 'Error Loading Recipe',
         imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500',
         creator: 'Unknown',
-        ingredients: DEFAULT_INGREDIENTS,
+        ingredients: [], // Empty array if no recipe
       };
     }
 
@@ -291,14 +255,11 @@ export const ExploreRecipesScreen: React.FC = () => {
         creator: recipe.creator || 'Community Chef',
         matchPercentage: result?.pct || recipe.matchPercentage,
         hasExpiring: result?.hasExpiring,
-        ingredients: recipe.ingredients || DEFAULT_INGREDIENTS,
+        // Ingredients come from Supabase recipe (already transformed)
       };
     } catch (error) {
       console.error('Error getting recipe with match:', error);
-      return {
-        ...recipe,
-        ingredients: DEFAULT_INGREDIENTS,
-      };
+      return recipe; // Return recipe as-is if error
     }
   };
 
@@ -308,8 +269,8 @@ export const ExploreRecipesScreen: React.FC = () => {
 
     try {
       const recipeWithMatch = getRecipeWithMatch(item);
-      const ingredients = recipeWithMatch.ingredients || DEFAULT_INGREDIENTS;
-      const ingredientCount = Array.isArray(ingredients) ? ingredients.length : 5;
+      const ingredients = recipeWithMatch.ingredients || [];
+      const ingredientCount = Array.isArray(ingredients) ? ingredients.length : 0;
 
       return (
         <RecipeCard
@@ -337,11 +298,8 @@ export const ExploreRecipesScreen: React.FC = () => {
   // Get different recipe sets for different sections with error handling
   const trendingRecipes = (() => {
     try {
-      const quickEasy = placeholderRecipes?.['Quick & Easy'];
-      if (!quickEasy || !Array.isArray(quickEasy)) {
-        return transformRecipes(categoryRecipes.slice(0, 3));
-      }
-      return transformRecipes(quickEasy.slice(0, 3));
+      // Use categoryRecipes directly since we removed placeholderRecipes
+      return categoryRecipes.slice(0, 3);
     } catch (error) {
       console.error('Error getting trending recipes:', error);
       return [];
@@ -350,11 +308,8 @@ export const ExploreRecipesScreen: React.FC = () => {
 
   const fiveIngredientRecipes = (() => {
     try {
-      const healthy = placeholderRecipes?.['Healthy'];
-      if (!healthy || !Array.isArray(healthy)) {
-        return transformRecipes(categoryRecipes.slice(0, 6));
-      }
-      return transformRecipes(healthy.slice(0, 6));
+      // Use categoryRecipes directly since we removed placeholderRecipes
+      return categoryRecipes.slice(0, 6);
     } catch (error) {
       console.error('Error getting five ingredient recipes:', error);
       return [];
@@ -366,6 +321,39 @@ export const ExploreRecipesScreen: React.FC = () => {
     if (!array || !Array.isArray(array)) return [];
     return array.slice(start, end);
   };
+
+  // Loading state for recipes
+  if (recipesLoading && activeMode === 'Explore') {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Recipes</Text>
+        </View>
+        <View style={[styles.content, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ fontSize: 18, color: theme.colors.primary }}>Loading recipes...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state for recipes
+  if (recipesError && activeMode === 'Explore') {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Recipes</Text>
+        </View>
+        <View style={[styles.content, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+          <Text style={{ fontSize: 18, color: '#ff4444', marginBottom: 16, textAlign: 'center' }}>
+            Failed to load recipes
+          </Text>
+          <Text style={{ fontSize: 14, color: '#666', marginBottom: 24, textAlign: 'center' }}>
+            {recipesError.message}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -450,13 +438,14 @@ export const ExploreRecipesScreen: React.FC = () => {
         <View style={styles.sections}>
           {/* First section - no header, just recipes */}
           {filteredRecipes && filteredRecipes.length > 0 && (
-            <View>
-              <FlatList
+            <View style={{ height: 280 }}>
+              <FlashList
                 horizontal
                 data={safeSlice(filteredRecipes, 0, 6)}
                 renderItem={renderRecipeItem}
                 keyExtractor={(item) => item?.id || `recipe-${Math.random()}`}
                 showsHorizontalScrollIndicator={false}
+                estimatedItemSize={200}
                 contentContainerStyle={styles.horizontalList}
               />
             </View>
@@ -466,24 +455,27 @@ export const ExploreRecipesScreen: React.FC = () => {
           {trendingRecipes && trendingRecipes.length > 0 && (
             <View style={styles.section}>
               <SectionHeader title="Trending Now" />
-              <FlatList
-                data={trendingRecipes}
-                renderItem={({ item }) => {
-                  if (!item) return null;
-                  const recipeWithMatch = getRecipeWithMatch(item);
-                  return (
-                    <RecipeCard
-                      recipe={recipeWithMatch}
-                      variant="full"
-                      onPress={() => handleRecipePress(recipeWithMatch.id)}
-                      matchPercentage={activeMode === 'From Your Pantry' ? recipeWithMatch.matchPercentage : undefined}
-                      showMatchBadge={activeMode === 'From Your Pantry'}
-                    />
-                  );
-                }}
-                keyExtractor={(item) => item?.id || `trending-${Math.random()}`}
-                scrollEnabled={false}
-              />
+              <View style={{ height: trendingRecipes.length * 120 }}>
+                <FlashList
+                  data={trendingRecipes}
+                  renderItem={({ item }) => {
+                    if (!item) return null;
+                    const recipeWithMatch = getRecipeWithMatch(item);
+                    return (
+                      <RecipeCard
+                        recipe={recipeWithMatch}
+                        variant="full"
+                        onPress={() => handleRecipePress(recipeWithMatch.id)}
+                        matchPercentage={activeMode === 'From Your Pantry' ? recipeWithMatch.matchPercentage : undefined}
+                        showMatchBadge={activeMode === 'From Your Pantry'}
+                      />
+                    );
+                  }}
+                  keyExtractor={(item) => item?.id || `trending-${Math.random()}`}
+                  estimatedItemSize={120}
+                  scrollEnabled={false}
+                />
+              </View>
             </View>
           )}
 

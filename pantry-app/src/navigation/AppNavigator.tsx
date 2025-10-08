@@ -11,12 +11,14 @@ import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
 import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleShoppingListScreen';
 // import { EnhancedRecipesScreen } from '../features/recipes/screens/EnhancedRecipesScreen';
 // import { SimpleRecipesScreen } from '../features/recipes/screens/SimpleRecipesScreen';
-import { ExploreRecipesScreen } from '../features/recipes/screens/ExploreRecipesScreen';
+// import { ExploreRecipesScreen } from '../features/recipes/screens/ExploreRecipesScreen'; // OLD - Python backend
+import { ExploreRecipesScreenSupabase } from '../features/recipes/screens/ExploreRecipesScreenSupabase';
 import { RecipeDetailScreen } from '../features/recipes/screens/RecipeDetailScreen';
 import { RecipeFormScreen } from '../features/recipes/screens/RecipeFormScreen';
 import { ScannerScreen } from '../features/scanner/screens/ScannerScreen';
 import { FixQueueScreen } from '../features/receipt/screens/FixQueueScreen';
 import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
+import { PurchaseHistoryScreen } from '../features/receipt/screens/PurchaseHistoryScreen';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -64,7 +66,7 @@ const RecipeStack = () => (
       headerShown: false,
     }}
   >
-    <Stack.Screen name="RecipeList" component={ExploreRecipesScreen} />
+    <Stack.Screen name="RecipeList" component={ExploreRecipesScreenSupabase} />
     <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
     <Stack.Screen name="RecipeForm" component={RecipeFormScreen} />
   </Stack.Navigator>
@@ -85,6 +87,18 @@ const ReceiptStack = () => (
         presentation: 'modal',
       }}
     />
+  </Stack.Navigator>
+);
+
+// Profile Stack Navigator
+const ProfileStack = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerShown: false,
+    }}
+  >
+    <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+    <Stack.Screen name="PurchaseHistory" component={PurchaseHistoryScreen} />
   </Stack.Navigator>
 );
 
@@ -159,7 +173,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStack}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon="👤" label="Profile" />

@@ -14,7 +14,7 @@ import { Camera, useCameraDevice, useCameraPermission } from 'react-native-visio
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useHousehold } from '../../../hooks/useHousehold';
-import { receiptService } from '../../../services/receiptService';
+import { receiptService } from '../../../services/receiptServiceGemini';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -91,8 +91,7 @@ export function CameraScreen() {
         result.text,
         currentHousehold.id,
         {
-          ocr_confidence: result.blocks?.[0]?.confidence || 0.85,
-          use_gemini: false, // Let backend decide
+          ocrConfidence: result.blocks?.[0]?.confidence || 0.85,
         }
       );
 

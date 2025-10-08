@@ -209,6 +209,25 @@ class ReceiptServiceGemini {
    * Confirm all fix queue items and move to purchase history
    */
   async confirmFixQueueItems(items: ReceiptItem[], householdId: string) {
+    // Fetch full items from fix queue to get canonical_item_id
+    const itemIds = items.map(i => i.id).filter(Boolean);
+    let queueItemsData: any[] = [];
+
+    if (itemIds.length > 0) {
+      const { data, error: fetchError } = await supabase
+        .from('receipt_fix_queue')
+        .select('id, canonical_item_id')
+        .in('id', itemIds);
+
+      if (fetchError) throw fetchError;
+      queueItemsData = data || [];
+    }
+
+    // Create map of item ID to canonical_item_id
+    const canonicalIdMap = new Map(
+      queueItemsData.map(item => [item.id, item.canonical_item_id])
+    );
+
     const purchases = items.map(item => ({
       household_id: householdId,
       product_name: item.parsed_name,
@@ -218,7 +237,8 @@ class ReceiptServiceGemini {
       total_price_cents: Math.round(item.price_cents * item.quantity),
       category: item.categories,
       purchase_date: new Date().toISOString(),
-      purchase_date_local: new Date().toISOString().split('T')[0]
+      purchase_date_local: new Date().toISOString().split('T')[0],
+      canonical_item_id: item.id ? canonicalIdMap.get(item.id) : null  // ✅ Preserve canonical ID!
     }));
 
     const { error: purchaseError } = await supabase
@@ -227,7 +247,6 @@ class ReceiptServiceGemini {
 
     if (purchaseError) throw purchaseError;
 
-    const itemIds = items.map(i => i.id).filter(Boolean);
     if (itemIds.length > 0) {
       const { error: resolveError } = await supabase
         .from('receipt_fix_queue')

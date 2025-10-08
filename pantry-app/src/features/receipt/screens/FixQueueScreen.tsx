@@ -249,6 +249,8 @@ export function FixQueueScreen() {
   const renderHeader = () => {
     // Use receipt total (includes tax) if available, otherwise sum items
     const totalAmount = receipt?.total_amount_cents || editedItems.reduce((sum, item) => sum + item.price_cents, 0);
+    const subtotalAmount = receipt?.subtotal_cents || editedItems.reduce((sum, item) => sum + item.price_cents, 0);
+    const taxAmount = receipt?.tax_amount_cents || (totalAmount - subtotalAmount);
 
     return (
       <View style={styles.header}>
@@ -258,11 +260,18 @@ export function FixQueueScreen() {
             <Text style={styles.receiptDate}>
               {new Date(receipt.receipt_date).toLocaleDateString()}
             </Text>
-            <Text style={styles.receiptTotal}>
-              Total: ${(totalAmount / 100).toFixed(2)}
-            </Text>
+            <View style={styles.totalRow}>
+              <Text style={styles.receiptTotal}>
+                Total: ${(totalAmount / 100).toFixed(2)}
+              </Text>
+              {taxAmount > 0 && (
+                <Text style={styles.taxAmount}>
+                  (+ ${(taxAmount / 100).toFixed(2)} tax)
+                </Text>
+              )}
+            </View>
             <Text style={styles.itemCount}>
-              {editedItems.length} items + tax
+              {editedItems.length} items
             </Text>
             {receipt.parse_method === 'gemini' && (
               <View style={styles.aiUsedBadge}>
@@ -463,11 +472,21 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: 4,
   },
+  totalRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginTop: 12,
+    gap: 8,
+  },
   receiptTotal: {
     fontSize: 24,
     fontWeight: '700',
     color: '#111827',
-    marginTop: 12,
+  },
+  taxAmount: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '400',
   },
   itemCount: {
     fontSize: 14,
