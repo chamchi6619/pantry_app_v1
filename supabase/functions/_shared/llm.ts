@@ -643,20 +643,22 @@ export async function extractFromVideoVision(
   console.log(`💰 Estimated: ${estimatedVideoTokens} tokens, ~$${(estimatedCostCents / 100).toFixed(4)}`);
 
   const prompt = instructionsOnly
-    ? `Watch this cooking video and tell me the step-by-step cooking instructions.
+    ? `Watch this cooking video and extract ONLY the step-by-step cooking instructions.
+
+IMPORTANT: Do NOT extract ingredients. Only extract instructions.
 
 Return as JSON:
 {
-  "ingredients": [],
   "instructions": [
     {"step_number": 1, "instruction": "what to do"}
   ]
 }
 
 Rules:
-- Listen to what the person says
-- Write each step in order
-- Only extract what you hear`
+- Listen to what the person says in the video
+- Write each cooking step in order
+- Be concise but complete
+- Only extract what you actually hear`
     : `Watch this cooking video and tell me:
 
 1. What ingredients are mentioned or shown?
@@ -701,7 +703,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.1,
-      maxOutputTokens: 2000,
+      maxOutputTokens: 4000, // Increased from 2000 to prevent truncation
       topP: 0.95,
       responseMimeType: 'application/json', // Force JSON response
     },
