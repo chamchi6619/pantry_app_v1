@@ -130,13 +130,21 @@ export function hasRecipeQualitySignals(sourceText: string): boolean {
   const hasListStructure = listPattern.test(sourceText) || numberedListPattern.test(sourceText);
 
   // Check for ingredient-related keywords
-  const ingredientKeywords = /\b(ingredient|recipe|you need|you'll need|for the|sauce|marinade|dressing)\b/i;
+  const ingredientKeywords = /\b(ingredients?|recipes?|you need|you'll need|for the|sauce|marinade|dressing)\b/i;
   const hasIngredientKeywords = ingredientKeywords.test(sourceText);
 
   // Must have either:
   // - Quantity signals AND some structure (list or keywords)
+  // - Strong ingredient keywords (even without quantities)
   // - Strong list structure (3+ bullets)
   if (hasQuantitySignals && (hasListStructure || hasIngredientKeywords)) {
+    return true;
+  }
+
+  // NEW: If text explicitly mentions "ingredients" or "recipe", trust it
+  // Even without quantities, creators often list items in prose form
+  // Example: "Ingredients: Fresh Asparagus, Garlic, Butter"
+  if (hasIngredientKeywords && sourceText.length >= 100) {
     return true;
   }
 
