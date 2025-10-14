@@ -793,8 +793,13 @@ Rules:
       `(confidence: ${confidence.toFixed(2)}, cost: ${actualCostCents}¢)`
     );
 
+    // When instructionsOnly=true, success depends on instructions, not ingredients
+    const success = instructionsOnly
+      ? parsed.instructions.length > 0
+      : parsed.ingredients.length > 0;
+
     return {
-      success: parsed.ingredients.length > 0,
+      success,
       ingredients: parsed.ingredients,
       instructions: parsed.instructions,
       confidence,
