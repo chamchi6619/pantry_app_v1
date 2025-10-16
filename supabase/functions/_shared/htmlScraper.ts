@@ -556,25 +556,69 @@ export async function extractFromTikTokHTML(url: string): Promise<HTMLExtraction
 function extractXiaoHongShuDescription(html: string): string {
   try {
     // Xiaohongshu embeds data in window.__INITIAL_STATE__
-    const dataMatch = html.match(/window\.__INITIAL_STATE__\s*=\s*({.+?})\s*<\/script>/s);
-    if (dataMatch) {
-      const data = JSON.parse(dataMatch[1]);
+    // Use more robust extraction: find the assignment and extract until actual </script>
+    const stateStart = html.indexOf('window.__INITIAL_STATE__');
+    if (stateStart === -1) {
+      console.warn('   ⚠️  window.__INITIAL_STATE__ not found in HTML');
+      return '';
+    }
 
-      // Navigate to note description (path may vary for images vs videos)
-      const noteDetail = data?.note?.noteDetailMap;
+    // Find the equals sign after __INITIAL_STATE__
+    const equalsIndex = html.indexOf('=', stateStart);
+    if (equalsIndex === -1) {
+      console.warn('   ⚠️  No assignment found after __INITIAL_STATE__');
+      return '';
+    }
 
-      if (noteDetail) {
-        // Get the first note (there's usually only one)
-        const noteId = Object.keys(noteDetail)[0];
-        const note = noteDetail[noteId]?.note;
+    // Find the closing </script> tag
+    const scriptEndIndex = html.indexOf('</script>', equalsIndex);
+    if (scriptEndIndex === -1) {
+      console.warn('   ⚠️  No closing </script> tag found');
+      return '';
+    }
 
-        if (note) {
-          const description = note.desc || note.title || '';
+    // Extract the JSON string between = and </script>
+    // Remove the equals sign and any leading whitespace
+    let jsonStr = html.substring(equalsIndex + 1, scriptEndIndex).trim();
 
-          if (description) {
-            console.log(`📝 Extracted Xiaohongshu description from HTML (${description.length} chars)`);
-            return description;
-          }
+    // Remove trailing semicolon if present
+    if (jsonStr.endsWith(';')) {
+      jsonStr = jsonStr.slice(0, -1).trim();
+    }
+
+    // Replace JavaScript undefined with null for valid JSON
+    jsonStr = jsonStr.replace(/:\s*undefined\b/g, ': null');
+
+    // Additional safety: replace other JavaScript-specific values that aren't valid JSON
+    jsonStr = jsonStr.replace(/:\s*NaN\b/g, ': null');
+    jsonStr = jsonStr.replace(/:\s*Infinity\b/g, ': null');
+    jsonStr = jsonStr.replace(/:\s*-Infinity\b/g, ': null');
+
+    // Parse JSON
+    let data;
+    try {
+      data = JSON.parse(jsonStr);
+    } catch (parseError) {
+      console.error('   ❌ JSON parse error:', parseError instanceof Error ? parseError.message : 'Unknown error');
+      console.error('   First 500 chars of JSON string:', jsonStr.substring(0, 500));
+      console.error('   Last 500 chars of JSON string:', jsonStr.substring(jsonStr.length - 500));
+      return '';
+    }
+
+    // Navigate to note description (path may vary for images vs videos)
+    const noteDetail = data?.note?.noteDetailMap;
+
+    if (noteDetail) {
+      // Get the first note (there's usually only one)
+      const noteId = Object.keys(noteDetail)[0];
+      const note = noteDetail[noteId]?.note;
+
+      if (note) {
+        const description = note.desc || note.title || '';
+
+        if (description) {
+          console.log(`📝 Extracted Xiaohongshu description from HTML (${description.length} chars)`);
+          return description;
         }
       }
     }

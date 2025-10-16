@@ -81,9 +81,20 @@ export async function extractMetadataWithYtDlp(
       const errorText = await response.text();
       console.error(`❌ Cloud Run error (HTTP ${response.status}): ${errorText}`);
 
+      // Try to parse error JSON to extract stderr
+      let parsedError;
+      let stderr;
+      try {
+        parsedError = JSON.parse(errorText);
+        stderr = parsedError.stderr;
+      } catch {
+        // Couldn't parse as JSON, use raw error text
+      }
+
       return {
         success: false,
-        error: `Cloud Run service error: HTTP ${response.status}`,
+        error: parsedError?.error || `Cloud Run service error: HTTP ${response.status}`,
+        stderr: stderr,
         latency_ms,
       };
     }

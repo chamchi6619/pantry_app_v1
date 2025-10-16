@@ -101,6 +101,16 @@ interface Ingredient {
   comment_score?: number | null;  // Score if sourced from comment
 }
 
+// ============================================================
+// VIDEO LENGTH LIMITS
+// ============================================================
+// These limits balance cost, quality, and user experience
+const VIDEO_LENGTH_LIMITS = {
+  VISION_FIRST_MAX: 120,        // 2 min - Vision-first extraction (Step 4A)
+  HYBRID_INSTRUCTIONS_MAX: 300, // 5 min - Hybrid text + vision for instructions (Step 5.5)
+  VISION_HARD_CAP: 600,         // 10 min - Hard cap for any Vision extraction (Step 6)
+} as const;
+
 serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -710,6 +720,75 @@ serve(async (req) => {
           cookCard.extraction.evidence_source = evidenceSource;
 
           console.log(`✅ L3: Final ${cookCard.ingredients.length} ingredients after validation`);
+
+          // Check if we should finalize and return early
+          // Early return if: (1) ingredients extracted AND (2) instructions exist OR not needed
+          const hasInstructionsFromL3 = llmResult.instructions && llmResult.instructions.length > 0;
+          const shouldFinalizeEarly = cookCard.ingredients.length >= 3 && (hasInstructionsFromL3 || platform !== 'youtube');
+
+          if (shouldFinalizeEarly) {
+            console.log(`🎯 L3 extraction complete with ${cookCard.ingredients.length} ingredients and ${hasInstructionsFromL3 ? llmResult.instructions.length : 0} instructions`);
+            console.log(`   Early return: Skipping L4/L5 Vision extraction`);
+
+            // Finalize extraction
+            const avgConfidence =
+              cookCard.ingredients.reduce((sum, ing) => sum + ing.confidence, 0) /
+              cookCard.ingredients.length;
+            cookCard.extraction.confidence = avgConfidence;
+            cookCard.extraction.cost_cents = extractionCost;
+            cookCard.extraction.timestamp = new Date().toISOString();
+
+            const extractionLatency = Date.now() - extractionStartTime;
+
+            // Match ingredients to canonical items
+            cookCard.ingredients = await matchCanonicalItems(supabase, cookCard.ingredients);
+
+            // Cache extraction
+            const inputHash = await computeInputHash(url, title, description, undefined);
+            await setCachedExtraction(supabase, url, inputHash, cookCard, extractionCost);
+
+            // Increment monthly quota
+            await incrementMonthlyQuota(supabase, user_id, extractionCost);
+
+            // Log extraction completed
+            await logEvent(supabase, {
+              user_id,
+              household_id,
+              event_type: "extraction_completed",
+              extraction_method: cookCard.extraction.method,
+              extraction_confidence: avgConfidence,
+              extraction_cost_cents: extractionCost,
+              input_hash: inputHash,
+              ingredients_count: cookCard.ingredients.length,
+              extraction_latency_ms: extractionLatency,
+              cache_hit: false,
+              ladder_path: commentUsed ? 'L2→L3' : 'L1→L3',
+              evidence_source: evidenceSource,
+              source_text_length: sourceText.length,
+              early_return: true,
+            });
+
+            await logEvent(supabase, {
+              user_id,
+              household_id,
+              event_type: "llm_call_made",
+              llm_cost_cents: extractionCost,
+              extraction_confidence: avgConfidence,
+              ingredients_count: cookCard.ingredients.length,
+            });
+
+            // Return success
+            return new Response(
+              JSON.stringify({
+                cook_card: cookCard,
+                requires_confirmation: avgConfidence < 0.8,
+                cache_status: "fresh",
+              }),
+              { status: 200, headers: { "Content-Type": "application/json" } }
+            );
+          } else {
+            console.log(`   ⏭️  L3 succeeded but continuing to L4 Vision (ingredients: ${cookCard.ingredients.length}, instructions: ${hasInstructionsFromL3})`);
+          }
         }
         } // Close quality gate else block
       }
@@ -857,10 +936,134 @@ serve(async (req) => {
       // CRITICAL FIX: Skip Vision extraction for photo posts (duration=0 from HTML scraping)
       // Photo posts don't have videos to download, so yt-dlp will fail
       // These should have been handled by L3 text extraction from HTML description
+      console.log(`🔧 Photo post check: duration=${duration_seconds}, metadata_source=${metadata_source}, description_length=${description.length}`);
+
       if (duration_seconds === 0 && metadata_source === 'html_scraper') {
         console.error("❌ L4 skipped: Photo post detected (no video available)");
         console.log(`   This appears to be a photo post. L3 text extraction should have succeeded.`);
+        console.log(`   Description length: ${description.length} chars`);
         console.log(`   If you're seeing this, the description may not contain parseable recipe text.`);
+
+        // For Xiaohongshu photo posts with description, try L3 extraction one more time
+        // (may have been skipped due to quality gate or length check)
+        if (platform === 'xiaohongshu' && description.length >= 100) {
+          console.log(`📝 Xiaohongshu photo post with description - attempting L3 extraction...`);
+
+          try {
+            // Normalize unicode fractions
+            const normalizedText = normalizeFractions(description);
+
+            // Check quality signals
+            const hasQualitySignals = hasRecipeQualitySignals(normalizedText);
+
+            if (hasQualitySignals) {
+              console.log('✅ L3 gate passed: Recipe quality signals detected');
+
+              // Extract with LLM
+              const llmResult = await extractWithLLM(url, platform, cookCard, normalizedText);
+              if (llmResult.success && llmResult.ingredients.length > 0) {
+                console.log(`   📦 L3 returned ${llmResult.ingredients.length} ingredients (raw)`);
+                extractionCost += llmResult.cost;
+
+                // Evidence phrase validation
+                const evidenceResult = filterByEvidence(llmResult.ingredients, normalizedText);
+                console.log(`   ✅ Evidence validation: ${evidenceResult.stats.validated}/${evidenceResult.stats.total} passed`);
+
+                // Section header filter
+                const sectionResult = filterSectionHeaders(evidenceResult.validated);
+                console.log(`   ✅ Section header filter: ${sectionResult.stats.kept}/${sectionResult.stats.total} kept`);
+
+                // Group ingredients
+                const groupedIngredients = groupIngredientsBySections(sectionResult.filtered);
+
+                // Final ingredients
+                cookCard.ingredients = groupedIngredients.map(ing => ({
+                  ...ing,
+                  evidence_source: 'description',
+                  comment_score: null,
+                }));
+
+                // Update instructions from Gemini
+                if (llmResult.instructions && llmResult.instructions.length > 0) {
+                  cookCard.instructions = {
+                    type: "steps",
+                    steps: llmResult.instructions,
+                  };
+                  console.log(`   ✅ Added ${llmResult.instructions.length} instruction steps from Gemini`);
+                }
+
+                cookCard.extraction.method = "llm_assisted";
+                cookCard.extraction.version = "L3-gemini-2.0-flash-evidence";
+                cookCard.extraction.evidence_source = "description";
+
+                console.log(`✅ L3: Final ${cookCard.ingredients.length} ingredients from Xiaohongshu photo post`);
+
+                // Continue to finalization
+                const avgConfidence =
+                  cookCard.ingredients.reduce((sum, ing) => sum + ing.confidence, 0) /
+                  cookCard.ingredients.length;
+                cookCard.extraction.confidence = avgConfidence;
+                cookCard.extraction.cost_cents = extractionCost;
+                cookCard.extraction.timestamp = new Date().toISOString();
+
+                const extractionLatency = Date.now() - extractionStartTime;
+
+                // Match ingredients to canonical items
+                cookCard.ingredients = await matchCanonicalItems(supabase, cookCard.ingredients);
+
+                // Cache extraction
+                const inputHash = await computeInputHash(url, title, description, undefined);
+                await setCachedExtraction(supabase, url, inputHash, cookCard, extractionCost);
+
+                // Increment monthly quota
+                await incrementMonthlyQuota(supabase, user_id, extractionCost);
+
+                // Log extraction completed
+                await logEvent(supabase, {
+                  user_id,
+                  household_id,
+                  event_type: "extraction_completed",
+                  extraction_method: cookCard.extraction.method,
+                  extraction_confidence: avgConfidence,
+                  extraction_cost_cents: extractionCost,
+                  input_hash: inputHash,
+                  ingredients_count: cookCard.ingredients.length,
+                  extraction_latency_ms: extractionLatency,
+                  cache_hit: false,
+                  ladder_path: 'L1→L3',
+                  evidence_source: 'description',
+                  source_text_length: normalizedText.length,
+                  xiaohongshu_photo_post: true,
+                });
+
+                await logEvent(supabase, {
+                  user_id,
+                  household_id,
+                  event_type: "llm_call_made",
+                  llm_cost_cents: extractionCost,
+                  extraction_confidence: avgConfidence,
+                  ingredients_count: cookCard.ingredients.length,
+                });
+
+                // Return success
+                return new Response(
+                  JSON.stringify({
+                    cook_card: cookCard,
+                    requires_confirmation: avgConfidence < 0.8,
+                    cache_status: "fresh",
+                  }),
+                  { status: 200, headers: { "Content-Type": "application/json" } }
+                );
+              } else {
+                console.log(`   ❌ L3 extraction failed or returned no ingredients`);
+              }
+            } else {
+              console.log('⏭️  L3 skipped: No recipe quality signals detected');
+            }
+          } catch (l3Error) {
+            console.error('   ❌ L3 extraction error:', l3Error);
+          }
+        }
 
         await logEvent(supabase, {
           user_id,
@@ -933,6 +1136,201 @@ serve(async (req) => {
       }
 
       const videoDurationMinutes = duration_seconds / 60;
+
+      // ============================================================
+      // VIDEO LENGTH HARD CAP CHECK
+      // ============================================================
+      // Prevent costly Vision extractions on very long videos
+      // BUT: For YouTube, try L2 comment extraction first (may have pinned recipe comment)
+      if (duration_seconds > VIDEO_LENGTH_LIMITS.VISION_HARD_CAP) {
+        const durationMinutes = Math.round(duration_seconds / 60);
+        const capMinutes = VIDEO_LENGTH_LIMITS.VISION_HARD_CAP / 60;
+
+        console.error(`❌ Video too long: ${durationMinutes} minutes (max: ${capMinutes} minutes)`);
+
+        // SPECIAL CASE: For YouTube long videos, try L2 comment extraction
+        // Long cooking videos often have pinned recipe comments
+        if (platform === 'youtube') {
+          console.log(`📝 Long YouTube video detected - attempting L2 comment extraction before failing...`);
+
+          // Check if comment was already harvested in Step 4
+          if (commentUsed && sourceText.length > 0) {
+            console.log(`   ✅ Comment already harvested in Step 4 - reusing existing extraction`);
+            console.log(`   Source text length: ${sourceText.length} chars, evidence source: ${evidenceSource}`);
+
+            // Comment was already processed but may have failed L3 extraction
+            // Skip redundant harvest and return the hard cap error
+            console.log(`   ⚠️  Comment was processed but L3 extraction didn't produce ingredients`);
+            console.log(`   This may indicate the comment doesn't contain a parseable recipe`);
+          } else {
+            // No comment harvested yet - proceed with harvest
+            console.log(`   🔍 No comment harvested yet in Step 4, fetching now...`);
+
+          try {
+            const commentResult = await fetchCommentsFromURL(url, 20);
+
+            if (commentResult.success && commentResult.comments.length > 0) {
+              console.log(`   📋 Fetched ${commentResult.comments.length} comments`);
+
+              // Filter to likely ingredient candidates
+              const candidates = filterToIngredientCandidates(commentResult.comments);
+              console.log(`   Found ${candidates.length}/${commentResult.comments.length} comment candidates`);
+
+              // Find best ingredient comment (lowered threshold to 20 for testing)
+              const bestComment = findBestIngredientComment(candidates, 20);
+
+              if (bestComment) {
+                const commentText = bestComment.comment.text;
+                const commentScoreValue = bestComment.score;
+
+                console.log(`   ✅ L2: Found recipe comment (${commentText.length} chars, score: ${commentScoreValue})`);
+
+                await logEvent(supabase, {
+                  user_id,
+                  household_id,
+                  event_type: "l2_comment_found",
+                  comment_score: commentScoreValue,
+                  text_length: commentText.length,
+                  video_too_long: true,
+                });
+
+                // Extract with LLM from comment
+                const llmResult = await extractWithLLM(url, platform, cookCard, commentText);
+                if (llmResult.success && llmResult.ingredients.length > 0) {
+                  console.log(`   📦 L3 returned ${llmResult.ingredients.length} ingredients (raw)`);
+                  extractionCost += llmResult.cost;
+
+                  // Evidence phrase validation
+                  const evidenceResult = filterByEvidence(llmResult.ingredients, commentText);
+                  console.log(`   ✅ Evidence validation: ${evidenceResult.stats.validated}/${evidenceResult.stats.total} passed`);
+
+                  // Section header filter
+                  const sectionResult = filterSectionHeaders(evidenceResult.validated);
+                  console.log(`   ✅ Section header filter: ${sectionResult.stats.kept}/${sectionResult.stats.total} kept`);
+
+                  // Group ingredients
+                  const groupedIngredients = groupIngredientsBySections(sectionResult.filtered);
+
+                  // Final ingredients
+                  cookCard.ingredients = groupedIngredients.map(ing => ({
+                    ...ing,
+                    evidence_source: 'youtube_comment',
+                    comment_score: commentScoreValue,
+                  }));
+
+                  // Update instructions from Gemini
+                  if (llmResult.instructions && llmResult.instructions.length > 0) {
+                    cookCard.instructions = {
+                      type: "steps",
+                      steps: llmResult.instructions,
+                    };
+                    console.log(`   ✅ Added ${llmResult.instructions.length} instruction steps from Gemini`);
+                  }
+
+                  cookCard.extraction.method = "llm_assisted_comment";
+                  cookCard.extraction.version = "L3-gemini-2.0-flash-evidence";
+                  cookCard.extraction.evidence_source = "youtube_comment";
+
+                  console.log(`✅ L2→L3: Final ${cookCard.ingredients.length} ingredients from long video comment`);
+
+                  // Continue to finalization (skip the rest of Step 6)
+                  // Jump to the finalization code at line 443
+                  const avgConfidence =
+                    cookCard.ingredients.reduce((sum, ing) => sum + ing.confidence, 0) /
+                    cookCard.ingredients.length;
+                  cookCard.extraction.confidence = avgConfidence;
+                  cookCard.extraction.cost_cents = extractionCost;
+                  cookCard.extraction.timestamp = new Date().toISOString();
+
+                  const extractionLatency = Date.now() - extractionStartTime;
+
+                  // Match ingredients to canonical items
+                  cookCard.ingredients = await matchCanonicalItems(supabase, cookCard.ingredients);
+
+                  // Cache extraction
+                  const inputHash = await computeInputHash(url, title, description, undefined);
+                  await setCachedExtraction(supabase, url, inputHash, cookCard, extractionCost);
+
+                  // Increment monthly quota
+                  await incrementMonthlyQuota(supabase, user_id, extractionCost);
+
+                  // Log extraction completed
+                  await logEvent(supabase, {
+                    user_id,
+                    household_id,
+                    event_type: "extraction_completed",
+                    extraction_method: cookCard.extraction.method,
+                    extraction_confidence: avgConfidence,
+                    extraction_cost_cents: extractionCost,
+                    input_hash: inputHash,
+                    ingredients_count: cookCard.ingredients.length,
+                    extraction_latency_ms: extractionLatency,
+                    cache_hit: false,
+                    ladder_path: 'L2→L3',
+                    evidence_source: 'youtube_comment',
+                    comment_used: true,
+                    comment_score: commentScoreValue,
+                    source_text_length: commentText.length,
+                    video_too_long: true,
+                  });
+
+                  await logEvent(supabase, {
+                    user_id,
+                    household_id,
+                    event_type: "llm_call_made",
+                    llm_cost_cents: extractionCost,
+                    extraction_confidence: avgConfidence,
+                    ingredients_count: cookCard.ingredients.length,
+                  });
+
+                  // Return success
+                  return new Response(
+                    JSON.stringify({
+                      cook_card: cookCard,
+                      requires_confirmation: avgConfidence < 0.8,
+                      cache_status: "fresh",
+                    }),
+                    { status: 200, headers: { "Content-Type": "application/json" } }
+                  );
+                }
+              } else {
+                console.log('   ❌ L2: No suitable comments found');
+              }
+            } else {
+              console.log('   ❌ L2: No comments found');
+            }
+          } catch (commentErr) {
+            console.error('   ❌ Comment harvesting error:', commentErr);
+          }
+
+          // If we get here, comment extraction failed
+          console.log(`   ⚠️  Comment extraction failed - returning video_too_long error`);
+          } // Close else block for comment harvest check
+        }
+
+        // Log the hard cap event
+        await logEvent(supabase, {
+          user_id,
+          household_id,
+          event_type: "l4_vision_skipped",
+          reason: "video_too_long",
+          duration_seconds,
+          duration_minutes: durationMinutes,
+          cap_minutes: capMinutes,
+        });
+
+        return new Response(
+          JSON.stringify({
+            error: "video_too_long",
+            message: `This video is too long to process automatically (${durationMinutes} minutes). We can only extract recipes from videos up to ${capMinutes} minutes long. Please try a shorter video or manually enter the recipe details.`,
+            fallback: "manual_entry",
+            cook_card: cookCard, // Return basic metadata
+            duration_seconds,
+            max_duration_seconds: VIDEO_LENGTH_LIMITS.VISION_HARD_CAP,
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        );
+      }
 
       // DISABLED: Check global L4 budget
       // const globalBudgetCheck = await checkGlobalL4Budget(supabase, videoDurationMinutes);
