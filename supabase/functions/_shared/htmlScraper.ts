@@ -688,6 +688,117 @@ export async function extractFromXiaoHongShuHTML(url: string): Promise<HTMLExtra
 }
 
 /**
+ * Extract from generic web page (non-social-media)
+ * Primary target: Recipe websites with schema.org markup
+ */
+async function extractFromGenericHTML(url: string): Promise<HTMLExtractionResult> {
+  console.log('🌐 Fetching generic web page HTML...');
+
+  try {
+    const html = await fetchHTML(url);
+    console.log(`✅ Fetched HTML (${html.length} bytes)`);
+
+    const sources: string[] = [];
+    let combinedText = '';
+    const metadata: HTMLExtractionResult['metadata'] = {};
+
+    // 1. Try Schema.org Recipe (primary method for recipe sites)
+    const schema = extractSchemaOrg(html);
+    if (schema) {
+      sources.push('schema_org');
+
+      // Extract all recipe metadata
+      metadata.title = schema.name;
+      metadata.description = schema.description;
+
+      // Extract image URL
+      if (typeof schema.image === 'string') {
+        metadata.image_url = schema.image;
+      } else if (Array.isArray(schema.image) && schema.image.length > 0) {
+        metadata.image_url = typeof schema.image[0] === 'string' ? schema.image[0] : schema.image[0].url;
+      }
+
+      // Extract author/creator
+      if (schema.author) {
+        metadata.creator = {
+          name: schema.author.name,
+          handle: schema.author.url,
+        };
+      }
+
+      // Extract recipe timings
+      metadata.prep_time_minutes = parseDuration(schema.prepTime || '');
+      metadata.cook_time_minutes = parseDuration(schema.cookTime || '');
+
+      // Extract servings
+      if (schema.recipeYield) {
+        metadata.servings = typeof schema.recipeYield === 'number'
+          ? schema.recipeYield
+          : parseInt(schema.recipeYield.toString().match(/\d+/)?.[0] || '0');
+      }
+
+      // Extract ingredients (most important!)
+      if (schema.recipeIngredient && Array.isArray(schema.recipeIngredient)) {
+        metadata.ingredients = schema.recipeIngredient;
+        combinedText += '=== Ingredients ===\n' + schema.recipeIngredient.join('\n') + '\n\n';
+      }
+
+      // Extract instructions
+      if (schema.recipeInstructions) {
+        if (typeof schema.recipeInstructions === 'string') {
+          metadata.instructions = schema.recipeInstructions;
+          combinedText += '=== Instructions ===\n' + schema.recipeInstructions + '\n\n';
+        } else if (Array.isArray(schema.recipeInstructions)) {
+          const steps = schema.recipeInstructions.map(step =>
+            typeof step === 'string' ? step : (step.text || step.name || String(step))
+          );
+          metadata.instructions = steps;
+          combinedText += '=== Instructions ===\n' + steps.join('\n') + '\n\n';
+        }
+      }
+
+      if (schema.description) {
+        combinedText += '=== Description ===\n' + schema.description + '\n\n';
+      }
+
+      console.log(`✅ Schema.org extraction: ${metadata.ingredients?.length || 0} ingredients, ${Array.isArray(metadata.instructions) ? metadata.instructions.length : 0} steps`);
+    }
+
+    // 2. Fallback to OpenGraph if schema.org failed
+    if (!metadata.title || !metadata.ingredients) {
+      const og = extractOpenGraph(html);
+
+      if (!metadata.title && og.title) {
+        metadata.title = og.title;
+      }
+      if (!metadata.description && og.description) {
+        metadata.description = og.description;
+        sources.push('opengraph');
+      }
+      if (!metadata.image_url && og.image) {
+        metadata.image_url = og.image;
+      }
+    }
+
+    return {
+      success: true,
+      text: combinedText.trim(),
+      sources,
+      metadata,
+    };
+  } catch (error) {
+    console.error('❌ Generic HTML extraction failed:', error);
+    return {
+      success: false,
+      text: '',
+      sources: [],
+      metadata: {},
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
  * Platform-agnostic extraction
  * Automatically detects platform and uses appropriate scraper
  */
@@ -706,14 +817,12 @@ export async function extractFromHTML(
       return await extractFromTikTokHTML(url);
     case 'xiaohongshu':
       return await extractFromXiaoHongShuHTML(url);
+    case 'web':           // NEW
+    case 'traditional':   // NEW
+    case 'unknown':       // NEW
+      return await extractFromGenericHTML(url);
     default:
-      console.warn(`⚠️  Unsupported platform: ${platform}`);
-      return {
-        success: false,
-        text: '',
-        sources: [],
-        metadata: {},
-        error: `Platform not supported: ${platform}`,
-      };
+      console.warn(`⚠️  Unsupported platform: ${platform}, trying generic extraction...`);
+      return await extractFromGenericHTML(url);  // Fallback to generic
   }
 }

@@ -111,6 +111,206 @@ const VIDEO_LENGTH_LIMITS = {
   VISION_HARD_CAP: 600,         // 10 min - Hard cap for any Vision extraction (Step 6)
 } as const;
 
+// ============================================================
+// HELPER FUNCTIONS FOR SCHEMA.ORG EXTRACTION
+// ============================================================
+
+/**
+ * Check if URL is from a social media platform
+ * CRITICAL: This determines whether we use video extraction or schema.org extraction
+ *
+ * Returns true for: YouTube, Instagram, TikTok, Facebook, Twitter, Xiaohongshu, Pinterest
+ * Returns false for: Recipe blogs, news sites, personal websites
+ */
+function isSocialMediaDomain(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+
+    // Use regex patterns to match domains + allowed subdomains
+    // MUST match exactly - no false positives!
+    const SOCIAL_MEDIA_PATTERNS = [
+      /^(m\.)?youtube\.(com|[a-z]{2,3}(\.[a-z]{2})?)$/,  // youtube.com, youtube.co.uk, m.youtube.com
+      /^(www\.|m\.)?instagram\.com$/,
+      /^(vm\.|vt\.|www\.)?tiktok\.com$/,
+      /^(www\.|m\.)?facebook\.com$/,
+      /^fb\.(com|watch)$/,
+      /^(www\.|mobile\.)?twitter\.com$/,
+      /^x\.com$/,
+      /^(www\.)?xiaohongshu\.com$/,
+      /^xhslink\.com$/,
+      /^(www\.)?pinterest\.com$/,
+      /^pin\.it$/,
+    ];
+
+    const isMatch = SOCIAL_MEDIA_PATTERNS.some(pattern => pattern.test(hostname));
+
+    if (isMatch) {
+      console.log(`🎥 Social media domain detected: ${hostname}`);
+    }
+
+    return isMatch;
+  } catch (error) {
+    console.error('⚠️  Error parsing URL in isSocialMediaDomain:', error);
+    return false;  // Default to non-social (safer for cost)
+  }
+}
+
+/**
+ * Validate schema.org Recipe markup quality
+ * Returns true only if schema.org data is trustworthy enough to skip L3 processing
+ */
+function hasValidRecipeSchema(metadata: any): boolean {
+  // Gate 1: Must have Recipe type
+  if (!metadata || metadata['@type'] !== 'Recipe') {
+    console.log('   ❌ Schema validation failed: Not a Recipe type');
+    return false;
+  }
+
+  // Gate 2: Must have title (non-empty)
+  if (!metadata.title || metadata.title.trim().length < 3) {
+    console.log('   ❌ Schema validation failed: Missing or invalid title');
+    return false;
+  }
+
+  // Gate 3: Must have ingredients array
+  if (!metadata.ingredients || !Array.isArray(metadata.ingredients)) {
+    console.log('   ❌ Schema validation failed: Missing ingredients array');
+    return false;
+  }
+
+  // Gate 4: Must have at least 3 ingredients
+  if (metadata.ingredients.length < 3) {
+    console.log('   ❌ Schema validation failed: Too few ingredients');
+    return false;
+  }
+
+  // Gate 5: Ingredients must look real (not placeholders)
+  const validIngredients = metadata.ingredients.filter((ing: any) => {
+    if (typeof ing !== 'string') return false;
+
+    const text = ing.toLowerCase().trim();
+
+    // Reject if too short (real ingredients are usually 8+ chars)
+    if (text.length < 8) return false;
+
+    // Reject social media placeholders
+    const PLACEHOLDER_PATTERNS = [
+      /see (video|post|description|caption|above|below)/i,
+      /swipe up/i,
+      /link in bio/i,
+      /check (out |the )?(video|description)/i,
+      /watch (the )?video/i,
+      /click (here|link)/i,
+      /dm me/i,
+      /follow (me |us )?for/i,
+    ];
+
+    if (PLACEHOLDER_PATTERNS.some(pattern => pattern.test(text))) {
+      console.log(`   🚫 Rejected placeholder ingredient: "${text}"`);
+      return false;
+    }
+
+    // Must have EITHER:
+    // - A number (quantity): "2 cups", "1/2 tsp"
+    // - A food-related unit: "cup", "tablespoon", "lb"
+    // - A common ingredient word: "flour", "sugar", "salt"
+    const hasQuantity = /\d+/.test(text);
+    const hasUnit = /(cup|tablespoon|tbsp|teaspoon|tsp|pound|lb|ounce|oz|gram|g|kilogram|kg|milliliter|ml|liter|l|pinch|dash|piece)/i.test(text);
+    const hasCommonFood = /(flour|sugar|salt|pepper|oil|butter|milk|egg|water|garlic|onion|chicken|beef|pork|fish|cheese|cream|sauce|vegetable|fruit)/i.test(text);
+
+    return hasQuantity || hasUnit || hasCommonFood;
+  });
+
+  // Must have at least 3 valid-looking ingredients after filtering
+  if (validIngredients.length < 3) {
+    console.log(`   ❌ Schema validation failed: Only ${validIngredients.length} valid ingredients after filtering`);
+    return false;
+  }
+
+  // Gate 6: Must have instructions (either string or array)
+  const hasInstructions =
+    (metadata.instructions && metadata.instructions.length > 20) ||
+    (metadata.recipeInstructions && (
+      (typeof metadata.recipeInstructions === 'string' && metadata.recipeInstructions.length > 20) ||
+      (Array.isArray(metadata.recipeInstructions) && metadata.recipeInstructions.length > 0)
+    ));
+
+  if (!hasInstructions) {
+    console.log('   ❌ Schema validation failed: Missing or invalid instructions');
+    return false;
+  }
+
+  console.log(`   ✅ Schema validation passed: ${validIngredients.length} valid ingredients`);
+  return true;
+}
+
+/**
+ * Format instructions from schema.org to CookCard format
+ */
+function formatInstructionsFromSchema(instructions: any): any {
+  if (!instructions) {
+    return { type: 'link_only' };
+  }
+
+  let steps: string[];
+
+  if (typeof instructions === 'string') {
+    // Split string into sentence-level steps
+    steps = instructions
+      .split(/\.(?=\s+[A-Z]|\s*$)/)  // Split on period followed by capital or end
+      .map(s => s.trim())
+      .filter(s => s.length > 10)
+      .map(s => s.endsWith('.') ? s : s + '.');
+  } else if (Array.isArray(instructions)) {
+    // Each array item might be a paragraph - split into sentences
+    steps = [];
+    for (const paragraph of instructions) {
+      const text = typeof paragraph === 'string' ? paragraph : (paragraph.text || String(paragraph));
+      const sentences = text
+        .split(/\.(?=\s+[A-Z]|\s*$)/)
+        .map(s => s.trim())
+        .filter(s => s.length > 10)
+        .map(s => s.endsWith('.') ? s : s + '.');
+      steps.push(...sentences);
+    }
+  } else {
+    steps = [];
+  }
+
+  if (steps.length === 0) {
+    return { type: 'link_only' };
+  }
+
+  return {
+    type: 'steps',
+    steps: steps.map((step, idx) => ({
+      step_number: idx + 1,
+      instruction: step,
+    })),
+    text: steps.join('\n\n'),
+  };
+}
+
+/**
+ * Convert schema.org ingredient string to CookCard ingredient format
+ * NOTE: We DON'T attempt to parse amount/unit (error-prone)
+ * Phase 2 will add proper ingredient parsing library
+ */
+function convertSchemaOrgIngredient(rawText: string, index: number): Ingredient {
+  return {
+    name: rawText,                    // Original text for display
+    normalized_name: rawText,          // Will be cleaned in Phase 2
+    canonical_item_id: undefined,      // Will be matched in Phase 2
+    amount: undefined,                 // Don't attempt regex parsing (error-prone)
+    unit: undefined,
+    preparation: undefined,
+    confidence: 0.95,                  // High confidence (structured data)
+    provenance: 'schema_org',
+    sort_order: index,
+    is_optional: false,
+  };
+}
+
 serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -188,6 +388,178 @@ serve(async (req) => {
     // }
 
     console.log(`⚠️  Rate limits DISABLED for testing (tier: ${quotaCheck.quota?.tier}, monthly: ${quotaCheck.quota?.extractions_this_month}/${RATE_LIMITS[quotaCheck.quota?.tier || 'free'].monthly_limit})`);
+
+    // ============================================================
+    // STEP 0.5: SCHEMA.ORG FAST PATH (NEW!)
+    // ============================================================
+    // For non-social-media URLs, try schema.org extraction first
+    // - Cost: $0.00 (no AI processing)
+    // - Speed: ~500ms (just HTML fetch + parse)
+    // - Reliability: High (structured data from Recipe markup)
+    //
+    // If schema.org fails, we fall back to video extraction (L3/L4)
+
+    const USE_SCHEMA_ORG_PATH = Deno.env.get('USE_SCHEMA_ORG_PATH') !== 'false';  // Feature flag
+
+    if (USE_SCHEMA_ORG_PATH && !isSocialMediaDomain(url)) {
+      console.log('🌐 Non-social-media URL - checking for Recipe schema.org...');
+
+      try {
+        // Fetch and parse HTML for schema.org
+        const htmlResult = await extractFromHTML(url, 'web');
+
+        if (htmlResult.success && htmlResult.metadata.ingredients) {
+          console.log(`   Found schema.org with ${htmlResult.metadata.ingredients.length} ingredients`);
+
+          // Validate schema.org quality
+          if (hasValidRecipeSchema(htmlResult.metadata)) {
+            console.log('   ✅ Valid Recipe schema.org found - using structured data ($0.00)');
+
+            // Build CookCard from schema.org
+            const hostname = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+
+            const cookCard: CookCard = {
+              version: '1.0',
+              source: {
+                url,
+                platform: 'traditional',
+                creator: {
+                  handle: hostname,
+                  name: htmlResult.metadata.creator?.name || hostname,
+                  avatar_url: htmlResult.metadata.creator?.avatar_url,
+                },
+              },
+              title: htmlResult.metadata.title || 'Recipe',
+              description: htmlResult.metadata.description || '',
+              image_url: htmlResult.metadata.image_url || '',
+              prep_time_minutes: htmlResult.metadata.prep_time_minutes || undefined,
+              cook_time_minutes: htmlResult.metadata.cook_time_minutes || undefined,
+              servings: htmlResult.metadata.servings || undefined,
+              instructions: formatInstructionsFromSchema(htmlResult.metadata.instructions),
+              ingredients: htmlResult.metadata.ingredients.map((ing, idx) =>
+                convertSchemaOrgIngredient(ing, idx)
+              ),
+              extraction: {
+                method: 'schema_org',
+                confidence: 0.95,
+                version: 'schema_org_v1',
+                timestamp: new Date().toISOString(),
+                cost_cents: 0,  // FREE!
+                sources: htmlResult.sources,
+              },
+            };
+
+            // Save to database
+            const cookCardId = crypto.randomUUID();
+            const { data: savedCard, error: saveError } = await supabase
+              .from('cook_cards')
+              .insert({
+                id: cookCardId,
+                user_id,
+                household_id,
+                source_url: url,
+                platform: 'traditional',
+                platform_identifier: hostname,
+
+                title: cookCard.title,
+                description: cookCard.description,
+                image_url: cookCard.image_url,
+                prep_time_minutes: cookCard.prep_time_minutes,
+                cook_time_minutes: cookCard.cook_time_minutes,
+                servings: cookCard.servings,
+
+                instructions_type: cookCard.instructions.type,
+                instructions_text: cookCard.instructions.text || '',
+                instructions_json: cookCard.instructions.steps || null,
+
+                creator_name: cookCard.source.creator.name,
+                creator_handle: cookCard.source.creator.handle,
+                creator_avatar_url: cookCard.source.creator.avatar_url,
+
+                extraction_method: 'schema_org',
+                extraction_confidence: 0.95,
+                extraction_version: 'schema_org_v1',
+                extraction_cost_cents: 0,
+
+                is_confirmed: true,  // No confirmation needed for structured data
+                is_archived: false,
+              })
+              .select()
+              .single();
+
+            if (saveError) {
+              console.error('❌ Error saving schema.org cook_card:', saveError);
+              throw saveError;
+            }
+
+            // Save ingredients
+            const ingredientRows = cookCard.ingredients.map((ing, idx) => ({
+              cook_card_id: savedCard.id,
+              sort_order: idx,
+              ingredient_name: ing.name,
+              normalized_name: ing.normalized_name,
+              amount: ing.amount,
+              unit: ing.unit,
+              preparation: ing.preparation,
+              confidence: ing.confidence,
+              provenance: ing.provenance,
+              canonical_item_id: ing.canonical_item_id,
+              in_pantry: false,
+              is_substitution: false,
+              is_optional: false,
+            }));
+
+            const { error: ingredientsError } = await supabase
+              .from('cook_card_ingredients')
+              .insert(ingredientRows);
+
+            if (ingredientsError) {
+              console.error('❌ Error saving ingredients:', ingredientsError);
+              throw ingredientsError;
+            }
+
+            // Log telemetry
+            await supabase.from('cook_card_ingress_events').insert({
+              user_id,
+              household_id,
+              session_id: url,  // Use URL as session ID for schema.org
+              event_type: 'extraction_completed',
+              platform: 'traditional',
+              recipe_url: url,
+              metadata: {
+                extraction_method: 'schema_org',
+                cost_cents: 0,
+                ingredient_count: cookCard.ingredients.length,
+              },
+            });
+
+            console.log(`✅ Schema.org extraction complete: ${savedCard.id}`);
+
+            // Return immediately (skip video extraction entirely)
+            return new Response(
+              JSON.stringify({
+                cook_card: { ...cookCard, id: savedCard.id, created_at: savedCard.created_at, updated_at: savedCard.updated_at },
+                extraction: cookCard.extraction,
+              }),
+              {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' }
+              }
+            );
+          } else {
+            console.log('   ⚠️  Schema.org validation failed - will try video extraction fallback');
+          }
+        } else {
+          console.log('   ℹ️  No schema.org Recipe markup found');
+        }
+      } catch (schemaError) {
+        console.error('   ❌ Schema.org extraction error:', schemaError);
+        console.log('   Falling back to video extraction...');
+      }
+
+      // If we reach here, schema.org failed - continue with video extraction
+      console.log('🎬 Continuing with video extraction (L3/L4)...');
+    }
 
     // ============================================================
     // STEP 1: PLATFORM METADATA EXTRACTION (L0)
