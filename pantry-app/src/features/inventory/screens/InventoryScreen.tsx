@@ -248,6 +248,17 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({
 
   const daysLeft = getDaysLeft();
   const isExpiringSoon = daysLeft !== null && daysLeft <= 3;
+  const isExpired = daysLeft !== null && daysLeft < 0;
+  const shouldShowExpiry = daysLeft !== null && daysLeft <= 7;
+
+  const getExpiryText = () => {
+    if (daysLeft === null || daysLeft > 7) return null;
+    if (daysLeft < 0) return '❌ Expired';
+    if (daysLeft === 0) return '🔥 Today';
+    if (daysLeft === 1) return '🔥 1d';
+    if (daysLeft <= 3) return `🔥 ${daysLeft}d`;
+    return `${daysLeft}d`;
+  };
 
   return (
     <View style={styles.swipeContainer}>
@@ -260,16 +271,13 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({
         <Text style={styles.itemIcon}>{getItemIcon()}</Text>
         <View style={styles.itemInfo}>
           <Text style={styles.itemName}>{toTitleCase(item.name)}</Text>
-          <View style={styles.itemMeta}>
-            <Text style={styles.locationText}>{item.location}</Text>
-            {item.expirationDate ? (
-              <Text style={[styles.expiryText, isExpiringSoon && styles.expiryTextUrgent]}>
-                {isExpiringSoon && '🔥 '}{daysLeft <= 0 ? 'Expired' : `${daysLeft} days left`}
+          {shouldShowExpiry && (
+            <View style={styles.itemMeta}>
+              <Text style={[styles.expiryText, (isExpiringSoon || isExpired) && styles.expiryTextUrgent]}>
+                {getExpiryText()}
               </Text>
-            ) : (
-              <Text style={styles.expiryUnknown}>Expiry Unknown</Text>
-            )}
-          </View>
+            </View>
+          )}
         </View>
       </View>
       <View style={styles.itemActions}>
@@ -887,23 +895,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   itemMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginTop: 2,
-    gap: theme.spacing.xs,
-  },
-  locationText: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
   },
   expiryText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSecondary,
-  },
-  expiryUnknown: {
-    fontSize: 12,
-    color: '#9CA3AF',  // Lighter gray color for unknown expiry
-    fontStyle: 'italic',
+    fontWeight: '500',
   },
   expiryTextUrgent: {
     color: theme.colors.error,
