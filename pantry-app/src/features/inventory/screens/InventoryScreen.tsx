@@ -21,7 +21,6 @@ import { toTitleCase } from '../../../core/utils/textUtils';
 import { useInventorySupabaseStore } from '../../../stores/inventorySupabaseStore';
 import { useAuth } from '../../../contexts/AuthContext';
 import { FEATURE_FLAGS } from '../../../config/featureFlags';
-import { SyncStatusIndicator } from '../../../components/SyncStatusIndicator';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -39,8 +38,6 @@ function formatQuantity(qty: number): string {
   // Everything else: 1 decimal max
   return qty.toFixed(1);
 }
-
-type LocationTab = 'all' | 'fridge' | 'freezer' | 'pantry';
 
 interface InventoryItem {
   id: string;
@@ -313,17 +310,14 @@ export const InventoryScreen: React.FC = () => {
   const addItem = useInventorySupabaseStore((state) => state.addItem);
   const initialize = useInventorySupabaseStore((state) => state.initialize);
   const loadFromSupabase = useInventorySupabaseStore((state) => state.loadFromSupabase);
-  const isSyncing = useInventorySupabaseStore((state) => state.isSyncing);
-  const syncError = useInventorySupabaseStore((state) => state.syncError);
-  const forceSync = useInventorySupabaseStore((state) => state.forceSync);
 
-  const [activeTab, setActiveTab] = useState<LocationTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [openItemId, setOpenItemId] = useState<string | null>(null);
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
 
   // Initialize store with household ID
   React.useEffect(() => {
@@ -347,15 +341,10 @@ export const InventoryScreen: React.FC = () => {
       item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    if (activeTab !== 'all') {
-      filtered = filtered.filter(item => item.location.toLowerCase() === activeTab.toLowerCase());
-    }
-
     // Apply category filter if any selected
     if (selectedCategories.size > 0) {
       filtered = filtered.filter(item => selectedCategories.has(item.category));
     }
-
 
     // Group by location (convert to title case for display)
     const grouped = filtered.reduce((acc, item) => {
@@ -370,17 +359,16 @@ export const InventoryScreen: React.FC = () => {
     // Always include all three sections in the correct order
     const locationOrder = ['Fridge', 'Freezer', 'Pantry'];
     const sections = locationOrder
-      .filter(location => activeTab === 'all' || location.toLowerCase() === activeTab)
       .map(location => ({
         title: location,
         icon: location === 'Fridge' ? '❄️' : location === 'Freezer' ? '🧊' : '🗄️',
-        data: grouped[location] || [],
-        count: grouped[location]?.length || 0,
-      }))
-      .filter(section => section.data.length > 0); // Only show sections with items
+        data: collapsedSections.has(location) ? [] : (grouped[location] || []),
+        actualCount: grouped[location]?.length || 0,
+        isCollapsed: collapsedSections.has(location),
+      }));
 
     return sections;
-  }, [items, searchQuery, activeTab, selectedCategories]);
+  }, [items, searchQuery, selectedCategories, collapsedSections]);
 
   // Get category counts
   const categoryCounts = useMemo(() => {
@@ -496,11 +484,6 @@ export const InventoryScreen: React.FC = () => {
     deleteItem(itemId);
   };
 
-  const handleForceSync = () => {
-    console.log('[Inventory] Force sync requested');
-    // Trigger force sync
-    forceSync();
-  };
 
   const handleSaveItem = (itemData: any) => {
     console.log('Received item data:', itemData);
@@ -543,12 +526,30 @@ export const InventoryScreen: React.FC = () => {
     setRefreshing(false);
   }, [loadFromSupabase]);
 
+  const toggleSection = (sectionTitle: string) => {
+    setCollapsedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionTitle)) {
+        newSet.delete(sectionTitle);
+      } else {
+        newSet.add(sectionTitle);
+      }
+      return newSet;
+    });
+  };
+
   const renderSectionHeader = ({ section }: any) => (
-    <View style={styles.sectionHeader}>
+    <Pressable
+      style={styles.sectionHeader}
+      onPress={() => toggleSection(section.title)}
+    >
+      <Text style={styles.chevron}>
+        {section.isCollapsed ? '►' : '▼'}
+      </Text>
       <Text style={styles.sectionIcon}>{section.icon}</Text>
       <Text style={styles.sectionTitle}>{section.title}</Text>
-      <Text style={styles.sectionCount}>{section.count} items</Text>
-    </View>
+      <Text style={styles.sectionCount}>{section.actualCount} items</Text>
+    </Pressable>
   );
 
   const renderItem = ({ item }: { item: InventoryItem }) => (
@@ -575,54 +576,15 @@ export const InventoryScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {FEATURE_FLAGS.SHOW_SYNC_STATUS && <SyncStatusIndicator />}
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Inventory</Text>
-          {FEATURE_FLAGS.SHOW_SYNC_STATUS && isSyncing && (
-            <Text style={styles.syncStatus}>🔄 Syncing...</Text>
-          )}
-          {FEATURE_FLAGS.SHOW_SYNC_STATUS && syncError && (
-            <Text style={styles.syncError}>⚠️ Sync error</Text>
-          )}
-        </View>
-        <View style={styles.headerButtons}>
-          <Pressable style={styles.syncButton} onPress={handleForceSync}>
-            <Text style={styles.syncButtonText}>🔄 Sync</Text>
-          </Pressable>
-          <Pressable style={styles.addItemButton} onPress={handleAddItem}>
-            <Text style={styles.addItemText}>Add Item</Text>
-            <View style={[styles.addButton, { marginLeft: 3 }]}>
-              <Text style={styles.addIcon}>+</Text>
-            </View>
-          </Pressable>
-        </View>
-      </View>
-
-      <View style={styles.tabContainer}>
-        {(['All', 'Fridge', 'Freezer', 'Pantry'] as const).map((tab) => (
-          <Pressable
-            key={tab}
-            style={[
-              styles.tab,
-              activeTab === tab.toLowerCase() && styles.tabActive,
-            ]}
-            onPress={() => {
-              setActiveTab(tab.toLowerCase() as LocationTab);
-              // Maintain category filters when switching tabs
-            }}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === tab.toLowerCase() && styles.tabTextActive,
-              ]}
-            >
-              {tab}
-            </Text>
-          </Pressable>
-        ))}
+        <Text style={styles.title}>Inventory</Text>
+        <Pressable style={styles.addItemButton} onPress={handleAddItem}>
+          <Text style={styles.addItemText}>Add Item</Text>
+          <View style={[styles.addButton, { marginLeft: 3 }]}>
+            <Text style={styles.addIcon}>+</Text>
+          </View>
+        </Pressable>
       </View>
 
       <View style={styles.searchContainer}>
@@ -630,64 +592,62 @@ export const InventoryScreen: React.FC = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Search by name..."
-          style={styles.searchInput}
+          containerStyle={styles.searchInput}
           leftIcon={<Text>🔍</Text>}
         />
       </View>
 
-      {activeTab === 'all' && (
-        <View style={styles.categoryPillsContainer}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoryPills}
-            contentContainerStyle={styles.categoryPillsContent}
-          >
-          <Pressable
-            onPress={() => setSelectedCategories(new Set())}
-            style={[
-              styles.categoryPill,
-              {
-                backgroundColor: selectedCategories.size === 0 ? '#E5FFE5' : '#F0F0F0',
-                borderColor: selectedCategories.size === 0 ? theme.colors.primary : '#E5E7EB',
-              }
-            ]}
-          >
-            <Text style={[styles.categoryPillIcon, selectedCategories.size === 0 && { color: '#000' }]}>●</Text>
-            <Text style={[styles.categoryPillText, selectedCategories.size === 0 && { color: '#000', fontWeight: '600' }]}>All</Text>
-            <Text style={[styles.categoryPillCount, selectedCategories.size === 0 && { color: '#000' }]}>{items.length}</Text>
-          </Pressable>
-          {topCategories.map(cat => {
-            const isSelected = selectedCategories.has(cat.name);
-            return (
-              <Pressable
-                key={cat.name}
-                onPress={() => {
-                  const newSelected = new Set(selectedCategories);
-                  if (isSelected) {
-                    newSelected.delete(cat.name);
-                  } else {
-                    newSelected.add(cat.name);
-                  }
-                  setSelectedCategories(newSelected);
-                }}
-                style={[
-                  styles.categoryPill,
-                  {
-                    backgroundColor: isSelected ? cat.color : '#F0F0F0',
-                    borderColor: isSelected ? theme.colors.primary : '#E5E7EB',
-                  }
-                ]}
-              >
-                <Text style={[styles.categoryPillIcon, isSelected && { color: '#000' }]}>{cat.icon}</Text>
-                <Text style={[styles.categoryPillText, isSelected && { color: '#000', fontWeight: '600' }]}>{cat.name}</Text>
-                <Text style={[styles.categoryPillCount, isSelected && { color: '#000' }]}>{cat.count}</Text>
-              </Pressable>
-            );
-          })}
-          </ScrollView>
-        </View>
-      )}
+      <View style={styles.categoryPillsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryPills}
+          contentContainerStyle={styles.categoryPillsContent}
+        >
+        <Pressable
+          onPress={() => setSelectedCategories(new Set())}
+          style={[
+            styles.categoryPill,
+            {
+              backgroundColor: selectedCategories.size === 0 ? '#E5FFE5' : '#F0F0F0',
+              borderColor: selectedCategories.size === 0 ? theme.colors.primary : '#E5E7EB',
+            }
+          ]}
+        >
+          <Text style={[styles.categoryPillIcon, selectedCategories.size === 0 && { color: '#000' }]}>●</Text>
+          <Text style={[styles.categoryPillText, selectedCategories.size === 0 && { color: '#000', fontWeight: '600' }]}>All</Text>
+          <Text style={[styles.categoryPillCount, selectedCategories.size === 0 && { color: '#000' }]}>{items.length}</Text>
+        </Pressable>
+        {topCategories.map(cat => {
+          const isSelected = selectedCategories.has(cat.name);
+          return (
+            <Pressable
+              key={cat.name}
+              onPress={() => {
+                const newSelected = new Set(selectedCategories);
+                if (isSelected) {
+                  newSelected.delete(cat.name);
+                } else {
+                  newSelected.add(cat.name);
+                }
+                setSelectedCategories(newSelected);
+              }}
+              style={[
+                styles.categoryPill,
+                {
+                  backgroundColor: isSelected ? cat.color : '#F0F0F0',
+                  borderColor: isSelected ? theme.colors.primary : '#E5E7EB',
+                }
+              ]}
+            >
+              <Text style={[styles.categoryPillIcon, isSelected && { color: '#000' }]}>{cat.icon}</Text>
+              <Text style={[styles.categoryPillText, isSelected && { color: '#000', fontWeight: '600' }]}>{cat.name}</Text>
+              <Text style={[styles.categoryPillCount, isSelected && { color: '#000' }]}>{cat.count}</Text>
+            </Pressable>
+          );
+        })}
+        </ScrollView>
+      </View>
 
       <SectionList
         sections={getSectionData}
@@ -766,31 +726,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     lineHeight: 20,  // Ensure proper centering
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: theme.spacing.sm,
-    alignItems: 'center',
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.surface,
-    marginHorizontal: 2,
-  },
-  tabActive: {
-    backgroundColor: theme.colors.primary,
-  },
-  tabText: {
-    ...theme.typography.body,
-    color: theme.colors.textLight,
-  },
-  tabTextActive: {
-    color: '#fff',
-    fontWeight: '600',
   },
   searchContainer: {
     paddingHorizontal: theme.spacing.md,
@@ -876,6 +811,12 @@ const styles = StyleSheet.create({
     borderTopWidth: 3,  // Bolder divider
     borderTopColor: theme.colors.border,
     marginTop: 0,  // Remove margin to eliminate gap
+  },
+  chevron: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    marginRight: theme.spacing.xs,
+    width: 16,
   },
   sectionIcon: {
     fontSize: 20,
@@ -1018,36 +959,5 @@ const styles = StyleSheet.create({
   loadingText: {
     ...theme.typography.body,
     color: theme.colors.textLight,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  syncButton: {
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.sm,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-  },
-  syncButtonText: {
-    color: theme.colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  syncStatus: {
-    fontSize: 12,
-    color: theme.colors.primary,
-  },
-  syncError: {
-    fontSize: 12,
-    color: theme.colors.error,
   },
 });
