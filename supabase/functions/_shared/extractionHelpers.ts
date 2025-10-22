@@ -37,7 +37,7 @@ export async function loadCanonicalItemsMap(supabase: any): Promise<Map<string, 
   // Fetch all canonical items (single query)
   const { data: items, error } = await supabase
     .from('canonical_items')
-    .select('id, name, aliases');
+    .select('id, canonical_name, aliases');
 
   if (error) {
     console.error('❌ Failed to load canonical items:', error);
@@ -48,7 +48,7 @@ export async function loadCanonicalItemsMap(supabase: any): Promise<Map<string, 
   const map = new Map<string, string>();
 
   for (const item of items || []) {
-    const normalizedName = item.name.toLowerCase().trim();
+    const normalizedName = item.canonical_name.toLowerCase().trim();
     map.set(normalizedName, item.id);
 
     // Add aliases if present

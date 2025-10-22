@@ -45,3 +45,28 @@ src/services/realOcrService.ts
 
 # MCP configuration with credentials
 .mcp.json
+
+# Archive directories (historical context only)
+archive/
+
+# Large data files
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Logs and errors
+*.log
+*_errors.txt
+nohup.out
+
+# Temporary files
+.temp/
+.cache/

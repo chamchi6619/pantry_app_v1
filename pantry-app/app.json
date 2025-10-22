@@ -7,6 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "pantryapp",
     "extra": {
       "eas": {
         "projectId": "cf90aca2-e420-4071-b27c-b1f5f74a7fb0"
@@ -22,10 +23,30 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to scan receipts for easy pantry inventory management.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to photo library to save scanned receipts."
-      }
+        "NSPhotoLibraryUsageDescription": "This app needs access to photo library to save scanned receipts.",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["pantryapp"]
+          }
+        ],
+        "LSApplicationQueriesSchemes": [
+          "tiktok",
+          "snssdk1233",
+          "instagram",
+          "xhslink",
+          "xhsdiscover",
+          "youtube"
+        ]
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "associatedDomains": [
+        "applinks:pantryapp.com"
+      ]
     },
     "android": {
+      "package": "com.yourcompany.pantryapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -36,6 +57,27 @@
         "CAMERA",
         "WRITE_EXTERNAL_STORAGE",
         "READ_EXTERNAL_STORAGE"
+      ],
+      "intentFilters": [
+        {
+          "action": "SEND",
+          "category": ["DEFAULT"],
+          "data": [
+            {
+              "mimeType": "text/plain"
+            }
+          ]
+        },
+        {
+          "action": "VIEW",
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [
+            {
+              "scheme": "https",
+              "host": "pantryapp.com"
+            }
+          ]
+        }
       ]
     },
     "plugins": [

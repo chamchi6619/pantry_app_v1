@@ -619,8 +619,8 @@ export async function extractFromVideoVision(
     };
   }
 
-  // Use Gemini 2.5 Flash for vision
-  const model = 'gemini-2.5-flash';
+  // Use Gemini 2.0 Flash for vision (proven more reliable, 79% cost savings)
+  const model = 'gemini-2.0-flash';
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   // Determine media resolution
@@ -650,15 +650,16 @@ IMPORTANT: Do NOT extract ingredients. Only extract instructions.
 Return as JSON:
 {
   "instructions": [
-    {"step_number": 1, "instruction": "what to do"}
+    {"step_number": 1, "instruction": "detailed, natural cooking instruction"}
   ]
 }
 
-Rules:
-- Listen to what the person says in the video
-- Write each cooking step in order
-- Be concise but complete
-- Only extract what you actually hear`
+Instructions should be:
+- Natural and friendly (like a chef teaching you)
+- Detailed with context (e.g., "Cut the well-fermented kimchi into smaller pieces" not "Cut kimchi")
+- Include important details: times, temperatures, visual cues, doneness
+- Complete sentences with articles (the/a) and descriptive words
+- Listen to what the person says and capture their teaching style`
     : `Watch this cooking video and tell me:
 
 1. What ingredients are mentioned or shown?
@@ -670,15 +671,21 @@ Return as JSON:
     {"name": "ingredient name", "amount": number or null, "unit": "unit" or null}
   ],
   "instructions": [
-    {"step_number": 1, "instruction": "what to do"}
+    {"step_number": 1, "instruction": "detailed, natural cooking instruction"}
   ]
 }
 
-Rules:
-- List ingredients you see or hear
-- Write instructions in order
+Instructions should be:
+- Natural and friendly (like a chef teaching you)
+- Detailed with context (e.g., "Fry the pork in a pan with vegetable oil until it's fully cooked" not "Fry pork")
+- Include important details: times, temperatures, visual cues, doneness
+- Complete sentences with articles (the/a) and descriptive words
+- Capture the natural flow of how someone would explain cooking
+
+For ingredients:
+- List ALL ingredients you see or hear
 - Use singular units (cup not cups)
-- Only extract what's actually in the video`;
+- Include amounts when visible or mentioned`;
 
   // Determine if input is a YouTube URL or File API URI
   const isFileApiUri = youtubeUrl.startsWith('https://generativelanguage.googleapis.com/v1beta/files/');

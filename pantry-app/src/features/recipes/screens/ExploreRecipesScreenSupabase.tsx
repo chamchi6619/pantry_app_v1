@@ -10,6 +10,7 @@ import {
   Dimensions,
   Pressable,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -29,6 +30,7 @@ import { PantryCTA } from '../components/PantryCTA';
 import recipeServiceSupabase from '../../../services/recipeServiceSupabase';
 import { canonicalItemsService } from '../../../services/canonicalItemsService';
 import { supabase } from '../../../lib/supabase';
+import { getHybridRecommendations, getPersonalizedRecommendations } from '../../../services/recommendationEngine';
 
 // Stores
 import { useInventorySupabaseStore } from '../../../stores/inventorySupabaseStore';
@@ -38,13 +40,15 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export const ExploreRecipesScreenSupabase: React.FC = () => {
   const navigation = useNavigation<any>();
-  const { householdId } = useAuth();
+  const { householdId, user } = useAuth();
+  const userId = user?.id;
 
   // State
   const [activeMode, setActiveMode] = useState<'Explore' | 'From Your Pantry'>('Explore');
   const [activeCategory, setActiveCategory] = useState('Popular');
   const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [recommendationMode, setRecommendationMode] = useState<'Your Recipes' | 'Discover New'>('Your Recipes');
 
   // Recipe state
   const [loading, setLoading] = useState(false);
@@ -86,11 +90,33 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
     }
   };
 
-  // Load recipes when category or mode changes
+  // Load recipes when category, mode, or recommendation mode changes
   useEffect(() => {
-    console.log(`🔄 loadRecipes triggered: mode=${activeMode}, category=${activeCategory}`);
+    console.log(`🔄 loadRecipes triggered: mode=${activeMode}, category=${activeCategory}, recMode=${recommendationMode}`);
     loadRecipes();
-  }, [activeCategory, activeMode]);
+
+    // Log telemetry when entering "From Your Pantry" mode
+    if (activeMode === 'From Your Pantry') {
+      (async () => {
+        try {
+          const { logIngressEvent, generateSessionId } = await import('../../../services/telemetry');
+          logIngressEvent({
+            sessionId: generateSessionId(),
+            eventType: 'ingress_opened',
+            ingressMethod: 'paste_link',
+            platform: 'youtube',
+            metadata: {
+              screen: 'FromYourPantry',
+              category: activeCategory,
+              pantry_item_count: items?.length || 0,
+            },
+          });
+        } catch (err) {
+          console.warn('Failed to log pantry mode telemetry:', err);
+        }
+      })();
+    }
+  }, [activeCategory, activeMode, recommendationMode, items]);
 
   // Load initial data (only for Explore mode)
   useEffect(() => {
@@ -135,14 +161,61 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
       let fetchedRecipes: any[];
 
       if (activeMode === 'From Your Pantry') {
-        // Use new Edge Function for canonical-based recipe matching
-        if (!householdId) {
-          console.warn('No household ID available for pantry matching');
+        // Phase 3: NEW - Personalized recommendations from saved Cook Cards
+        if (!householdId || !userId) {
+          console.warn('No household ID or user ID available for pantry matching');
           fetchedRecipes = [];
           setRecipes([]);
           setLoading(false);
           return;
         }
+
+        // OPTION 1: Use personalized recommendations (Phase 3) - Controlled by toggle
+        if (recommendationMode === 'Your Recipes') {
+        try {
+          console.log('🎯 Using personalized recommendations from saved Cook Cards');
+          const personalizedRecs = await getPersonalizedRecommendations(userId, householdId, 20);
+
+          if (personalizedRecs.length > 0) {
+            fetchedRecipes = personalizedRecs.map(rec => ({
+              id: rec.cook_card.id,
+              title: rec.cook_card.title,
+              name: rec.cook_card.title,
+              summary: rec.cook_card.description,
+              imageUrl: rec.cook_card.image_url,
+              cookTime: rec.cook_card.cook_time_minutes || rec.cook_card.total_time_minutes,
+              servings: rec.cook_card.servings,
+              matchPercentage: Math.round(rec.completeness * 100),
+              matchScore: rec.match_score,
+              priorityReasons: rec.priority_reasons,
+              totalIngredients: rec.cook_card.ingredients?.length || 0,
+              matchedCount: rec.have_ingredients.length,
+              missingCount: rec.missing_ingredients.length,
+              matchedIngredients: rec.have_ingredients.map(i => i.ingredient_name),
+              missingIngredients: rec.missing_ingredients.map(i => i.ingredient_name),
+              source_url: rec.cook_card.source_url,
+              isPersonalized: true, // Flag for UI - navigate to CookCardScreen
+              cookCard: rec.cook_card, // Full cook card data for navigation
+            }));
+
+            console.log(`✅ Got ${fetchedRecipes.length} personalized recommendations`);
+          } else {
+            // Fallback to YouTube discovery if no saved recipes
+            console.log('📭 No saved recipes, falling back to YouTube discovery');
+            fetchedRecipes = [];
+            // Continue to OPTION 2 below
+          }
+        } catch (error) {
+          console.error('❌ Error getting personalized recommendations:', error);
+          fetchedRecipes = [];
+        }
+        } else {
+          // Recommendation mode is 'Discover New' - skip personalized, go straight to YouTube
+          fetchedRecipes = [];
+        }
+
+        // OPTION 2: Use YouTube discovery (fallback if no saved recipes OR if in 'Discover New' mode)
+        if (fetchedRecipes.length === 0) {
 
         // Dynamic thresholds based on matchable pantry size
         // Count only items that can be matched (have canonical_item_id in DB)
@@ -230,6 +303,7 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
         } else {
           fetchedRecipes = [];
         }
+        } // Close: if (fetchedRecipes.length === 0)
       } else {
         // Explore mode - search by category
         let searchOptions: any = { limit: 20 };
@@ -265,6 +339,62 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
     setRefreshing(false);
   }, [activeCategory, activeMode]);
 
+  // Handle add to shopping list
+  const handleAddToShoppingList = async (recipe: any) => {
+    try {
+      const { addIngredientsToShoppingList } = await import('../../../services/shoppingListService');
+      const { supabase } = await import('../../../lib/supabase');
+
+      // Get household ID
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        Alert.alert('Error', 'You must be logged in to add items to shopping list');
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('household_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.household_id) {
+        Alert.alert('Error', 'Could not find your household');
+        return;
+      }
+
+      // Get missing ingredients
+      const missingIngredients = recipe.missingIngredients || [];
+
+      if (missingIngredients.length === 0) {
+        Alert.alert('Nothing to Add', 'You have all the ingredients for this recipe!');
+        return;
+      }
+
+      // Add to shopping list
+      const result = await addIngredientsToShoppingList(
+        missingIngredients,
+        profile.household_id,
+        recipe.id,
+        recipe.title || recipe.name
+      );
+
+      // Show success message
+      if (result.added > 0) {
+        const message = result.duplicates > 0
+          ? `Added ${result.added} item${result.added > 1 ? 's' : ''} (${result.duplicates} already in list)`
+          : `Added ${result.added} item${result.added > 1 ? 's' : ''} to your shopping list`;
+
+        Alert.alert('Success', message);
+      } else {
+        Alert.alert('Already Added', 'All items are already in your shopping list');
+      }
+    } catch (error) {
+      console.error('Failed to add to shopping list:', error);
+      Alert.alert('Error', 'Failed to add items to shopping list');
+    }
+  };
+
   // Get expiring ingredients
   const getExpiringIngredients = useCallback(() => {
     try {
@@ -298,11 +428,111 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
     }
   }, [items]);
 
+  /**
+   * Transform database cook_card to CookCard TypeScript format
+   */
+  const transformCookCardFromDB = (dbCard: any): any => {
+    return {
+      id: dbCard.id,
+      version: '1.0',
+      source: {
+        url: dbCard.source_url,
+        platform: dbCard.platform,
+        creator: {
+          handle: dbCard.creator_handle,
+          name: dbCard.creator_name,
+          avatar_url: dbCard.creator_avatar_url,
+        },
+      },
+      title: dbCard.title,
+      description: dbCard.description,
+      image_url: dbCard.image_url,
+      prep_time_minutes: dbCard.prep_time_minutes,
+      cook_time_minutes: dbCard.cook_time_minutes,
+      total_time_minutes: dbCard.total_time_minutes,
+      servings: dbCard.servings,
+      instructions: {
+        type: dbCard.instructions_type || 'link_only',
+        text: dbCard.instructions_text,
+        steps: dbCard.instructions_json,
+      },
+      ingredients: (dbCard.ingredients || []).map((ing: any, idx: number) => ({
+        name: ing.ingredient_name,
+        normalized_name: ing.normalized_name,
+        canonical_item_id: ing.canonical_item_id,
+        amount: ing.amount,
+        unit: ing.unit,
+        preparation: ing.preparation,
+        confidence: ing.confidence || 1.0,
+        provenance: ing.provenance || 'creator_provided',
+        in_pantry: ing.in_pantry,
+        is_substitution: ing.is_substitution,
+        substitution_rationale: ing.substitution_rationale,
+        group: ing.ingredient_group,
+        sort_order: ing.sort_order !== null ? ing.sort_order : idx,
+        is_optional: ing.is_optional,
+      })),
+      extraction: {
+        method: dbCard.extraction_method || 'metadata',
+        confidence: dbCard.extraction_confidence || 1.0,
+        version: dbCard.extraction_version || '1.0',
+        timestamp: dbCard.created_at || new Date().toISOString(),
+        cost_cents: dbCard.extraction_cost_cents || 0,
+      },
+      created_at: dbCard.created_at,
+      updated_at: dbCard.updated_at,
+    };
+  };
+
   // Navigation functions
   const handleRecipePress = async (recipe: any) => {
     if (!recipe) return;
 
-    console.log('🔘 Recipe tapped:', recipe.title, 'Has ingredients?', !!recipe.ingredients);
+    console.log('🔘 Recipe tapped:', recipe.title, 'Has ingredients?', !!recipe.ingredients, 'isPersonalized?', recipe.isPersonalized);
+
+    // If this is a personalized recipe (from saved Cook Cards), navigate to CookCardScreen
+    if (recipe.isPersonalized && recipe.cookCard) {
+      console.log('🎯 Navigating to CookCardScreen for personalized recipe');
+      const cookCard = transformCookCardFromDB(recipe.cookCard);
+      navigation.navigate('CookCard', {
+        cookCard,
+        mode: 'normal',
+      });
+      return;
+    }
+
+    // Log telemetry for pantry recommendations
+    if (activeMode === 'From Your Pantry' && recipe.source_url) {
+      try {
+        const { logIngressEvent, generateSessionId } = await import('../../../services/telemetry');
+        logIngressEvent({
+          sessionId: generateSessionId(),
+          eventType: 'video_opened',
+          ingressMethod: 'paste_link',
+          platform: recipe.source_url.includes('youtube') ? 'youtube' : 'unknown',
+          recipeUrl: recipe.source_url,
+          metadata: {
+            match_percentage: recipe.matchPercentage || 0,
+            pantry_mode: activeMode,
+            category: activeCategory,
+          },
+        });
+      } catch (err) {
+        console.warn('Failed to log telemetry:', err);
+      }
+    }
+
+    // If recipe has YouTube URL, open in YouTube app
+    if (recipe.source_url && recipe.source_url.includes('youtube')) {
+      try {
+        const { openYouTubeDeepLink } = await import('../../../services/cookCardService');
+        await openYouTubeDeepLink(recipe.source_url, recipe.title || recipe.name);
+        return;
+      } catch (err) {
+        console.error('Failed to open YouTube link:', err);
+        // Fall through to normal navigation
+      }
+    }
 
     // If recipe doesn't have ingredients array, fetch full details from database
     if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) {
@@ -478,9 +708,27 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
             <Text style={styles.headerSubtitle}>What's for dinner?</Text>
           </View>
         </View>
-        <Pressable onPress={() => {}}>
-          <Ionicons name="options-outline" size={24} color="#6B7280" />
-        </Pressable>
+        <View style={styles.headerRight}>
+          <Pressable
+            onPress={() => navigation.navigate('BrowsePlatforms')}
+            style={styles.browseButton}
+          >
+            <Ionicons name="search" size={20} color="#007AFF" />
+          </Pressable>
+          <Pressable
+            onPress={() => navigation.navigate('SocialRecipesTest')}
+            style={styles.testButton}
+          >
+            <Ionicons name="flask" size={20} color="#6B7280" />
+          </Pressable>
+          <Pressable
+            onPress={() => navigation.navigate('SavedRecipes')}
+            style={styles.savedButton}
+          >
+            <Ionicons name="bookmark" size={24} color={theme.colors.primary} />
+            <Text style={styles.savedButtonText}>Saved</Text>
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView
@@ -503,10 +751,23 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
           />
         </View>
 
+        {/* Recommendation Mode Toggle - Only in Pantry Mode */}
+        {activeMode === 'From Your Pantry' && (
+          <View style={styles.recommendationToggle}>
+            <SegmentedControl
+              segments={['Your Recipes', 'Discover New']}
+              activeSegment={recommendationMode}
+              onSegmentPress={(segment) => setRecommendationMode(segment as any)}
+            />
+          </View>
+        )}
+
         {/* Pantry Match Summary - Only in Pantry Mode */}
         {activeMode === 'From Your Pantry' && (
           <View style={styles.summaryCard}>
-            <Text style={styles.summaryTitle}>What You Can Make</Text>
+            <Text style={styles.summaryTitle}>
+              {recommendationMode === 'Your Recipes' ? 'From Your Collection' : 'What You Can Make'}
+            </Text>
             <View style={styles.summaryRow}>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryValue}>{pantryItemCount}</Text>
@@ -619,7 +880,13 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
                               Missing: {recipe.missingIngredients.slice(0, 3).join(', ')}
                               {recipe.missingIngredients.length > 3 ? ` +${recipe.missingIngredients.length - 3} more` : ''}
                             </Text>
-                            <Pressable style={styles.addToListButton}>
+                            <Pressable
+                              style={styles.addToListButton}
+                              onPress={(e) => {
+                                e.stopPropagation();
+                                handleAddToShoppingList(recipe);
+                              }}
+                            >
                               <Ionicons name="add-circle-outline" size={18} color={theme.colors.primary} />
                               <Text style={styles.addToListText}>Add to Shopping List</Text>
                             </Pressable>
@@ -654,6 +921,15 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Floating Action Button - Paste Recipe Link */}
+      <Pressable
+        style={styles.fab}
+        onPress={() => navigation.navigate('PasteLink')}
+      >
+        <Ionicons name="link" size={24} color="#FFFFFF" />
+        <Text style={styles.fabText}>Paste Link</Text>
+      </Pressable>
     </SafeAreaView>
   );
 };
@@ -679,6 +955,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   headerTitle: {
     fontSize: 22,
     fontWeight: '700',
@@ -689,6 +970,38 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: 2,
   },
+  browseButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    backgroundColor: '#E6F2FF',
+    marginRight: 8,
+  },
+  testButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    marginRight: 8,
+  },
+  savedButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: '#F0FDF4',
+  },
+  savedButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.primary,
+  },
   content: {
     flex: 1,
   },
@@ -697,6 +1010,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#F9FAFB',
+  },
+  // Recommendation Toggle
+  recommendationToggle: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
+    backgroundColor: '#FFFFFF',
   },
   // Pantry Match Summary
   summaryCard: {
@@ -937,5 +1257,28 @@ const styles = StyleSheet.create({
     marginTop: 16,
     color: '#6B7280',
     fontSize: 16,
+  },
+  // Floating Action Button
+  fab: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: theme.colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  fabText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });

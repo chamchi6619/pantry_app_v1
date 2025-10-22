@@ -311,13 +311,24 @@ const InlineItem: React.FC<InlineItemProps> = React.memo(({
           >
             {item.checked && <Text style={styles.checkmark}>✓</Text>}
           </View>
-          <Text
-            style={[styles.itemText, item.checked && styles.itemTextChecked]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {item.name}
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={[styles.itemText, item.checked && styles.itemTextChecked]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.name}
+            </Text>
+            {item.recipe_name && (
+              <Text
+                style={[styles.recipeSourceText, item.checked && styles.recipeSourceTextChecked]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                From: {item.recipe_name}
+              </Text>
+            )}
+          </View>
         </Pressable>
 
         {/* Quantity controls on the right */}
@@ -863,7 +874,6 @@ const styles = StyleSheet.create({
   itemText: {
     ...theme.typography.body,
     color: theme.colors.text,
-    flex: 1,
     textAlignVertical: 'center',
     includeFontPadding: false,
     marginRight: theme.spacing.sm, // Add space before quantity controls
@@ -871,6 +881,17 @@ const styles = StyleSheet.create({
   itemTextChecked: {
     textDecorationLine: 'line-through',
     color: theme.colors.textLight,
+  },
+  recipeSourceText: {
+    fontSize: 12,
+    color: theme.colors.textLight,
+    marginTop: 2,
+    fontStyle: 'italic',
+  },
+  recipeSourceTextChecked: {
+    textDecorationLine: 'line-through',
+    color: theme.colors.textLight,
+    opacity: 0.6,
   },
   inlineInput: {
     fontSize: theme.typography.body.fontSize,

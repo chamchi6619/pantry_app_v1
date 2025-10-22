@@ -19,11 +19,12 @@
  * Fail-Closed: Never silently invent data. If confidence <80%, require user confirmation.
  */
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { normalizeRecipeURL, detectPlatform } from "../_shared/urlUtils.ts";
 import { parseIngredientsFromText, calculateAverageConfidence } from "../_shared/ingredientRegex.ts";
 import { extractIngredientsWithGemini, extractFromVideoVision } from "../_shared/llm.ts";
+import { cleanIngredientName } from "../_shared/ingredientCleaner.ts";
 import { uploadToGeminiFileAPI, deleteGeminiFile } from "../_shared/geminiFileAPI.ts";
 import { extractVideoUrl } from "../_shared/platformScrapers.ts";
 import { extractAudioTranscript, shouldRunASR } from "../_shared/asr.ts";
@@ -38,9 +39,72 @@ import { fetchCommentsFromURL, filterToIngredientCandidates, extractIngredientsS
 import { findBestIngredientComment, analyzeCommentScores, scoreCommentForIngredients } from "../_shared/commentScoring.ts";
 import { extractFromHTML } from "../_shared/htmlScraper.ts";
 import { checkMonthlyQuota, checkHourlyRateLimit, incrementMonthlyQuota, checkUserL4Budget, checkGlobalL4Budget, reserveL4Budget, releaseL4Budget, RATE_LIMITS } from "../_shared/rateLimiting.ts";
-import { hasRecipeQualitySignals, fetchYouTubeTranscriptSafe, groupIngredientsBySections, normalizeFractions, matchCanonicalItems } from "../_shared/extractionHelpers.ts";
+import { hasRecipeQualitySignals, fetchYouTubeTranscriptSafe, groupIngredientsBySections, normalizeFractions } from "../_shared/extractionHelpers.ts";
+import { findMatch, type CanonicalItem } from "../_shared/canonicalMatcher.ts";
 import { extractMetadataWithYtDlp, uploadVideoToGeminiFileAPI, checkYtDlpAvailable } from "../_shared/ytdlp.ts";
 import { getYouTubeMetadata, getYouTubeCaptions, extractYouTubeVideoId, checkYouTubeAPIAvailable } from "../_shared/youtubeAPI.ts";
+
+/**
+ * Extract recipe URL from text (description or comment)
+ *
+ * Strategy: Filter out social/affiliate/merch links, prefer URLs with "recipe" in path
+ *
+ * @param text - Description or comment text to search
+ * @returns First recipe URL found, or null
+ */
+function extractRecipeUrl(text: string): string | null {
+  if (!text) return null;
+
+  const urls = text.match(/https?:\/\/[^\s]+/g);
+  if (!urls || urls.length === 0) return null;
+
+  // Blocklist: Social media, affiliates, merch, video platforms
+  const BLOCKLIST = [
+    // Social
+    'instagram.com', 'facebook.com', 'twitter.com', 'x.com', 'tiktok.com', 'pinterest.com',
+    // Monetization
+    'patreon.com', 'ko-fi.com', 'buymeacoffee.com',
+    // Affiliates
+    'amazon.com', 'amzn.to', 'butcherbox', 'hellofresh', 'bchrbox.co',
+    // Merch
+    'teespring.com', 'redbubble.com', 'spreadshirt.com',
+    // Video platforms (avoid self-reference)
+    'youtube.com', 'youtu.be',
+  ];
+
+  const candidates = urls.filter(url =>
+    !BLOCKLIST.some(blocked => url.toLowerCase().includes(blocked))
+  );
+
+  if (candidates.length === 0) return null;
+
+  console.log(`   🔍 URL candidates: ${candidates.join(', ')}`);
+
+  // Prefer URLs with "recipe" in path (strong signal)
+  const recipeUrls = candidates.filter(url => /recipe/i.test(url));
+  console.log(`   🔍 URLs with "recipe" in path: ${recipeUrls.join(', ')}`);
+  if (recipeUrls.length > 0) {
+    console.log(`   ✅ Selected: ${recipeUrls[0]}`);
+    return recipeUrls[0];
+  }
+
+  // Fallback: Look for URLs near keywords like "RECIPE:", "Full recipe at", etc.
+  // Check 100 chars before and after each URL for recipe-related keywords
+  for (const url of candidates) {
+    const urlIndex = text.indexOf(url);
+    const contextBefore = text.substring(Math.max(0, urlIndex - 100), urlIndex).toLowerCase();
+    const contextAfter = text.substring(urlIndex + url.length, Math.min(text.length, urlIndex + url.length + 100)).toLowerCase();
+    const context = contextBefore + contextAfter;
+
+    // Strong signals that this URL is the recipe link
+    if (/recipe|full recipe|written recipe|get the recipe/i.test(context)) {
+      return url;
+    }
+  }
+
+  // Last resort: return first candidate (but this is risky - might be homepage)
+  return candidates[0];
+}
 
 interface ExtractionRequest {
   url: string;
@@ -282,7 +346,7 @@ function formatInstructionsFromSchema(instructions: any): any {
   }
 
   return {
-    type: 'steps',
+    type: 'creator_provided',
     steps: steps.map((step, idx) => ({
       step_number: idx + 1,
       instruction: step,
@@ -305,13 +369,13 @@ function convertSchemaOrgIngredient(rawText: string, index: number): Ingredient 
     unit: undefined,
     preparation: undefined,
     confidence: 0.95,                  // High confidence (structured data)
-    provenance: 'schema_org',
+    provenance: 'creator_provided',
     sort_order: index,
     is_optional: false,
   };
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -764,7 +828,7 @@ serve(async (req) => {
                   amount: normalized.amount,
                   unit: normalized.unit,
                   confidence: visionResult.confidence,
-                  provenance: 'video_vision',
+                  provenance: 'detected',
                   sort_order: index,
                   evidence_phrase: ing.evidence_phrase || null,
                   evidence_source: 'video_vision',
@@ -776,13 +840,13 @@ serve(async (req) => {
               // Add instructions if provided
               if (visionResult.instructions && visionResult.instructions.length > 0) {
                 cookCard.instructions = {
-                  type: "steps",
+                  type: "creator_provided",
                   steps: visionResult.instructions,
                 };
               }
 
               cookCard.extraction.method = "video_vision";
-              cookCard.extraction.version = "L4-gemini-2.5-flash-vision-v87";
+              cookCard.extraction.version = "L4-gemini-2.0-flash-vision-v89-natural";
               cookCard.extraction.evidence_source = "video_vision";
 
               visionExtractedEarly = true;
@@ -1081,7 +1145,7 @@ serve(async (req) => {
           // Update instructions from Gemini (structured with ingredients and tips)
           if (llmResult.instructions && llmResult.instructions.length > 0) {
             cookCard.instructions = {
-              type: "steps",
+              type: "creator_provided",
               steps: llmResult.instructions,
             };
             console.log(`   ✅ Added ${llmResult.instructions.length} instruction steps from Gemini`);
@@ -1175,6 +1239,267 @@ serve(async (req) => {
       }
 
     // ============================================================
+    // STEP 5.2: BLOG RECIPE EXTRACTION (L3.2)
+    // ============================================================
+    // Many cooking videos link to full written recipes on creator's blog
+    // This provides BOTH ingredients + instructions in high-quality format
+    // Priority: Blog > Transcript > Vision (blog is FREE scraping + cheap Gemini)
+    //
+    // Only runs if:
+    // - Vision-first didn't already succeed (short-form videos)
+    // - For social media platforms (YouTube, Instagram, TikTok, Facebook)
+    // - Recipe is incomplete from L3 (missing ingredients or instructions)
+    if (!visionExtractedEarly && ['youtube', 'instagram', 'tiktok', 'facebook'].includes(platform)) {
+      // Try description first
+      let blogUrl = extractRecipeUrl(description);
+
+      // Fallback: Check YouTube comments if no URL in description
+      // (Many creators post recipe links in pinned comments after uploading)
+      if (!blogUrl && platform === 'youtube') {
+        try {
+          const commentsForBlog = await fetchCommentsFromURL(url, 5); // Just check first 5
+          if (commentsForBlog.success && commentsForBlog.comments.length > 0) {
+            for (const comment of commentsForBlog.comments) {
+              blogUrl = extractRecipeUrl(comment.text);
+              if (blogUrl) {
+                console.log(`   🔗 Found recipe URL in comment by ${comment.author}`);
+                break;
+              }
+            }
+          }
+        } catch (commentFetchError) {
+          console.log(`   ⚠️ Comment URL check failed: ${commentFetchError instanceof Error ? commentFetchError.message : 'unknown'}`);
+          // Continue with description URL or null
+        }
+      }
+
+      if (blogUrl) {
+        console.log(`🔗 Step 5.2: Blog extraction from ${blogUrl}`);
+
+        await logEvent(supabase, {
+          user_id, household_id,
+          event_type: "blog_url_found",
+          blog_url: blogUrl,
+          video_url: url,
+        });
+
+        try {
+          // Fetch blog HTML with 5s timeout (prevent slow blogs from blocking)
+          const blogHtml = await Promise.race([
+            extractFromHTML(blogUrl, 'blog'),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('timeout')), 5000)
+            )
+          ]);
+
+          // Extract raw ingredients and instructions from schema.org
+          const rawIngredients = blogHtml.metadata?.ingredients || [];
+          const rawInstructions = blogHtml.metadata?.instructions || [];
+          const instructionSteps = Array.isArray(rawInstructions) ? rawInstructions :
+                                   typeof rawInstructions === 'string' ? rawInstructions.split('\n').filter(s => s.trim()) : [];
+
+          console.log(`   📄 Blog schema.org: ${rawIngredients.length} ingredients, ${instructionSteps.length} steps`);
+
+          // Only proceed if blog has meaningful content
+          if (rawIngredients.length >= 3 || instructionSteps.length >= 3) {
+            // Combine into text for Gemini cleaning (same as we do for description/comments)
+            const blogText = `
+Ingredients:
+${rawIngredients.join('\n')}
+
+Instructions:
+${instructionSteps.join('\n')}
+            `.trim();
+
+            console.log(`   🤖 Cleaning with Gemini (${blogText.length} chars)...`);
+
+            try {
+              // Clean with Gemini (same pipeline as L3 description extraction)
+              const geminiResult = await extractIngredientsWithGemini(title, blogText, platform);
+              extractionCost += geminiResult.cost_cents;
+
+              const cleanedIngredients = geminiResult.ingredients || [];
+              const cleanedInstructions = geminiResult.instructions || [];
+
+              console.log(`   ✅ Cleaned: ${cleanedIngredients.length} ingredients, ${cleanedInstructions.length} steps`);
+
+              // Blog must provide BOTH ingredients AND instructions to replace L3 results
+              // (If blog only has ingredients, keep L3 ingredients and let transcript add instructions)
+              if (cleanedIngredients.length >= 3 && cleanedInstructions.length >= 3) {
+                console.log(`   🎯 Blog complete - replacing L3 results`);
+
+                // Build CookCard from cleaned blog data
+                cookCard.ingredients = cleanedIngredients.map((ing, idx) => ({
+                  name: ing.name,
+                  amount: ing.amount || null,
+                  unit: ing.unit || null,
+                  confidence: ing.confidence || 0.95,
+                  evidence_phrase: ing.evidence_phrase || ing.name,
+                  order_index: idx,
+                  canonical_item_id: null,
+                  evidence_source: 'creator_blog',
+                }));
+
+                cookCard.instructions = {
+                  type: "creator_provided",
+                  steps: cleanedInstructions.map(step =>
+                    typeof step === 'string' ? step : step.instruction || String(step)
+                  ),
+                };
+
+                cookCard.extraction.method = "blog_gemini_cleaned";
+                cookCard.extraction.version = "L3.2-blog-gemini-2.0-flash";
+                cookCard.extraction.evidence_source = "creator_blog";
+                cookCard.extraction.cost_cents = extractionCost;
+                cookCard.extraction.confidence = 0.90; // Blog recipes are high quality
+                cookCard.extraction.timestamp = new Date().toISOString();
+
+                const extractionLatency = Date.now() - extractionStartTime;
+
+                // Match ingredients to canonical items
+                try {
+                  cookCard.ingredients = await matchCanonicalItems(supabase, cookCard.ingredients);
+                } catch (canonicalError) {
+                  console.warn(`   ⚠️ Canonical matching failed: ${canonicalError instanceof Error ? canonicalError.message : 'unknown'}`);
+                  // Continue with unmatched ingredients (canonical_item_id will be null)
+                }
+
+                // Cache extraction
+                const inputHash = await computeInputHash(url, title, description, undefined);
+                await setCachedExtraction(supabase, url, inputHash, cookCard, extractionCost);
+
+                // Increment monthly quota
+                await incrementMonthlyQuota(supabase, user_id, extractionCost);
+
+                // Log success
+                await logEvent(supabase, {
+                  user_id, household_id,
+                  event_type: "blog_extraction_success",
+                  blog_url: blogUrl,
+                  video_url: url,
+                  ingredients_count: cookCard.ingredients.length,
+                  instructions_count: cookCard.instructions.steps.length,
+                  cost_cents: geminiResult.cost_cents,
+                });
+
+                await logEvent(supabase, {
+                  user_id, household_id,
+                  event_type: "extraction_completed",
+                  extraction_method: "blog_gemini_cleaned",
+                  extraction_confidence: 0.90,
+                  extraction_cost_cents: extractionCost,
+                  input_hash: inputHash,
+                  ingredients_count: cookCard.ingredients.length,
+                  extraction_latency_ms: extractionLatency,
+                  cache_hit: false,
+                  ladder_path: 'L3.2-blog',
+                  evidence_source: 'creator_blog',
+                  early_return: true,
+                });
+
+                // EARLY RETURN - blog extraction complete!
+                return new Response(
+                  JSON.stringify({
+                    cook_card: cookCard,
+                    requires_confirmation: false, // Blog recipes are high quality
+                    cache_status: "fresh",
+                  }),
+                  { status: 200, headers: { "Content-Type": "application/json" } }
+                );
+              } else {
+                console.log(`   ⚠️ Blog incomplete: ${cleanedIngredients.length}i, ${cleanedInstructions.length}s (need 3+ each)`);
+                console.log(`   Keeping L3 results, continuing to L3.5/L4...`);
+              }
+            } catch (geminiError) {
+              console.error(`   ❌ Gemini cleaning failed: ${geminiError instanceof Error ? geminiError.message : 'unknown'}`);
+              await logEvent(supabase, {
+                user_id, household_id,
+                event_type: "blog_extraction_failed",
+                blog_url: blogUrl,
+                video_url: url,
+                error: `gemini_error: ${geminiError instanceof Error ? geminiError.message : 'unknown'}`,
+              });
+              // Fall through to L3.5/L4
+            }
+          } else {
+            console.log(`   ⚠️ Blog schema.org incomplete: ${rawIngredients.length}i, ${instructionSteps.length}s`);
+          }
+
+        } catch (blogError) {
+          const errorMsg = blogError instanceof Error ? blogError.message : 'unknown';
+          console.log(`   ❌ Blog scraping failed: ${errorMsg}`);
+
+          await logEvent(supabase, {
+            user_id, household_id,
+            event_type: "blog_extraction_failed",
+            blog_url: blogUrl,
+            video_url: url,
+            error: errorMsg,
+            is_timeout: errorMsg === 'timeout',
+          });
+
+          // Fall through to L3.5/L4
+        }
+      } else {
+        console.log(`   ℹ️ Step 5.2: No recipe URL found in description or comments`);
+      }
+    }
+
+    // ============================================================
+    // STEP 5.3: L3.5 - YOUTUBE TRANSCRIPT INSTRUCTIONS (YOUTUBE-ONLY)
+    // ============================================================
+    // For YouTube videos, extract instructions from FREE YouTube transcript API
+    // This is more accurate and cheaper than Vision API for spoken instructions
+    // Only runs if instructions are still missing after L3
+    if (platform === 'youtube' && (!cookCard.instructions?.steps || cookCard.instructions.steps.length === 0)) {
+      console.log('🎬 L3.5: YouTube transcript instruction extraction...');
+
+      // Fetch transcript if not already fetched in L2.5
+      if (!transcript || transcript.length === 0) {
+        console.log('   Fetching YouTube transcript (not cached from L2.5)...');
+        const videoId = extractYouTubeVideoId(url);
+        if (videoId) {
+          transcript = await fetchYouTubeTranscriptSafe(videoId, 5000); // 5s timeout (more patient than L2.5)
+        }
+      } else {
+        console.log(`   Reusing transcript from L2.5 (${transcript.length} chars)`);
+      }
+
+      if (transcript && transcript.length > 100) {
+        console.log(`   📝 Extracting instructions from ${transcript.length} char transcript...`);
+
+        try {
+          const transcriptExtraction = await extractIngredientsWithGemini(title, transcript, platform);
+          extractionCost += transcriptExtraction.cost_cents;
+
+          if (transcriptExtraction.instructions && transcriptExtraction.instructions.length > 0) {
+            cookCard.instructions = {
+              type: "creator_provided",
+              steps: transcriptExtraction.instructions.map((step) => step.instruction),
+            };
+            console.log(`   ✅ L3.5: Extracted ${cookCard.instructions.steps.length} instruction steps from YouTube transcript (cost: ${transcriptExtraction.cost_cents}¢)`);
+
+            await logEvent(supabase, {
+              user_id,
+              household_id,
+              event_type: "l3.5_youtube_transcript_instructions",
+              instruction_count: cookCard.instructions.steps.length,
+              transcript_length: transcript.length,
+              cost_cents: transcriptExtraction.cost_cents,
+            });
+          } else {
+            console.log('   ℹ️  L3.5: No structured instructions found in transcript');
+          }
+        } catch (transcriptError) {
+          console.error('   ⚠️  L3.5: Transcript extraction error:', transcriptError);
+          // Continue to L4 Vision fallback
+        }
+      } else {
+        console.log('   ℹ️  L3.5: No transcript available (video may lack captions or be non-English)');
+      }
+    }
+
+    // ============================================================
     // STEP 5.5: SMART L4 VISION FOR INSTRUCTIONS (NEW!)
     // ============================================================
     // If L3 succeeded with ingredients but NO instructions, run L4 Vision
@@ -1235,7 +1560,7 @@ serve(async (req) => {
             // Extract instructions from vision result
             if (visionResult.success && visionResult.instructions && visionResult.instructions.length > 0) {
               cookCard.instructions = {
-                type: "steps",
+                type: "creator_provided",
                 steps: visionResult.instructions,
               };
               console.log(`   ✅ L4 Vision: Added ${visionResult.instructions.length} instruction steps from video audio`);
@@ -1358,7 +1683,7 @@ serve(async (req) => {
                 // Update instructions from Gemini
                 if (llmResult.instructions && llmResult.instructions.length > 0) {
                   cookCard.instructions = {
-                    type: "steps",
+                    type: "creator_provided",
                     steps: llmResult.instructions,
                   };
                   console.log(`   ✅ Added ${llmResult.instructions.length} instruction steps from Gemini`);
@@ -1593,7 +1918,7 @@ serve(async (req) => {
                   // Update instructions from Gemini
                   if (llmResult.instructions && llmResult.instructions.length > 0) {
                     cookCard.instructions = {
-                      type: "steps",
+                      type: "creator_provided",
                       steps: llmResult.instructions,
                     };
                     console.log(`   ✅ Added ${llmResult.instructions.length} instruction steps from Gemini`);
@@ -1919,7 +2244,7 @@ serve(async (req) => {
               amount: normalized.amount,
               unit: normalized.unit,
               confidence: ing.confidence,
-              provenance: `multi_source_${ing.source}`,
+              provenance: 'detected',
               sort_order: index,
               evidence_phrase: ing.evidence_phrase || null,
               evidence_source: ing.source,
@@ -1959,7 +2284,7 @@ serve(async (req) => {
               amount: normalized.amount,
               unit: normalized.unit,
               confidence: ing.confidence,
-              provenance: `multi_source_${ing.source}`,
+              provenance: 'detected',
               sort_order: index,
               evidence_phrase: ing.evidence_phrase || null,
               evidence_source: ing.source,
@@ -1986,7 +2311,7 @@ serve(async (req) => {
               amount: normalized.amount,
               unit: normalized.unit,
               confidence: visionResult.confidence,
-              provenance: 'video_vision',
+              provenance: 'detected',
               sort_order: index,
               evidence_phrase: ing.evidence_phrase || null,
               evidence_source: 'video_vision',
@@ -1996,14 +2321,14 @@ serve(async (req) => {
           });
 
           cookCard.extraction.method = "video_vision";
-          cookCard.extraction.version = "L4-gemini-2.5-flash-vision";
+          cookCard.extraction.version = "L4-gemini-2.0-flash-vision-v89-natural";
         }
       }
 
       // Update instructions if provided by Vision
       if (visionResult.instructions && visionResult.instructions.length > 0) {
         cookCard.instructions = {
-          type: "steps",
+          type: "creator_provided",
           steps: visionResult.instructions,
         };
         console.log(`   ✅ Added ${visionResult.instructions.length} instruction steps from vision`);
@@ -2081,7 +2406,7 @@ serve(async (req) => {
 
       // Multi-source tracking (if used)
       vision_used: ['video_vision', 'vision_transcript_hybrid', 'multi_source_hybrid'].includes(cookCard.extraction.method),
-      vision_model: ['video_vision', 'vision_transcript_hybrid', 'multi_source_hybrid'].includes(cookCard.extraction.method) ? 'gemini-2.5-flash' : null,
+      vision_model: ['video_vision', 'vision_transcript_hybrid', 'multi_source_hybrid'].includes(cookCard.extraction.method) ? 'gemini-2.0-flash' : null,
       vision_duration_seconds: ['video_vision', 'vision_transcript_hybrid', 'multi_source_hybrid'].includes(cookCard.extraction.method) ? duration_seconds : null,
       asr_used: cookCard.extraction.method === 'multi_source_hybrid',
       asr_cost_cents: asrCost || 0,
@@ -2099,6 +2424,13 @@ serve(async (req) => {
         ingredients_count: cookCard.ingredients.length,
       });
     }
+
+    // Clean ingredient names before returning (strip quantities, units, prep words)
+    console.log(`🧹 Cleaning ${cookCard.ingredients.length} ingredient names...`);
+    cookCard.ingredients = cookCard.ingredients.map(ing => ({
+      ...ing,
+      name: cleanIngredientName(ing.name)
+    }));
 
     // Response
     return new Response(
@@ -2746,7 +3078,7 @@ async function parseCreatorText(url: string, platform: string, cookCard: CookCar
       unit: ing.unit,
       preparation: ing.preparation,
       confidence: ing.confidence,
-      provenance: 'creator_text',
+      provenance: 'creator_provided',
       sort_order: ing.sort_order,
       is_optional: ing.is_optional,
     }));
@@ -2828,37 +3160,36 @@ async function extractWithLLM(
 }
 
 /**
- * Match ingredients to canonical items
+ * Match ingredients to canonical items using fuzzy matcher
+ * Uses the strong canonicalMatcher.ts with fuzzy matching, aliases, and Levenshtein distance
  */
 async function matchCanonicalItems(supabase: any, ingredients: Ingredient[]) {
+  // Load canonical items with all fields needed for fuzzy matching
   const { data: canonicalItems } = await supabase
     .from("canonical_items")
-    .select("id, canonical_name, aliases");
+    .select("id, canonical_name, aliases, category");
 
   if (!canonicalItems) return ingredients;
 
+  // Convert to CanonicalItem format expected by findMatch
+  const canonicalList: CanonicalItem[] = canonicalItems.map(item => ({
+    id: item.id,
+    canonical_name: item.canonical_name,
+    aliases: item.aliases,
+    category: item.category
+  }));
+
+  // Match each ingredient using the strong fuzzy matcher
   return ingredients.map((ingredient) => {
-    const normalized = ingredient.name.toLowerCase().trim();
+    const match = findMatch(ingredient.name, canonicalList, supabase);
 
-    // Simple matching logic (will improve in Task 3.1)
-    for (const item of canonicalItems) {
-      if (item.canonical_name.toLowerCase() === normalized) {
-        ingredient.canonical_item_id = item.id;
-        break;
-      }
-
-      // Check aliases
-      if (item.aliases && Array.isArray(item.aliases)) {
-        for (const alias of item.aliases) {
-          if (alias.toLowerCase() === normalized) {
-            ingredient.canonical_item_id = item.id;
-            break;
-          }
-        }
-      }
+    if (match) {
+      ingredient.canonical_item_id = match.canonical_item_id;
+      ingredient.normalized_name = match.matched_name.toLowerCase().trim();
+    } else {
+      ingredient.normalized_name = ingredient.name.toLowerCase().trim();
     }
 
-    ingredient.normalized_name = normalized;
     return ingredient;
   });
 }

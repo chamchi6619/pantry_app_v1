@@ -19,6 +19,12 @@ import { ScannerScreen } from '../features/scanner/screens/ScannerScreen';
 import { FixQueueScreen } from '../features/receipt/screens/FixQueueScreen';
 import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
 import { PurchaseHistoryScreen } from '../features/receipt/screens/PurchaseHistoryScreen';
+import PasteLinkScreen from '../screens/PasteLinkScreen';
+import { CookCardScreen } from '../screens/CookCardScreen';
+import { ShareHandlerScreen } from '../screens/ShareHandlerScreen';
+import { SavedRecipesScreen } from '../screens/SavedRecipesScreen';
+import { SocialRecipesTestScreen } from '../screens/SocialRecipesTestScreen';
+import BrowsePlatformsScreen from '../screens/BrowsePlatformsScreen';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -67,6 +73,9 @@ const RecipeStack = () => (
     }}
   >
     <Stack.Screen name="RecipeList" component={ExploreRecipesScreenSupabase} />
+    <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} />
+    <Stack.Screen name="SocialRecipesTest" component={SocialRecipesTestScreen} />
+    <Stack.Screen name="BrowsePlatforms" component={BrowsePlatformsScreen} />
     <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
     <Stack.Screen name="RecipeForm" component={RecipeFormScreen} />
   </Stack.Navigator>
@@ -222,7 +231,25 @@ export const AppNavigator: React.FC = () => {
         }}
       >
         {hasValidSession ? (
-          <Stack.Screen name="Main" component={TabNavigator} />
+          <>
+            <Stack.Screen name="Main" component={TabNavigator} />
+            {/* Cook Card modal screens */}
+            <Stack.Screen
+              name="PasteLink"
+              component={PasteLinkScreen}
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="CookCard"
+              component={CookCardScreen}
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="ShareHandler"
+              component={ShareHandlerScreen}
+              options={{ presentation: 'modal' }}
+            />
+          </>
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />
         )}
