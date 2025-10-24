@@ -9,6 +9,7 @@ export interface InventoryItem {
   id: string;
   name: string;
   normalized?: string;
+  canonicalItemId?: string; // Link to canonical_items for recipe matching
   quantity: number;
   unit: string;
   category: string;
@@ -159,6 +160,7 @@ export const useInventorySupabaseStore = create<InventoryState>()(
               id: item.id,
               name: item.name,
               normalized: item.normalized || item.normalized_name,
+              canonicalItemId: item.canonical_item_id,
               quantity: Number(item.quantity),
               unit: item.unit,
               category: item.category || '',

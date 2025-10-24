@@ -27,7 +27,6 @@ import { CuisineChips } from '../components/CuisineChips';
 import { PantryCTA } from '../components/PantryCTA';
 
 // Services
-import recipeServiceSupabase from '../../../services/recipeServiceSupabase';
 import { canonicalItemsService } from '../../../services/canonicalItemsService';
 import { supabase } from '../../../lib/supabase';
 import { getHybridRecommendations, getPersonalizedRecommendations } from '../../../services/recommendationEngine';
@@ -54,10 +53,7 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [recipes, setRecipes] = useState<any[]>([]);
-  const [heroRecipes, setHeroRecipes] = useState<any[]>([]);
-  const [trendingRecipes, setTrendingRecipes] = useState<any[]>([]);
-  const [quickRecipes, setQuickRecipes] = useState<any[]>([]);
-  const [stats, setStats] = useState({ totalRecipes: 0, totalIngredients: 0, totalCanonicalItems: 0 });
+  const [stats, setStats] = useState({ totalCanonicalItems: 0 });
 
   // Store selectors
   const items = useInventorySupabaseStore(state => state.items);
@@ -80,11 +76,14 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
       // Initialize canonical items service
       await canonicalItemsService.initialize();
 
-      // Get stats
-      const recipeStats = await recipeServiceSupabase.getStats();
-      setStats(recipeStats);
+      // Get canonical items count
+      const { count } = await supabase
+        .from('canonical_items')
+        .select('*', { count: 'exact', head: true });
 
-      console.log('✅ Recipe services initialized:', recipeStats);
+      setStats({ totalCanonicalItems: count || 0 });
+
+      console.log('✅ Recipe services initialized. Canonical items:', count);
     } catch (error) {
       console.error('Error initializing services:', error);
     }
@@ -118,38 +117,7 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
     }
   }, [activeCategory, activeMode, recommendationMode, items]);
 
-  // Load initial data (only for Explore mode)
-  useEffect(() => {
-    if (activeMode === 'Explore') {
-      loadInitialData();
-    }
-  }, []);
-
-  const loadInitialData = async () => {
-    setLoading(true);
-    try {
-      // Load hero recipes (popular)
-      const popularRecipes = await recipeServiceSupabase.getPopularRecipes(3);
-      if (popularRecipes.length > 0) {
-        setHeroRecipes(popularRecipes.map((recipe, index) => ({
-          ...recipeServiceSupabase.transformToUIFormat(recipe),
-          subtitle: index === 0 ? "Editor's Choice" : index === 1 ? 'Trending Now' : 'Seasonal Special',
-        })));
-      }
-
-      // Load trending recipes
-      const trending = await recipeServiceSupabase.getPopularRecipes(5);
-      setTrendingRecipes(trending.map(r => recipeServiceSupabase.transformToUIFormat(r)));
-
-      // Load quick recipes
-      const quick = await recipeServiceSupabase.getQuickRecipes(6);
-      setQuickRecipes(quick.map(r => recipeServiceSupabase.transformToUIFormat(r)));
-    } catch (error) {
-      console.error('Error loading initial data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // No initial data loading needed - all recipes come from Cook Cards
 
   const loadRecipes = async () => {
     if (loading) return;
@@ -296,7 +264,8 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
             const expiringItems = getExpiringIngredients();
             fetchedRecipes = fetchedRecipes.filter((r: any) => {
               return r.matchedIngredients?.some((ing: string) =>
-                expiringItems.some(exp => ing.toLowerCase().includes(exp.toLowerCase()))
+                expiringItems.some(exp => ing.toLowerCase().includes(exp.name.toLowerCase()))
+                // ✅ FIXED: Access exp.name instead of exp (now an object)
               );
             });
           }
@@ -305,17 +274,10 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
         }
         } // Close: if (fetchedRecipes.length === 0)
       } else {
-        // Explore mode - search by category
-        let searchOptions: any = { limit: 20 };
-
-        if (activeCategory === 'Quick & Easy') {
-          searchOptions.maxTime = 30;
-        } else if (activeCategory !== 'Popular') {
-          searchOptions.query = activeCategory;
-        }
-
-        const searchResults = await recipeServiceSupabase.searchRecipes(searchOptions);
-        fetchedRecipes = searchResults.map(r => recipeServiceSupabase.transformToUIFormat(r));
+        // Explore mode - currently no recipes in Explore mode
+        // All recipes are from saved Cook Cards in "From Your Pantry" mode
+        // TODO: Add public recipe discovery in future phase
+        fetchedRecipes = [];
       }
 
       console.log(`📝 Setting ${fetchedRecipes.length} recipes to state`);
@@ -332,10 +294,6 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
     setRefreshing(true);
     await canonicalItemsService.syncFromSupabase();
     await loadRecipes();
-    // Only reload initial data if in Explore mode
-    if (activeMode === 'Explore') {
-      await loadInitialData();
-    }
     setRefreshing(false);
   }, [activeCategory, activeMode]);
 
@@ -398,35 +356,110 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
   // Get expiring ingredients
   const getExpiringIngredients = useCallback(() => {
     try {
-      if (!items || !Array.isArray(items)) return [];
+      if (!items || !Array.isArray(items)) {
+        console.log('[ExpiryDebug] No items or items not an array:', { hasItems: !!items, isArray: Array.isArray(items) });
+        return [];
+      }
+
+      console.log('[ExpiryDebug] Total pantry items:', items.length);
 
       const expiringItems = items
         .filter(item => {
           try {
-            if (!item || !item.expirationDate) return false;
-            if (typeof item.expirationDate !== 'string') return false;
+            if (!item || !item.expirationDate) {
+              return false;
+            }
+            if (typeof item.expirationDate !== 'string') {
+              console.log('[ExpiryDebug] Invalid expiration date type:', item.name, typeof item.expirationDate);
+              return false;
+            }
 
             const dateParts = item.expirationDate.split('-');
-            if (!dateParts || dateParts.length !== 3) return false;
+            if (!dateParts || dateParts.length !== 3) {
+              console.log('[ExpiryDebug] Invalid date format:', item.name, item.expirationDate);
+              return false;
+            }
 
             const [year, month, day] = dateParts.map(Number);
-            if (isNaN(year) || isNaN(month) || isNaN(day)) return false;
+            if (isNaN(year) || isNaN(month) || isNaN(day)) {
+              console.log('[ExpiryDebug] Invalid date parts:', item.name, { year, month, day });
+              return false;
+            }
 
             const expiry = new Date(year, month - 1, day);
             const daysUntil = Math.ceil((expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-            return daysUntil <= 7 && daysUntil > 0;
+            const isExpiring = daysUntil <= 7 && daysUntil > 0;
+
+            if (isExpiring) {
+              console.log('[ExpiryDebug] Found expiring item:', item.name, { daysUntil, expirationDate: item.expirationDate, canonicalItemId: item.canonicalItemId });
+            }
+
+            return isExpiring;
           } catch (err) {
-            console.error('Error processing expiration date for item:', item?.name, err);
+            console.error('[ExpiryDebug] Error processing expiration date for item:', item?.name, err);
             return false;
           }
         })
-        .map(item => item.name || 'Unknown Item');
+        .map(item => ({
+          name: item.name || 'Unknown Item',
+          canonicalItemId: item.canonicalItemId,
+          daysUntilExpiry: item.expirationDate ? Math.ceil((new Date(item.expirationDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null,
+        }));
+
+      console.log('[ExpiryDebug] Total expiring items found:', expiringItems.length, expiringItems);
       return expiringItems;
     } catch (error) {
-      console.error('Error getting expiring ingredients:', error);
+      console.error('[ExpiryDebug] Error getting expiring ingredients:', error);
       return [];
     }
   }, [items]);
+
+  /**
+   * Check if a recipe uses any expiring ingredients
+   */
+  const getRecipeExpiringItems = useCallback((recipe: any) => {
+    const expiringIngredients = getExpiringIngredients();
+
+    // Get ingredients array - handle both personalized (cookCard.ingredients) and YouTube (no ingredients)
+    // Personalized recipes have cookCard.ingredients from saved Cook Cards
+    // YouTube recipes don't have detailed ingredient data with canonical IDs
+    const ingredients = recipe.cookCard?.ingredients || recipe.ingredients || [];
+
+    if (!Array.isArray(ingredients) || ingredients.length === 0) {
+      console.log('[ExpiryDebug] Recipe has no ingredients:', recipe.title || recipe.name);
+      return [];
+    }
+
+    console.log('[ExpiryDebug] Checking recipe:', recipe.title || recipe.name, {
+      totalIngredients: ingredients.length,
+      expiringIngredientsAvailable: expiringIngredients.length,
+      sampleIngredient: ingredients[0]
+    });
+
+    const matchingExpiring = ingredients
+      .filter((ing: any) => {
+        const hasMatch = expiringIngredients.some(exp =>
+          exp.canonicalItemId && ing.canonical_item_id === exp.canonicalItemId
+        );
+        if (hasMatch) {
+          console.log('[ExpiryDebug] Found match!', ing.ingredient_name || ing.name, ing.canonical_item_id);
+        }
+        return hasMatch;
+      })
+      .map((ing: any) => {
+        const expiringItem = expiringIngredients.find(exp => exp.canonicalItemId === ing.canonical_item_id);
+        return {
+          name: ing.ingredient_name || ing.name, // Handle both formats
+          daysUntilExpiry: expiringItem?.daysUntilExpiry || 0,
+        };
+      });
+
+    if (matchingExpiring.length > 0) {
+      console.log('[ExpiryDebug] Recipe uses expiring ingredients:', recipe.title || recipe.name, matchingExpiring);
+    }
+
+    return matchingExpiring;
+  }, [getExpiringIngredients]);
 
   /**
    * Transform database cook_card to CookCard TypeScript format
@@ -602,8 +635,13 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
             source_url: fullRecipe.source_url || null,
           };
 
-          console.log('🎯 Navigating with ingredients:', recipeWithIngredients.ingredients.length);
-          navigation.navigate('RecipeDetail', { recipe: recipeWithIngredients });
+          console.log('🎯 Recipe details fetched:', recipeWithIngredients.ingredients.length);
+          // RecipeDetailScreen deprecated - old recipes table no longer used
+          Alert.alert(
+            'Feature Not Available',
+            'Recipe details for traditional recipes are no longer supported. Please use Cook Cards from social media instead.',
+            [{ text: 'OK' }]
+          );
           return;
         }
       } catch (error) {
@@ -612,8 +650,13 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
       }
     }
 
-    console.log('🎯 Navigating with existing ingredients:', recipe.ingredients?.length);
-    navigation.navigate('RecipeDetail', { recipe });
+    console.log('🎯 Recipe (old format)');
+    // RecipeDetailScreen deprecated - old recipes table no longer used
+    Alert.alert(
+      'Feature Not Available',
+      'Recipe details for traditional recipes are no longer supported. Please use Cook Cards from social media instead.',
+      [{ text: 'OK' }]
+    );
   };
 
   const handleScanPress = () => {
@@ -671,7 +714,7 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
           <Text style={styles.title}>Recipes</Text>
           <View style={styles.connectionBadge}>
             <Text style={styles.connectionText}>
-              ● {stats.totalRecipes} recipes
+              ● {stats.totalCanonicalItems} ingredients
             </Text>
           </View>
         </View>
@@ -824,6 +867,10 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
               const matchColor = matchPercentage >= 80 ? '#10B981' : matchPercentage >= 50 ? '#F59E0B' : '#9CA3AF';
               const matchLabel = matchPercentage >= 90 ? 'Perfect Match!' : matchPercentage >= 70 ? 'Almost there' : `Missing ${recipe.missingCount || 0} items`;
 
+              // Check for expiring ingredients in this recipe
+              const expiringItems = getRecipeExpiringItems(recipe);
+              const hasExpiringIngredients = expiringItems.length > 0;
+
               return (
                 <Pressable
                   key={recipe.id}
@@ -841,6 +888,16 @@ export const ExploreRecipesScreenSupabase: React.FC = () => {
                   {activeMode === 'From Your Pantry' && (
                     <View style={[styles.matchBadgeLarge, { backgroundColor: matchColor }]}>
                       <Text style={styles.matchBadgeText}>{matchPercentage}%</Text>
+                    </View>
+                  )}
+
+                  {/* Use-It-Up Badge - Expiring Ingredients */}
+                  {activeMode === 'From Your Pantry' && hasExpiringIngredients && (
+                    <View style={styles.expiryBadge}>
+                      <Ionicons name="time" size={14} color="#DC2626" />
+                      <Text style={styles.expiryBadgeText}>
+                        Uses {expiringItems[0].name} (exp in {expiringItems[0].daysUntilExpiry}d)
+                      </Text>
                     </View>
                   )}
 
@@ -1132,6 +1189,30 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  expiryBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FEF2F2',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  expiryBadgeText: {
+    color: '#DC2626',
+    fontSize: 12,
+    fontWeight: '600',
   },
   recipeInfo: {
     padding: 16,
