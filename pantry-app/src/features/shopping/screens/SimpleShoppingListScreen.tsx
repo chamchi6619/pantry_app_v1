@@ -13,6 +13,7 @@ import {
   PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useIsFocused } from '@react-navigation/native';
 import { theme } from '../../../core/constants/theme';
 import { useShoppingListSupabaseStore } from '../../../stores/shoppingListSupabaseStore';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -358,6 +359,7 @@ const InlineItem: React.FC<InlineItemProps> = React.memo(({
 
 export const SimpleShoppingListScreen: React.FC = () => {
   const { householdId } = useAuth();
+  const isFocused = useIsFocused();
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Use Supabase store
@@ -373,7 +375,7 @@ export const SimpleShoppingListScreen: React.FC = () => {
   const isSyncing = useShoppingListSupabaseStore((state) => state.isSyncing);
   const syncError = useShoppingListSupabaseStore((state) => state.syncError);
 
-  // Initialize store with household ID
+  // Initialize store with household ID (once on mount)
   React.useEffect(() => {
     const initializeShoppingList = async () => {
       if (householdId) {
@@ -384,6 +386,14 @@ export const SimpleShoppingListScreen: React.FC = () => {
 
     initializeShoppingList();
   }, [householdId, initialize]);
+
+  // Refresh data when screen comes into focus
+  React.useEffect(() => {
+    if (isFocused && isInitialized && householdId) {
+      console.log('[Shopping] Screen focused, refreshing data...');
+      loadFromSupabase();
+    }
+  }, [isFocused, isInitialized, householdId, loadFromSupabase]);
 
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -445,13 +455,16 @@ export const SimpleShoppingListScreen: React.FC = () => {
 
       lastSubmitRef.current = { text: trimmedText, time: now };
 
+      // Clear input BEFORE adding to prevent double-showing
+      setNewItemText('');
+
       await addItem({
         name: trimmedText,
         quantity: 1,
         unit: 'pieces',
         category: 'Other',
       });
-      setNewItemText('');
+
       // Keep add mode active and input focused for continuous entry
       setIsAddingNew(true);
       // Scroll to bottom to keep input visible after adding item
@@ -659,7 +672,16 @@ export const SimpleShoppingListScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-          {filteredItems.map((item) => (
+          {filteredItems.length === 0 && !isAddingNew ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>🛒</Text>
+              <Text style={styles.emptyText}>Your shopping list is empty</Text>
+              <Text style={styles.emptySubtext}>
+                Add ingredients from recipes or tap + below to add items
+              </Text>
+            </View>
+          ) : (
+            filteredItems.map((item) => (
             <InlineItem
               key={item.id}
               item={item}
@@ -674,9 +696,11 @@ export const SimpleShoppingListScreen: React.FC = () => {
               onEditingChange={setEditingItemId}
               isAddingNew={isAddingNew}
             />
-          ))}
+          ))
+          )}
 
-          {/* Tap-to-add area */}
+          {/* Tap-to-add area - only show if there are items or actively adding */}
+          {(filteredItems.length > 0 || isAddingNew) && (
           <Pressable style={[styles.addArea, isAddingNew && { paddingTop: 0 }]} onPress={handleAddArea}>
             {isAddingNew ? (
               <View style={styles.itemRow}>
@@ -703,6 +727,7 @@ export const SimpleShoppingListScreen: React.FC = () => {
               <Text style={styles.addPrompt}>Tap to add item...</Text>
             )}
           </Pressable>
+          )}
           </ScrollView>
         </Pressable>
       </KeyboardAvoidingView>
@@ -967,5 +992,25 @@ const styles = StyleSheet.create({
   syncError: {
     fontSize: 12,
     color: theme.colors.error,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: theme.spacing.xl * 3,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: theme.spacing.md,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
   },
 });

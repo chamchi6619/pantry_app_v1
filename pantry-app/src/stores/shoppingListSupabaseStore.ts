@@ -91,7 +91,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
   persist(
     (set, get) => ({
       // Initial state
-      items: FEATURE_FLAGS.SYNC_SHOPPING ? [] : getMockItems(),
+      items: FEATURE_FLAGS.SYNC_MODE_SHOPPING !== 'off' ? [] : getMockItems(),
       activeListId: null,
       searchQuery: '',
       showChecked: true,
@@ -113,7 +113,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
       initialize: async (householdId: string) => {
         set({ householdId, isLoading: true, syncError: null });
 
-        if (!FEATURE_FLAGS.SYNC_SHOPPING) {
+        if (FEATURE_FLAGS.SYNC_MODE_SHOPPING === 'off') {
           // Use mock data if sync is disabled
           set({ items: getMockItems(), isLoading: false });
           return;
@@ -132,7 +132,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
       // Load items from Supabase
       loadFromSupabase: async () => {
         const { householdId } = get();
-        if (!householdId || !FEATURE_FLAGS.SYNC_SHOPPING) return;
+        if (!householdId || FEATURE_FLAGS.SYNC_MODE_SHOPPING === 'off') return;
 
         set({ isLoading: true, syncError: null });
 
@@ -170,7 +170,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
             .from('shopping_list_items')
             .select('*')
             .eq('list_id', listData.id)
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: true });
 
           if (itemsError) throw itemsError;
 
@@ -211,13 +211,13 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
           id: tempId,
           checked: false,
           addedAt: new Date().toISOString(),
-          syncStatus: FEATURE_FLAGS.SYNC_SHOPPING ? 'pending' : 'synced',
+          syncStatus: FEATURE_FLAGS.SYNC_MODE_SHOPPING !== 'off' ? 'pending' : 'synced',
         };
 
         // Update local state immediately
         set({ items: [...items, newItem] });
 
-        if (!FEATURE_FLAGS.SYNC_SHOPPING || !activeListId) {
+        if (FEATURE_FLAGS.SYNC_MODE_SHOPPING === 'off' || !activeListId) {
           // If sync is disabled, just use local ID
           newItem.id = Date.now().toString();
           newItem.syncStatus = 'synced';
@@ -238,7 +238,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
               unit: itemData.unit,
               category: itemData.category,
               notes: itemData.notes,
-              status: 'pending',
+              checked: false,  // Write to 'checked', 'status' is auto-generated
             })
             .select()
             .single();
@@ -295,7 +295,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
               id: `temp-${timestamp}-${index}`,
               checked: false,
               addedAt: new Date().toISOString(),
-              syncStatus: FEATURE_FLAGS.SYNC_SHOPPING ? 'pending' : 'synced',
+              syncStatus: FEATURE_FLAGS.SYNC_MODE_SHOPPING !== 'off' ? 'pending' : 'synced',
             });
           }
         });
@@ -305,7 +305,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
         // Update local state immediately
         set({ items: [...existingItems, ...newItems] });
 
-        if (!FEATURE_FLAGS.SYNC_SHOPPING || !activeListId) {
+        if (FEATURE_FLAGS.SYNC_MODE_SHOPPING === 'off' || !activeListId) {
           // If sync is disabled, just use local IDs
           const localItems = newItems.map((item, index) => ({
             ...item,
@@ -330,7 +330,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
                 unit: item.unit,
                 category: item.category,
                 notes: item.notes,
-                status: 'pending',
+                checked: false,  // Write to 'checked', 'status' is auto-generated
               }))
             )
             .select();
@@ -369,13 +369,13 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
               ? {
                   ...item,
                   ...updates,
-                  syncStatus: FEATURE_FLAGS.SYNC_SHOPPING ? 'pending' : 'synced',
+                  syncStatus: FEATURE_FLAGS.SYNC_MODE_SHOPPING !== 'off' ? 'pending' : 'synced',
                 }
               : item
           ),
         });
 
-        if (!FEATURE_FLAGS.SYNC_SHOPPING || !activeListId) return;
+        if (FEATURE_FLAGS.SYNC_MODE_SHOPPING === 'off' || !activeListId) return;
 
         // Sync to Supabase
         set({ isSyncing: true });
@@ -389,7 +389,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
               unit: updates.unit,
               category: updates.category,
               notes: updates.notes,
-              status: updates.checked ? 'done' : 'pending',
+              checked: updates.checked ?? undefined,  // Write to 'checked', 'status' is auto-generated
             })
             .eq('id', id);
 
@@ -438,7 +438,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
         // Optimistic delete
         set({ items: items.filter(item => item.id !== id) });
 
-        if (!FEATURE_FLAGS.SYNC_SHOPPING || !activeListId) return;
+        if (FEATURE_FLAGS.SYNC_MODE_SHOPPING === 'off' || !activeListId) return;
 
         // Sync to Supabase
         set({ isSyncing: true });
@@ -475,7 +475,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
         // Optimistic update
         set({ items: items.filter(item => !item.checked) });
 
-        if (!FEATURE_FLAGS.SYNC_SHOPPING) return;
+        if (FEATURE_FLAGS.SYNC_MODE_SHOPPING === 'off') return;
 
         // Delete all checked items from Supabase
         for (const item of checkedItems) {
@@ -520,7 +520,7 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
       // Sync pending items
       syncPendingItems: async () => {
         const { items, activeListId } = get();
-        if (!activeListId || !FEATURE_FLAGS.SYNC_SHOPPING) return;
+        if (!activeListId || FEATURE_FLAGS.SYNC_MODE_SHOPPING === 'off') return;
 
         const pendingItems = items.filter(item => item.syncStatus === 'pending' || item.syncStatus === 'error');
         if (pendingItems.length === 0) return;
