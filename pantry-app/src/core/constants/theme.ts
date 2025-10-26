@@ -40,6 +40,13 @@ export const theme = {
     success: '#10B981',
     error: '#EF4444',
     info: '#3B82F6',
+
+    // Pantry match colors (for meal planning)
+    pantryMatch: {
+      high: '#10B981',    // Green for 70%+ match
+      medium: '#F59E0B',  // Yellow for 40-69% match
+      low: '#EF4444',     // Red for <40% match
+    },
   },
 
   spacing: {

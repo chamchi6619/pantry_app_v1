@@ -9,12 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { AuthScreen } from '../features/auth/screens/AuthScreen';
 import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
 import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleShoppingListScreen';
-// import { EnhancedRecipesScreen } from '../features/recipes/screens/EnhancedRecipesScreen';
-// import { SimpleRecipesScreen } from '../features/recipes/screens/SimpleRecipesScreen';
-// import { ExploreRecipesScreen } from '../features/recipes/screens/ExploreRecipesScreen'; // OLD - Python backend
 import { ExploreRecipesScreenSupabase } from '../features/recipes/screens/ExploreRecipesScreenSupabase';
-import { RecipeDetailScreen } from '../features/recipes/screens/RecipeDetailScreen';
-import { RecipeFormScreen } from '../features/recipes/screens/RecipeFormScreen';
 import { ScannerScreen } from '../features/scanner/screens/ScannerScreen';
 import { FixQueueScreen } from '../features/receipt/screens/FixQueueScreen';
 import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
@@ -25,6 +20,7 @@ import { ShareHandlerScreen } from '../screens/ShareHandlerScreen';
 import { SavedRecipesScreen } from '../screens/SavedRecipesScreen';
 import { SocialRecipesTestScreen } from '../screens/SocialRecipesTestScreen';
 import BrowsePlatformsScreen from '../screens/BrowsePlatformsScreen';
+import MealPlanningScreen from '../features/meal-planning/screens/MealPlanningScreen';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -74,10 +70,9 @@ const RecipeStack = () => (
   >
     <Stack.Screen name="RecipeList" component={ExploreRecipesScreenSupabase} />
     <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} />
+    <Stack.Screen name="MealPlanning" component={MealPlanningScreen} />
     <Stack.Screen name="SocialRecipesTest" component={SocialRecipesTestScreen} />
     <Stack.Screen name="BrowsePlatforms" component={BrowsePlatformsScreen} />
-    <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
-    <Stack.Screen name="RecipeForm" component={RecipeFormScreen} />
   </Stack.Navigator>
 );
 
