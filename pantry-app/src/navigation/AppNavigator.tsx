@@ -18,9 +18,10 @@ import PasteLinkScreen from '../screens/PasteLinkScreen';
 import { CookCardScreen } from '../screens/CookCardScreen';
 import { ShareHandlerScreen } from '../screens/ShareHandlerScreen';
 import { SavedRecipesScreen } from '../screens/SavedRecipesScreen';
-import { SocialRecipesTestScreen } from '../screens/SocialRecipesTestScreen';
 import BrowsePlatformsScreen from '../screens/BrowsePlatformsScreen';
 import MealPlanningScreen from '../features/meal-planning/screens/MealPlanningScreen';
+import RecipesTabbedScreen from '../features/queue/screens/RecipesTabbedScreen';
+import RecipesHeroScreen from '../features/queue/screens/RecipesHeroScreen';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -68,11 +69,12 @@ const RecipeStack = () => (
       headerShown: false,
     }}
   >
-    <Stack.Screen name="RecipeList" component={ExploreRecipesScreenSupabase} />
+    <Stack.Screen name="RecipeList" component={RecipesHeroScreen} />
     <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} />
+    <Stack.Screen name="Recipes" component={RecipesTabbedScreen} />
     <Stack.Screen name="MealPlanning" component={MealPlanningScreen} />
-    <Stack.Screen name="SocialRecipesTest" component={SocialRecipesTestScreen} />
     <Stack.Screen name="BrowsePlatforms" component={BrowsePlatformsScreen} />
+    <Stack.Screen name="ExploreVersions" component={ExploreRecipesScreenSupabase} />
   </Stack.Navigator>
 );
 

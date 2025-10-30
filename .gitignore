@@ -32,6 +32,10 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
+backend/.env
+pantry-app/.env
+scripts/.env
 
 # typescript
 *.tsbuildinfo
@@ -48,6 +52,9 @@ src/services/realOcrService.ts
 
 # Archive directories (historical context only)
 archive/
+**/archived/
+**/*DEPRECATED*
+**/DEPRECATED_*
 
 # Large data files
 *.json
@@ -70,3 +77,13 @@ nohup.out
 # Temporary files
 .temp/
 .cache/
+
+# Test files and directories
+**/__tests__/
+**/test*.ts
+**/test*.tsx
+**/test*.js
+**/test*.cjs
+*Test*.tsx
+scripts/test_*
+test/
