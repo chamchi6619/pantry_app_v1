@@ -189,12 +189,12 @@ export const useInventorySupabaseStore = create<InventoryState>()(
       addItem: async (item) => {
         const { householdId, items } = get();
 
-        // ✅ CLIENT-SIDE CANONICAL MATCHING
+        // ✅ CLIENT-SIDE CANONICAL MATCHING (inventory-only)
         const match = await matchIngredient(item.name);
 
         const itemName = match?.canonical_name || item.name;
-        const canonical_item_id = match?.canonical_item_id || item.canonicalItemId || null;
-        const normalized_name = match?.normalized_name || item.normalized || null;
+        const canonical_item_id = match?.canonical_item_id || null;
+        const normalized_name = match?.normalized_name || null;
 
         if (match) {
           console.log(`🔍 Matched "${item.name}" → "${match.canonical_name}" (${match.canonical_item_id})`);
@@ -231,7 +231,7 @@ export const useInventorySupabaseStore = create<InventoryState>()(
         set({ isSyncing: true });
 
         try {
-          // Call add-to-pantry Edge Function for canonical matching
+          // Call add-to-pantry Edge Function with matched canonical_item_id
           const { data: response, error: edgeFunctionError } = await supabase.functions.invoke('add-to-pantry', {
             body: {
               household_id: householdId,
@@ -243,8 +243,7 @@ export const useInventorySupabaseStore = create<InventoryState>()(
               notes: item.notes,
               expiry_date: item.expirationDate,
               source: 'manual',
-              canonical_item_id,  // ✅ Pass matched canonical ID
-              normalized_name,    // ✅ Pass normalized name
+              canonical_item_id,  // ✅ Pass matched canonical ID (or null)
             },
           });
 

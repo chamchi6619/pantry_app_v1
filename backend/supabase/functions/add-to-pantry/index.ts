@@ -272,8 +272,7 @@ interface AddToPantryRequest {
   expiry_date?: string;
   added_by?: string;
   source?: string;
-  canonical_item_id?: string | null;  // Pre-matched canonical ID (from recipes/shopping list)
-  normalized_name?: string | null;    // Pre-normalized name
+  canonical_item_id?: string | null;  // Pre-matched canonical ID from client-side matching
 }
 
 interface AddToPantryResponse {
@@ -317,8 +316,7 @@ Deno.serve(async (req) => {
       expiry_date,
       added_by,
       source = 'manual',
-      canonical_item_id: provided_canonical_id,
-      normalized_name
+      canonical_item_id: provided_canonical_id
     } = requestData;
 
     console.log(`\n📦 Add to Pantry - v2 (canonical passthrough)`);
