@@ -186,8 +186,6 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
               addedAt: item.created_at,
               checkedAt: item.status === 'done' ? item.updated_at : undefined,
               listId: item.list_id,
-              canonical_item_id: item.canonical_item_id,
-              normalized_name: item.normalized_name,
               syncStatus: 'synced',
               lastSyncedAt: new Date().toISOString(),
             }));

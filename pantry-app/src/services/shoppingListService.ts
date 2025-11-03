@@ -17,17 +17,22 @@ export interface ShoppingListItem {
   recipe_name?: string;
 }
 
+export interface IngredientToAdd {
+  name: string;
+  is_optional?: boolean;
+}
+
 /**
  * Add ingredients to shopping list
  *
- * @param ingredients - Array of ingredient names to add
+ * @param ingredients - Array of ingredient objects or names to add
  * @param householdId - Household ID
  * @param recipeId - Optional recipe ID (for tracking)
  * @param recipeName - Optional recipe name (for display)
  * @returns Number of items added
  */
 export async function addIngredientsToShoppingList(
-  ingredients: string[],
+  ingredients: (string | IngredientToAdd)[],
   householdId: string,
   recipeId?: string,
   recipeName?: string
@@ -81,8 +86,13 @@ export async function addIngredientsToShoppingList(
       (existingItems || []).map(item => item.name.toLowerCase().trim())
     );
 
-    const newIngredients = ingredients.filter(
-      ing => !existingNames.has(ing.toLowerCase().trim())
+    // Normalize ingredients to objects
+    const ingredientObjects: IngredientToAdd[] = ingredients.map(ing =>
+      typeof ing === 'string' ? { name: ing } : ing
+    );
+
+    const newIngredients = ingredientObjects.filter(
+      ing => !existingNames.has(ing.name.toLowerCase().trim())
     );
 
     const duplicates = ingredients.length - newIngredients.length;
@@ -91,14 +101,15 @@ export async function addIngredientsToShoppingList(
       return { added: 0, duplicates };
     }
 
-    // Insert new items
-    const itemsToInsert = newIngredients.map(name => ({
+    // Insert new items (use 'checked' column - 'status' is auto-generated)
+    // NOTE: canonical matching happens later when items are moved to inventory
+    const itemsToInsert = newIngredients.map(ing => ({
       list_id: listId,
-      name: name.trim(),
+      name: ing.name.trim(),  // Preserve exact ingredient text from recipe
       quantity: 1,
       unit: 'item',
       category: null,
-      checked: false,
+      checked: false,  // Database auto-generates 'status' from this boolean
       recipe_id: recipeId || null,
       recipe_name: recipeName || null,
     }));
@@ -168,7 +179,7 @@ export async function addItemToShoppingList(
         quantity: item.quantity || 1,
         unit: item.unit || 'item',
         category: item.category || null,
-        checked: false,
+        checked: false,  // Database auto-generates 'status' from this boolean
         recipe_id: item.recipe_id || null,
         recipe_name: item.recipe_name || null,
       })
@@ -180,6 +191,66 @@ export async function addItemToShoppingList(
     return data.id;
   } catch (error) {
     console.error('Failed to add item to shopping list:', error);
+    throw error;
+  }
+}
+
+/**
+ * Add all ingredients from a cook card to shopping list
+ * Useful for meal planning - adds all ingredients from a recipe
+ *
+ * @param cookCardId - Cook card ID
+ * @param householdId - Household ID
+ * @param userId - User ID (for tracking)
+ * @returns Number of items added and duplicates skipped
+ */
+export async function addRecipeIngredientsToShoppingList(
+  cookCardId: string,
+  householdId: string,
+  userId: string
+): Promise<{ added: number; duplicates: number }> {
+  try {
+    // Fetch cook card details for recipe name
+    const { data: cookCard, error: cookCardError } = await supabase
+      .from('cook_cards')
+      .select('title')
+      .eq('id', cookCardId)
+      .single();
+
+    if (cookCardError) throw cookCardError;
+
+    // Fetch ingredients for this cook card
+    const { data: ingredients, error: ingredientsError } = await supabase
+      .from('cook_card_ingredients')
+      .select('ingredient_name, amount, unit')
+      .eq('cook_card_id', cookCardId);
+
+    if (ingredientsError) throw ingredientsError;
+
+    if (!ingredients || ingredients.length === 0) {
+      console.warn(`No ingredients found for cook card ${cookCardId}`);
+      return { added: 0, duplicates: 0 };
+    }
+
+    // Format ingredient names with quantities
+    const ingredientNames = ingredients.map(ing => {
+      if (ing.amount && ing.unit) {
+        return `${ing.ingredient_name} (${ing.amount} ${ing.unit})`;
+      } else if (ing.amount) {
+        return `${ing.ingredient_name} (${ing.amount})`;
+      }
+      return ing.ingredient_name;
+    });
+
+    // Add to shopping list using existing function
+    return await addIngredientsToShoppingList(
+      ingredientNames,
+      householdId,
+      cookCardId, // recipe_id
+      cookCard.title // recipe_name
+    );
+  } catch (error) {
+    console.error('Failed to add recipe ingredients to shopping list:', error);
     throw error;
   }
 }

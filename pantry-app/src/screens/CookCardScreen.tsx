@@ -6,12 +6,12 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Linking,
   Alert,
   Modal,
-  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CookCard, PantryMatch, Ingredient } from '../types/CookCard';
 import { IngredientListItem } from '../components/cookcard/IngredientListItem';
 import { ConfidenceChip } from '../components/cookcard/ConfidenceChip';
@@ -23,7 +23,9 @@ import { supabase } from '../lib/supabase';
 interface CookCardScreenProps {
   route?: {
     params?: {
-      cookCard: CookCard;
+      cookCard?: CookCard;
+      cookCardId?: string; // ID of user's saved cook_card
+      recipeDatabaseId?: string; // ID of recipe_database recipe
       mode?: 'normal' | 'needs_ingredients';
       sessionId?: string;
     };
@@ -54,11 +56,19 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
   const { householdId, user } = useAuth();
   const userId = user?.id;
 
-  // Support both route params (from navigation) and direct props
-  const cookCard = props.route?.params?.cookCard || props.cookCard;
+  // Extract route params
+  const cookCardId = props.route?.params?.cookCardId;
+  const recipeDatabaseId = props.route?.params?.recipeDatabaseId;
   const mode = props.route?.params?.mode || props.mode || 'normal';
   const sessionId = props.route?.params?.sessionId || props.sessionId;
   const { onSave, onCook, onAddToShoppingList } = props;
+
+  // State for loaded cook card
+  const [cookCard, setCookCard] = useState<CookCard | null>(
+    props.route?.params?.cookCard || props.cookCard || null
+  );
+  const [loading, setLoading] = useState(false);
+  const [isFromDatabase, setIsFromDatabase] = useState(!!recipeDatabaseId);
 
   // Add close button to header (modal presentation)
   useLayoutEffect(() => {
@@ -78,118 +88,235 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
     });
   }, [navigation]);
 
-  if (!cookCard) {
-    return (
-      <View style={styles.container}>
-        <Text>Error: No Cook Card data provided</Text>
-      </View>
-    );
-  }
-  const [allowSubstitutions, setAllowSubstitutions] = useState(true);
+  // Load cook card data if IDs provided
+  useEffect(() => {
+    const loadCookCard = async () => {
+      if (cookCard) return; // Already have cook card from props
+
+      if (!cookCardId && !recipeDatabaseId) {
+        console.error('[CookCard] No cook card, cookCardId, or recipeDatabaseId provided');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        if (recipeDatabaseId) {
+          // Load from recipe_database
+          console.log('[CookCard] Loading recipe from database:', recipeDatabaseId.substring(0, 8));
+          const { data: recipe, error } = await supabase
+            .from('recipe_database')
+            .select(`
+              *,
+              ingredients:recipe_database_ingredients(*),
+              instructions:recipe_database_instructions(*)
+            `)
+            .eq('id', recipeDatabaseId)
+            .single();
+
+          if (error) throw error;
+          if (!recipe) throw new Error('Recipe not found');
+
+          console.log('[CookCard] Loaded recipe:', {
+            id: recipe.id.substring(0, 8),
+            title: recipe.title,
+            ingredientCount: recipe.ingredients?.length || 0,
+            instructionCount: recipe.instructions?.length || 0
+          });
+
+          // Transform to CookCard format
+          const transformedCookCard: CookCard = {
+            id: recipe.id,
+            version: '1.0',
+            source: {
+              url: recipe.source_url || '',
+              platform: (recipe.platform as Platform) || 'web',
+              creator: {
+                name: recipe.creator_name || 'Pantry App',
+                handle: recipe.creator_name || undefined,
+                avatar_url: undefined,
+                verified: false,
+              },
+            },
+            title: recipe.title,
+            description: recipe.description || undefined,
+            image_url: recipe.image_url || undefined,
+            prep_time_minutes: recipe.prep_time_minutes || undefined,
+            cook_time_minutes: recipe.cook_time_minutes || undefined,
+            total_time_minutes: recipe.total_time_minutes || undefined,
+            servings: recipe.servings || undefined,
+            instructions: recipe.instructions && recipe.instructions.length > 0
+              ? {
+                  type: 'steps',
+                  steps: recipe.instructions
+                    .sort((a: any, b: any) => a.step_number - b.step_number)
+                    .map((step: any) => ({
+                      step_number: step.step_number,
+                      instruction: step.instruction_text,
+                    })),
+                }
+              : {
+                  type: 'link_only',
+                },
+            ingredients: (recipe.ingredients || []).map((ing: any, index: number) => ({
+              name: ing.ingredient_name,
+              normalized_name: ing.normalized_name || undefined,
+              canonical_item_id: ing.canonical_item_id || undefined,
+              amount: ing.amount || undefined,
+              unit: ing.unit || undefined,
+              preparation: ing.preparation || undefined,
+              confidence: 1.0,
+              provenance: 'creator_provided' as IngredientProvenance,
+              sort_order: ing.sort_order || index,
+              is_optional: ing.is_optional || false,
+            })),
+            extraction: {
+              method: 'metadata',
+              confidence: 1.0,
+              version: 'recipe_database',
+              timestamp: recipe.created_at,
+              cost_cents: 0,
+            },
+            created_at: recipe.created_at,
+            updated_at: recipe.updated_at || recipe.created_at,
+          };
+
+          setCookCard(transformedCookCard);
+          setIsFromDatabase(true);
+        } else if (cookCardId) {
+          // Load from cook_cards (user's saved recipes)
+          const { data: card, error } = await supabase
+            .from('cook_cards')
+            .select('cook_card_data')
+            .eq('id', cookCardId)
+            .single();
+
+          if (error) throw error;
+          if (!card) throw new Error('Cook card not found');
+
+          setCookCard(card.cook_card_data as CookCard);
+          setIsFromDatabase(false);
+        }
+      } catch (error) {
+        console.error('[CookCard] Error loading cook card:', error);
+        Alert.alert('Error', 'Failed to load recipe');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCookCard();
+  }, [cookCardId, recipeDatabaseId, cookCard]);
+
   const [pantryMatch, setPantryMatch] = useState<PantryMatch | null>(null);
   const [saved, setSaved] = useState(false);
-  const [hasCooked, setHasCooked] = useState(false);
-  const [showRatingModal, setShowRatingModal] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [ratingNotes, setRatingNotes] = useState('');
+  const [showShoppingListModal, setShowShoppingListModal] = useState(false);
+  const [selectedOptionalIngredients, setSelectedOptionalIngredients] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     calculatePantryMatch();
-  }, [cookCard, allowSubstitutions]);
+  }, [cookCard]);
 
   // Default save handler if none provided
   const handleSave = async () => {
     if (onSave) {
       onSave();
-    } else {
-      // Default save behavior - save to database and log telemetry
-      try {
-        // Import services dynamically
-        const { saveCookCard } = await import('../services/cookCardService');
-        const { supabase } = await import('../lib/supabase');
+      return;
+    }
 
-        // Get user info
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          Alert.alert('Error', 'You must be logged in to save recipes');
-          return;
-        }
+    if (!cookCard) {
+      Alert.alert('Error', 'No recipe to save');
+      return;
+    }
 
-        // Get household ID (optional)
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('household_id')
-          .eq('id', user.id)
-          .single();
+    // Default save behavior - save to database and log telemetry
+    try {
+      // Import services dynamically
+      const { saveCookCard } = await import('../services/cookCardService');
+      const { supabase } = await import('../lib/supabase');
 
-        // Save to database
-        const result = await saveCookCard(
-          cookCard,
-          user.id,
-          profile?.household_id || undefined
-        );
+      // Get user info
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        Alert.alert('Error', 'You must be logged in to save recipes');
+        return;
+      }
 
-        if (result.alreadyExists) {
-          console.log('Cook Card already saved:', result.id);
-          Alert.alert(
-            'Already Saved',
-            "You've already saved this recipe!",
-            [{ text: 'OK' }]
-          );
-          // Don't change saved state - it was already saved
-          return;
-        }
+      // Get household ID (optional)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('household_id')
+        .eq('id', user.id)
+        .single();
 
-        // Only set saved if it's a new save
-        setSaved(true);
-        console.log('Cook Card saved:', result.id);
+      // Save to database
+      const result = await saveCookCard(
+        cookCard,
+        user.id,
+        profile?.household_id || undefined
+      );
 
-        // Log telemetry
-        if (sessionId) {
-          logIngressEvent({
-            sessionId,
-            eventType: 'cook_card_saved',
-            ingressMethod: mode === 'needs_ingredients' ? 'paste_link' : 'share_extension_ios',
-            platform: cookCard.source.platform as any,
-            recipeUrl: cookCard.source.url,
-            metadata: {
-              extraction_method: cookCard.extraction?.method,
-              confidence: cookCard.extraction?.confidence,
-              cook_card_id: result.id,
-            },
-          });
-        }
-
-        // Show success message and navigate back
+      if (result.alreadyExists) {
+        console.log('Cook Card already saved:', result.id);
         Alert.alert(
-          'Recipe Saved',
-          'This Cook Card has been saved to your collection.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Navigate back to recipes screen
-                if (navigation.canGoBack()) {
-                  navigation.goBack();
-                }
-              },
-            },
-          ]
-        );
-      } catch (error) {
-        console.error('Failed to save Cook Card:', error);
-        setSaved(false);
-        Alert.alert(
-          'Save Failed',
-          'Could not save recipe. Please try again.',
+          'Already Saved',
+          "You've already saved this recipe!",
           [{ text: 'OK' }]
         );
+        // Don't change saved state - it was already saved
+        return;
       }
+
+      // Only set saved if it's a new save
+      setSaved(true);
+      console.log('Cook Card saved:', result.id);
+
+      // Log telemetry
+      if (sessionId) {
+        logIngressEvent({
+          sessionId,
+          eventType: 'cook_card_saved',
+          ingressMethod: mode === 'needs_ingredients' ? 'paste_link' : 'share_extension_ios',
+          platform: cookCard.source.platform as any,
+          recipeUrl: cookCard.source.url,
+          metadata: {
+            extraction_method: cookCard.extraction?.method,
+            confidence: cookCard.extraction?.confidence,
+            cook_card_id: result.id,
+          },
+        });
+      }
+
+      // Show success message and navigate back
+      Alert.alert(
+        'Recipe Saved',
+        'This Cook Card has been saved to your collection.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate back to recipes screen
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('Failed to save Cook Card:', error);
+      setSaved(false);
+      Alert.alert(
+        'Save Failed',
+        'Could not save recipe. Please try again.',
+        [{ text: 'OK' }]
+      );
     }
   };
 
   /**
    * Handle add missing ingredients to shopping list
+   * Opens modal to let user select optional ingredients
    */
   const handleAddMissingToShoppingList = async () => {
     if (!pantryMatch || pantryMatch.need === 0) {
@@ -197,48 +324,93 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
       return;
     }
 
+    // Separate required and optional missing ingredients
+    const requiredMissing = pantryMatch.missing_ingredients.filter(ing => !ing.is_optional);
+    const optionalMissing = pantryMatch.missing_ingredients.filter(ing => ing.is_optional);
+
+    console.log('[CookCard] Shopping list breakdown:', {
+      totalMissing: pantryMatch.missing_ingredients.length,
+      requiredCount: requiredMissing.length,
+      optionalCount: optionalMissing.length,
+      optionals: optionalMissing.map(ing => ing.name),
+    });
+
+    // If no optional ingredients, add directly
+    if (optionalMissing.length === 0) {
+      console.log('[CookCard] No optionals, adding directly');
+      await confirmAddToShoppingList(requiredMissing.map(ing => ing.name));
+      return;
+    }
+
+    // Show modal for optional selection
+    console.log('[CookCard] Showing modal with optional ingredients');
+    setSelectedOptionalIngredients(new Set()); // Reset selection
+    setShowShoppingListModal(true);
+  };
+
+  /**
+   * Actually add selected ingredients to shopping list
+   */
+  const confirmAddToShoppingList = async (ingredientNames: string[]) => {
+
+    // Check if user is logged in
+    if (!userId) {
+      Alert.alert('Error', 'You must be logged in');
+      return;
+    }
+
     try {
+      let activeHouseholdId = householdId;
+
+      // If no householdId from context, try to get or create one
+      if (!activeHouseholdId) {
+        console.log('[CookCard] No householdId in context, attempting to create...');
+        const { data: newHouseholdId, error } = await supabase.rpc('get_or_create_household');
+
+        if (error || !newHouseholdId) {
+          console.error('[CookCard] Failed to get/create household:', error);
+          Alert.alert(
+            'Setup Required',
+            'Please complete your profile setup to use shopping lists. Go to Profile > Settings.'
+          );
+          return;
+        }
+
+        activeHouseholdId = newHouseholdId;
+        console.log('[CookCard] Created household:', activeHouseholdId);
+      }
+
       const { addIngredientsToShoppingList } = await import('../services/shoppingListService');
-      const { supabase } = await import('../lib/supabase');
 
-      // Get user and household
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        Alert.alert('Error', 'You must be logged in');
-        return;
-      }
+      // Map ingredient names to objects with optional flag
+      // Canonical matching will happen later when items are moved to inventory
+      const ingredientObjects = ingredientNames.map(name => {
+        const matchingIngredient = cookCard.ingredients.find(ing => ing.name === name);
+        return matchingIngredient ? {
+          name: matchingIngredient.name,
+          is_optional: matchingIngredient.is_optional
+        } : name; // Fallback to just name if not found
+      });
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('household_id')
-        .eq('id', user.id)
-        .single();
-
-      if (!profile?.household_id) {
-        Alert.alert('Error', 'Could not find your household');
-        return;
-      }
-
-      // Get missing ingredient names
-      const missingNames = pantryMatch.missing_ingredients.map(ing => ing.name);
-
-      // Add to shopping list
+      // Add to shopping list (canonical matching happens at inventory time)
       const result = await addIngredientsToShoppingList(
-        missingNames,
-        profile.household_id,
+        ingredientObjects,
+        activeHouseholdId,
         cookCard.id,
         cookCard.title
       );
 
-      // Show success
+      // Show success with navigation hint
       if (result.added > 0) {
         const message = result.duplicates > 0
-          ? `Added ${result.added} item${result.added > 1 ? 's' : ''} (${result.duplicates} already in list)`
-          : `Added ${result.added} item${result.added > 1 ? 's' : ''} to your shopping list`;
+          ? `Added ${result.added} item${result.added > 1 ? 's' : ''} to your shopping list (${result.duplicates} already in list).\n\nCheck the Shopping tab to see your list!`
+          : `Added ${result.added} item${result.added > 1 ? 's' : ''} to your shopping list!\n\nCheck the Shopping tab to see them.`;
 
-        Alert.alert('Success', message);
+        Alert.alert('✅ Success', message, [
+          { text: 'OK', style: 'default' }
+        ]);
       } else {
-        Alert.alert('Already Added', 'All items are already in your shopping list');
+        Alert.alert('Already Added', 'All items are already in your shopping list.\n\nCheck the Shopping tab to see your list.');
       }
     } catch (error) {
       console.error('Failed to add to shopping list:', error);
@@ -255,12 +427,18 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
       return;
     }
 
+    if (!cookCard) {
+      // CookCard not loaded yet
+      return;
+    }
+
     try {
       // Fetch user's pantry items
       const { data: pantryItems, error } = await supabase
         .from('pantry_items')
         .select('canonical_item_id, name')
         .eq('household_id', householdId)
+        .eq('status', 'active') // Only active items
         .gte('quantity', 0.01); // Only items with quantity > 0
 
       if (error) {
@@ -279,26 +457,40 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
         in_pantry: ing.canonical_item_id ? pantryCanonicalIds.has(ing.canonical_item_id) : false,
       }));
 
-      // Filter out optional ingredients and substitutions (if toggle is off)
+      // Filter out optional ingredients
       const requiredIngredients = updatedIngredients.filter((ing) => {
         if (ing.is_optional) return false;
-        if (!allowSubstitutions && ing.is_substitution) return false;
         return true;
       });
 
+      // Also track optional ingredients separately for shopping list modal
+      const optionalIngredients = updatedIngredients.filter((ing) => ing.is_optional);
+
       const available = requiredIngredients.filter((ing) => ing.in_pantry);
       const missing = requiredIngredients.filter((ing) => !ing.in_pantry);
+      const missingOptionals = optionalIngredients.filter((ing) => !ing.in_pantry);
+
+      // Combine all missing for shopping list (required + optional)
+      const allMissing = [...missing, ...missingOptionals];
 
       const matchPercentage =
         requiredIngredients.length > 0
           ? (available.length / requiredIngredients.length) * 100
           : 0;
 
+      console.log('[CookCard] Pantry match calculated:', {
+        total: requiredIngredients.length,
+        available: available.length,
+        missing: missing.length,
+        missingOptionals: missingOptionals.length,
+        percentage: Math.round(matchPercentage)
+      });
+
       setPantryMatch({
         have: available.length,
         need: missing.length,
         match_percentage: Math.round(matchPercentage),
-        missing_ingredients: missing,
+        missing_ingredients: allMissing, // Include both required and optional
         available_ingredients: available,
       });
 
@@ -309,65 +501,12 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
     }
   };
 
-  /**
-   * Open original recipe URL
-   */
-  const openSourceURL = () => {
-    Linking.openURL(cookCard.source.url).catch((err) =>
-      Alert.alert('Error', 'Could not open URL')
-    );
-  };
-
-  /**
-   * Mark recipe as cooked and log to meal history
-   */
-  const handleMarkAsCooked = async () => {
-    if (!userId || !householdId) {
-      Alert.alert('Error', 'You must be logged in to track meals');
-      return;
-    }
-
-    setHasCooked(true);
-    setShowRatingModal(true);
-  };
-
-  /**
-   * Submit rating and notes to meal history
-   */
-  const handleSubmitRating = async () => {
-    if (!userId || !householdId) return;
-
-    try {
-      const { error } = await supabase
-        .from('meal_history')
-        .insert({
-          user_id: userId,
-          household_id: householdId,
-          cook_card_id: cookCard.id,
-          cooked_at: new Date().toISOString(),
-          rating: rating > 0 ? rating : null,
-          notes: ratingNotes.trim() || null,
-        });
-
-      if (error) {
-        console.error('Error saving meal history:', error);
-        Alert.alert('Error', 'Failed to save cooking history');
-        return;
-      }
-
-      setShowRatingModal(false);
-      Alert.alert('Success', 'Cooking session logged! 🎉');
-    } catch (error) {
-      console.error('Error in handleSubmitRating:', error);
-      Alert.alert('Error', 'Failed to save cooking history');
-    }
-  };
 
   /**
    * Check if Cook Card requires user confirmation
    */
   const requiresConfirmation = (): boolean => {
-    return cookCard.extraction.confidence < 0.8;
+    return (cookCard.extraction?.confidence ?? 1) < 0.8;
   };
 
   /**
@@ -380,6 +519,31 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
     const mins = minutes % 60;
     return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color="#10B981" />
+        <Text style={styles.loadingText}>Loading recipe...</Text>
+      </View>
+    );
+  }
+
+  // Error state
+  if (!cookCard) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Text style={styles.errorText}>Error: No recipe data provided</Text>
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => navigation.canGoBack() && navigation.goBack()}
+        >
+          <Text style={styles.secondaryButtonText}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -406,7 +570,7 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
         <View style={styles.amberBanner}>
           <Text style={styles.amberBannerText}>
             ⚠️ We found {cookCard.ingredients.length} of ~
-            {Math.ceil(cookCard.ingredients.length / cookCard.extraction.confidence)}{' '}
+            {Math.ceil(cookCard.ingredients.length / (cookCard.extraction?.confidence ?? 1))}{' '}
             ingredients. Tap to confirm before planning.
           </Text>
         </View>
@@ -425,11 +589,6 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
             {cookCard.source.creator.name || cookCard.source.creator.handle}
             {cookCard.source.creator.verified && ' ✓'}
           </Text>
-          <TouchableOpacity onPress={openSourceURL}>
-            <Text style={styles.sourceLink}>
-              View on {cookCard.source.platform}
-            </Text>
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -469,11 +628,11 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
         )}
 
         {/* Extraction Provenance Badge */}
-        {cookCard.extraction?.sources && cookCard.extraction.sources.length > 0 && (
+        {(cookCard.extraction?.sources?.length ?? 0) > 0 && (
           <View style={styles.provenanceBadge}>
             <Ionicons name="checkmark-circle" size={14} color="#10B981" />
             <Text style={styles.provenanceText}>
-              Extracted from: {cookCard.extraction.sources.map((s: string) => s.replace(/_/g, ' ')).join(', ')}
+              Extracted from: {cookCard.extraction?.sources?.map((s: string) => s.replace(/_/g, ' ')).join(', ')}
             </Text>
           </View>
         )}
@@ -494,27 +653,6 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
             {pantryMatch.have} of {pantryMatch.have + pantryMatch.need} ingredients
             in your pantry
           </Text>
-
-          {/* Substitution Toggle */}
-          <TouchableOpacity
-            style={styles.toggleButton}
-            onPress={() => setAllowSubstitutions(!allowSubstitutions)}
-          >
-            <View
-              style={[
-                styles.toggleSwitch,
-                allowSubstitutions && styles.toggleSwitchActive,
-              ]}
-            >
-              <View
-                style={[
-                  styles.toggleKnob,
-                  allowSubstitutions && styles.toggleKnobActive,
-                ]}
-              />
-            </View>
-            <Text style={styles.toggleLabel}>Allow substitutions</Text>
-          </TouchableOpacity>
         </View>
       )}
 
@@ -568,11 +706,6 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
               </View>
             </View>
           ))}
-          <TouchableOpacity style={styles.linkButton} onPress={openSourceURL}>
-            <Text style={styles.linkButtonText}>
-              View original on {cookCard.source.platform}
-            </Text>
-          </TouchableOpacity>
         </View>
       )}
 
@@ -580,11 +713,9 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
       {cookCard.instructions.type === 'link_only' && (
         <View style={styles.instructionsSection}>
           <Text style={styles.sectionTitle}>Instructions</Text>
-          <TouchableOpacity style={styles.linkButton} onPress={openSourceURL}>
-            <Text style={styles.linkButtonText}>
-              View full recipe on {cookCard.source.platform}
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.linkOnlyMessage}>
+            Full cooking instructions are not available for this recipe.
+          </Text>
         </View>
       )}
 
@@ -632,96 +763,112 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
             <Text style={styles.secondaryButtonText}>Start Cooking</Text>
           </TouchableOpacity>
         )}
-
-        <TouchableOpacity
-          style={[
-            styles.markCookedButton,
-            hasCooked && styles.buttonDisabled,
-          ]}
-          onPress={handleMarkAsCooked}
-          disabled={hasCooked}
-        >
-          <Text style={styles.markCookedButtonText}>
-            {hasCooked ? 'Marked as Cooked ✓' : '🍳 Mark as Cooked'}
-          </Text>
-        </TouchableOpacity>
       </View>
 
       {/* Extraction Metadata (Debug) */}
       <View style={styles.debugSection}>
         <Text style={styles.debugTitle}>Extraction Info</Text>
         <Text style={styles.debugText}>
-          Method: {cookCard.extraction.method}
+          Method: {cookCard.extraction?.method ?? 'N/A'}
         </Text>
         <Text style={styles.debugText}>
-          Confidence: {Math.round(cookCard.extraction.confidence * 100)}%
+          Confidence: {Math.round((cookCard.extraction?.confidence ?? 1) * 100)}%
         </Text>
         <Text style={styles.debugText}>
-          Version: {cookCard.extraction.version}
+          Version: {cookCard.extraction?.version ?? 'N/A'}
         </Text>
-        {cookCard.extraction.cost_cents > 0 && (
+        {(cookCard.extraction?.cost_cents ?? 0) > 0 && (
           <Text style={styles.debugText}>
-            Cost: ${(cookCard.extraction.cost_cents / 100).toFixed(3)}
+            Cost: ${((cookCard.extraction?.cost_cents ?? 0) / 100).toFixed(3)}
           </Text>
         )}
       </View>
 
-      {/* Rating Modal */}
+      {/* Shopping List Selection Modal */}
       <Modal
-        visible={showRatingModal}
+        visible={showShoppingListModal}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowRatingModal(false)}
+        onRequestClose={() => setShowShoppingListModal(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>How was it?</Text>
-            <Text style={styles.modalSubtitle}>{cookCard.title}</Text>
+            <Text style={styles.modalTitle}>Add to Shopping List</Text>
+            <Text style={styles.modalSubtitle}>Select ingredients to add</Text>
 
-            {/* Star Rating */}
-            <View style={styles.starContainer}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <TouchableOpacity
-                  key={star}
-                  onPress={() => setRating(star)}
-                  style={styles.starButton}
-                >
-                  <Text style={styles.starText}>
-                    {star <= rating ? '⭐' : '☆'}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <ScrollView style={styles.ingredientScrollView}>
+              {/* Required Ingredients */}
+              {pantryMatch && pantryMatch.missing_ingredients.filter(ing => !ing.is_optional).length > 0 && (
+                <>
+                  <Text style={styles.ingredientSectionTitle}>Required</Text>
+                  {pantryMatch.missing_ingredients.filter(ing => !ing.is_optional).map((ingredient) => (
+                    <View key={ingredient.name} style={styles.ingredientCheckboxRow}>
+                      <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+                      <Text style={styles.ingredientCheckboxLabel}>{ingredient.name}</Text>
+                    </View>
+                  ))}
+                </>
+              )}
 
-            {/* Notes Input */}
-            <TextInput
-              style={styles.notesInput}
-              placeholder="Add notes (optional)"
-              placeholderTextColor="#9CA3AF"
-              value={ratingNotes}
-              onChangeText={setRatingNotes}
-              multiline
-              numberOfLines={3}
-            />
+              {/* Optional Ingredients */}
+              {pantryMatch && pantryMatch.missing_ingredients.filter(ing => ing.is_optional).length > 0 && (
+                <>
+                  <Text style={styles.ingredientSectionTitle}>Optional (select if desired)</Text>
+                  {pantryMatch.missing_ingredients.filter(ing => ing.is_optional).map((ingredient) => (
+                    <TouchableOpacity
+                      key={ingredient.name}
+                      style={styles.ingredientCheckboxRow}
+                      onPress={() => {
+                        const newSelected = new Set(selectedOptionalIngredients);
+                        if (newSelected.has(ingredient.name)) {
+                          newSelected.delete(ingredient.name);
+                        } else {
+                          newSelected.add(ingredient.name);
+                        }
+                        setSelectedOptionalIngredients(newSelected);
+                      }}
+                    >
+                      <Ionicons
+                        name={selectedOptionalIngredients.has(ingredient.name) ? 'checkbox' : 'square-outline'}
+                        size={20}
+                        color={selectedOptionalIngredients.has(ingredient.name) ? '#10B981' : '#9CA3AF'}
+                      />
+                      <Text style={styles.ingredientCheckboxLabel}>{ingredient.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </>
+              )}
+            </ScrollView>
 
             {/* Action Buttons */}
             <View style={styles.modalActions}>
               <TouchableOpacity
                 style={styles.modalCancelButton}
-                onPress={() => {
-                  setShowRatingModal(false);
-                  setRating(0);
-                  setRatingNotes('');
-                }}
+                onPress={() => setShowShoppingListModal(false)}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.modalSubmitButton}
-                onPress={handleSubmitRating}
+                onPress={async () => {
+                  if (!pantryMatch) return;
+
+                  // Combine required and selected optional ingredients
+                  const requiredNames = pantryMatch.missing_ingredients
+                    .filter(ing => !ing.is_optional)
+                    .map(ing => ing.name);
+                  const selectedOptionalNames = Array.from(selectedOptionalIngredients);
+                  const allIngredients = [...requiredNames, ...selectedOptionalNames];
+
+                  setShowShoppingListModal(false);
+                  await confirmAddToShoppingList(allIngredients);
+                }}
               >
-                <Text style={styles.modalSubmitText}>Save</Text>
+                <Text style={styles.modalSubmitText}>Add {
+                  (pantryMatch?.missing_ingredients.filter(ing => !ing.is_optional).length || 0) +
+                  selectedOptionalIngredients.size
+                } items</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -735,6 +882,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#EF4444',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   closeButton: {
     position: 'absolute',
@@ -978,6 +1141,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  linkOnlyMessage: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
   actions: {
     padding: 16,
     gap: 12,
@@ -1127,5 +1296,30 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  ingredientScrollView: {
+    maxHeight: 300,
+    marginBottom: 20,
+  },
+  ingredientSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginTop: 12,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  ingredientCheckboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+  },
+  ingredientCheckboxLabel: {
+    fontSize: 16,
+    color: '#111827',
+    marginLeft: 12,
+    flex: 1,
   },
 });
