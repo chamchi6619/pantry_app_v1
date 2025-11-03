@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { FEATURE_FLAGS } from '../config/featureFlags';
 import { smartSyncService } from '../services/smartSyncService';
+import { matchIngredient } from '../services/ingredientMatcher';
 
 export interface InventoryItem {
   id: string;
@@ -188,10 +189,24 @@ export const useInventorySupabaseStore = create<InventoryState>()(
       addItem: async (item) => {
         const { householdId, items } = get();
 
+        // ✅ CLIENT-SIDE CANONICAL MATCHING
+        const match = await matchIngredient(item.name);
+
+        const itemName = match?.canonical_name || item.name;
+        const canonical_item_id = match?.canonical_item_id || item.canonicalItemId || null;
+        const normalized_name = match?.normalized_name || item.normalized || null;
+
+        if (match) {
+          console.log(`🔍 Matched "${item.name}" → "${match.canonical_name}" (${match.canonical_item_id})`);
+        }
+
         // Create optimistic item
         const tempId = `temp-${Date.now()}`;
         const newItem: InventoryItem = {
           ...item,
+          name: itemName,  // Use canonical name if matched
+          canonicalItemId: canonical_item_id,
+          normalized: normalized_name,
           id: tempId,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -220,7 +235,7 @@ export const useInventorySupabaseStore = create<InventoryState>()(
           const { data: response, error: edgeFunctionError } = await supabase.functions.invoke('add-to-pantry', {
             body: {
               household_id: householdId,
-              name: item.name,
+              name: itemName,  // Use matched canonical name
               quantity: item.quantity,
               unit: item.unit,
               location: item.location,
@@ -228,6 +243,8 @@ export const useInventorySupabaseStore = create<InventoryState>()(
               notes: item.notes,
               expiry_date: item.expirationDate,
               source: 'manual',
+              canonical_item_id,  // ✅ Pass matched canonical ID
+              normalized_name,    // ✅ Pass normalized name
             },
           });
 

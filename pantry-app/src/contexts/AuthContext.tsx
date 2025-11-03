@@ -7,6 +7,7 @@ import { syncService } from '../services/supabaseSync';
 import { useReceiptStore } from '../stores/receiptStore';
 import { useInventoryStore } from '../stores/inventoryStore';
 import { useShoppingListStore } from '../stores/shoppingListStore';
+import { canonicalItemsService } from '../services/canonicalItemsService';
 
 interface AuthContextType {
   session: Session | null;
@@ -59,6 +60,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('[Auth] Starting initialization...');
 
+      // Initialize canonical items service in background (for ingredient matching)
+      canonicalItemsService.initialize().catch(err =>
+        console.warn('[Auth] Failed to initialize canonical items:', err)
+      );
+
       // Check for existing session
       const { data: { session }, error } = await supabase.auth.getSession();
 
@@ -86,10 +92,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session.user);
         await initializeUserData(session.user.id);
+        // Set initialized after user data is loaded
+        setIsInitialized(true);
+        setLoading(false);
       } else {
         // No session, user needs to sign in
         console.log('[Auth] No session, setting initialized');
         setIsInitialized(true);
+        setLoading(false);
       }
 
       // Listen for auth changes
@@ -110,10 +120,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
       );
-
-      // Always set initialized at the end of auth setup
-      setIsInitialized(true);
-      setLoading(false);
 
       return () => subscription.unsubscribe();
     } catch (error) {
@@ -144,8 +150,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Fetch user's household
-      const household = await fetchUserHousehold(userId);
+      let household = await fetchUserHousehold(userId);
       console.log(`[Auth] Fetched household: ${household} for user: ${userId}`);
+
+      // If no household exists, force create one
+      if (!household) {
+        console.log(`[Auth] No household found, creating one...`);
+        const { data: newHousehold, error } = await supabase.rpc('get_or_create_household');
+        if (!error && newHousehold) {
+          household = newHousehold;
+          console.log(`[Auth] Created household: ${household}`);
+        } else {
+          console.error(`[Auth] Failed to create household:`, error);
+        }
+      }
+
       if (household) {
         setHouseholdId(household);
 
@@ -154,8 +173,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log(`[Auth] Sync modes enabled, initializing sync...`);
           await initializeSync();
         }
-      } else {
-        console.log(`[Auth] No household found for user ${userId}`);
       }
 
       setIsInitialized(true);

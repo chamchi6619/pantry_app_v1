@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { FEATURE_FLAGS } from '../config/featureFlags';
+import { matchIngredient } from '../services/ingredientMatcher';
 
 export interface ShoppingItem {
   id: string;
@@ -15,6 +16,8 @@ export interface ShoppingItem {
   addedAt: string;
   checkedAt?: string;
   listId?: string;
+  canonical_item_id?: string | null;
+  normalized_name?: string | null;
 
   // Sync metadata
   syncStatus?: 'synced' | 'pending' | 'error';
@@ -186,6 +189,8 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
               addedAt: item.created_at,
               checkedAt: item.status === 'done' ? item.updated_at : undefined,
               listId: item.list_id,
+              canonical_item_id: item.canonical_item_id,
+              normalized_name: item.normalized_name,
               syncStatus: 'synced',
               lastSyncedAt: new Date().toISOString(),
             }));
@@ -204,10 +209,24 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
       addItem: async (itemData) => {
         const { activeListId, items } = get();
 
+        // ✅ CLIENT-SIDE CANONICAL MATCHING
+        const match = await matchIngredient(itemData.name);
+
+        const itemName = match?.canonical_name || itemData.name;
+        const canonical_item_id = match?.canonical_item_id || itemData.canonical_item_id || null;
+        const normalized_name = match?.normalized_name || itemData.normalized_name || null;
+
+        if (match) {
+          console.log(`🔍 Matched "${itemData.name}" → "${match.canonical_name}" (${match.canonical_item_id})`);
+        }
+
         // Create optimistic item
         const tempId = `temp-${Date.now()}`;
         const newItem: ShoppingItem = {
           ...itemData,
+          name: itemName,  // Use canonical name if matched
+          canonical_item_id,
+          normalized_name,
           id: tempId,
           checked: false,
           addedAt: new Date().toISOString(),
@@ -233,12 +252,14 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
             .from('shopping_list_items')
             .insert({
               list_id: activeListId,
-              name: itemData.name,
+              name: itemName,  // Use matched canonical name
               quantity: itemData.quantity,
               unit: itemData.unit,
               category: itemData.category,
               notes: itemData.notes,
               checked: false,  // Write to 'checked', 'status' is auto-generated
+              canonical_item_id,  // ✅ Store canonical ID
+              normalized_name,    // ✅ Store normalized name
             })
             .select()
             .single();
@@ -503,7 +524,8 @@ export const useShoppingListSupabaseStore = create<ShoppingListState>()(
               category: item.category,
               location: locationAssignments?.[item.id] || 'pantry',
               notes: item.notes,
-              normalized: item.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+              normalized: item.normalized_name || item.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+              canonicalItemId: item.canonical_item_id || undefined,
             });
           }
 

@@ -135,7 +135,7 @@ class CanonicalItemsService {
    */
   private transformSupabaseItem(item: CanonicalItem): CanonicalIngredient {
     return {
-      id: item.canonical_name.toLowerCase().replace(/\s+/g, '_'),
+      id: item.id, // ✅ USE DATABASE UUID, NOT CUSTOM ID!
       displayName: item.canonical_name,
       category: item.category || 'other',
       aliases: item.aliases || [],

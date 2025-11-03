@@ -7,7 +7,253 @@
  */
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { findMatch, type CanonicalItem } from '../_shared/canonicalMatcher.ts';
+
+// Inlined canonical matcher (from _shared/canonicalMatcher.ts)
+interface CanonicalItem {
+  id: string;
+  canonical_name: string;
+  aliases: string[] | null;
+  category: string | null;
+}
+
+interface MatchResult {
+  canonical_item_id: string;
+  confidence: 'exact' | 'alias' | 'fuzzy' | 'none';
+  matched_name: string;
+  score?: number;
+}
+
+function levenshtein(a: string, b: string): number {
+  const matrix: number[][] = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+function normalize(str: string): string {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/^s\s+/, '')
+    .replace(/\b(low-fat|lowfat|reduced-fat|fat-free|nonfat|non-fat)\b/gi, '')
+    .replace(/\b(low-sodium|reduced-sodium|sodium-free)\b/gi, '')
+    .replace(/\b(lite|light|reduced|part-skim|plain)\b/gi, '')
+    .replace(/\b(granny smith|gala|fuji|honeycrisp|red delicious|tart)\s+(apple)/gi, '$2')
+    .replace(/\b(kirkland|365|great value|member's mark|store brand|organic)\b/gi, '')
+    .replace(/\b(finely|coarsely|freshly|thinly|thickly|roughly|lightly)\s+/g, '')
+    .replace(/\b(chopped|sliced|diced|minced|grated|shredded|crushed|ground|whole)\b/g, '')
+    .replace(/\b(fresh|dried|frozen|canned|raw|roasted|toasted|cooked|prepared|uncooked)\b/g, '')
+    .replace(/\b(instant|quick-cooking|rapid-rise|ready-to-eat)\b/g, '')
+    .replace(/\b(bunch|sprig|sprigs|leaves|leaf|clove|cloves|head|heads|piece|pieces)\s+(of\s+)?/g, '')
+    .replace(/\b(pinch|dash|envelope|can|jar|package|box|container)\s+(of\s+)?/g, '')
+    .replace(/\b(peeled|seeded|trimmed|drained|rinsed|scrubbed|halved|quartered|pitted|cubed)\b/g, '')
+    .replace(/\b(divided|plus more|to taste|optional|if desired|if needed)\b/g, '')
+    .replace(/\s+or\s+\w+(\s+\w+)?/g, '')
+    .replace(/\([^)]*\)/g, '')
+    .replace(/\b(cup|cups|tablespoon|tablespoons|teaspoon|teaspoons|tbsp|tsp|oz|ounce|ounces|lb|pound|pounds|g|gram|grams|ml|liter|liters)\b/g, '')
+    .replace(/\b\d+(\.\d+)?\s*/g, '')
+    .replace(/[,;]+/g, ' ')
+    .replace(/\s*-\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isJunk(ingredientName: string): boolean {
+  const lower = ingredientName.toLowerCase().trim();
+  if (
+    ingredientName.startsWith('For the ') ||
+    ingredientName.startsWith('For ') ||
+    ingredientName.endsWith(':') ||
+    ingredientName.includes('Ingredient') ||
+    ingredientName.includes('Topping:') ||
+    ingredientName.includes('Salad:') ||
+    ingredientName.includes('Dressing:')
+  ) return true;
+  if (lower.length <= 2) return true;
+  if (/^[^\w]+$/.test(ingredientName)) return true;
+  if (lower === ')' || lower === '(' || lower.startsWith('s)') || lower === 'to medium') return true;
+  if (['fresh', 'grated', 'chopped', 'sliced', 'diced', 'en', 'canned', 'cubed', 'halved', 'quartered'].includes(lower)) return true;
+  if (
+    lower.includes('aluminum foil') ||
+    lower.includes('paper') ||
+    lower.includes('bamboo skewers') ||
+    lower.includes('toothpicks') ||
+    lower.includes('popsicle sticks') ||
+    lower.includes('craft sticks') ||
+    lower.includes('skewers') ||
+    lower.includes('foil')
+  ) return true;
+  if (
+    lower.includes('eating smart') ||
+    lower.includes('basic soup') ||
+    lower.includes('"logs"') ||
+    lower.includes('"bugs"')
+  ) return true;
+  if (
+    lower.startsWith('note:') ||
+    lower.includes('optional toppings') ||
+    lower.includes('necessary tools') ||
+    lower.includes('to reduce browning') ||
+    lower.includes('adjust to taste')
+  ) return true;
+  return false;
+}
+
+function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): MatchResult | null {
+  if (isJunk(ingredientName)) return null;
+  const normalized = normalize(ingredientName);
+  if (!normalized || normalized.length < 3) return null;
+
+  // 1. EXACT MATCH on canonical name
+  for (const item of canonicalItems) {
+    if (normalize(item.canonical_name) === normalized) {
+      return {
+        canonical_item_id: item.id,
+        confidence: 'exact',
+        matched_name: item.canonical_name,
+        score: 100
+      };
+    }
+  }
+
+  // 2. EXACT MATCH on aliases
+  for (const item of canonicalItems) {
+    if (item.aliases) {
+      for (const alias of item.aliases) {
+        if (normalize(alias) === normalized) {
+          return {
+            canonical_item_id: item.id,
+            confidence: 'alias',
+            matched_name: item.canonical_name,
+            score: 95
+          };
+        }
+      }
+    }
+  }
+
+  // 2.5 SINGULAR/PLURAL MATCH
+  for (const item of canonicalItems) {
+    const canonicalNorm = normalize(item.canonical_name);
+    if (canonicalNorm === normalized + 's' || canonicalNorm + 's' === normalized) {
+      return {
+        canonical_item_id: item.id,
+        confidence: 'fuzzy',
+        matched_name: item.canonical_name,
+        score: 90
+      };
+    }
+    if (canonicalNorm === normalized + 'es' || canonicalNorm + 'es' === normalized) {
+      return {
+        canonical_item_id: item.id,
+        confidence: 'fuzzy',
+        matched_name: item.canonical_name,
+        score: 90
+      };
+    }
+    if (item.aliases) {
+      for (const alias of item.aliases) {
+        const aliasNorm = normalize(alias);
+        if (aliasNorm === normalized + 's' || aliasNorm + 's' === normalized) {
+          return {
+            canonical_item_id: item.id,
+            confidence: 'alias',
+            matched_name: item.canonical_name,
+            score: 88
+          };
+        }
+        if (aliasNorm === normalized + 'es' || aliasNorm + 'es' === normalized) {
+          return {
+            canonical_item_id: item.id,
+            confidence: 'alias',
+            matched_name: item.canonical_name,
+            score: 88
+          };
+        }
+      }
+    }
+  }
+
+  // 3. CONTAINS MATCH
+  for (const item of canonicalItems) {
+    const canonicalNorm = normalize(item.canonical_name);
+    if (canonicalNorm.length < 4) continue;
+    if (normalized.includes(canonicalNorm)) {
+      return {
+        canonical_item_id: item.id,
+        confidence: 'fuzzy',
+        matched_name: item.canonical_name,
+        score: 80
+      };
+    }
+    if (canonicalNorm.includes(normalized) && normalized.length >= 4) {
+      return {
+        canonical_item_id: item.id,
+        confidence: 'fuzzy',
+        matched_name: item.canonical_name,
+        score: 75
+      };
+    }
+  }
+
+  // 4. FUZZY MATCH using Levenshtein distance
+  let bestMatch: { item: CanonicalItem; distance: number; score: number } | null = null;
+  for (const item of canonicalItems) {
+    const canonicalNorm = normalize(item.canonical_name);
+    const distance = levenshtein(normalized, canonicalNorm);
+    const maxLength = Math.max(normalized.length, canonicalNorm.length);
+    const threshold = Math.ceil(maxLength * 0.3);
+    if (distance <= threshold) {
+      const score = Math.round((1 - distance / maxLength) * 70);
+      if (!bestMatch || distance < bestMatch.distance) {
+        bestMatch = { item, distance, score };
+      }
+    }
+    if (item.aliases) {
+      for (const alias of item.aliases) {
+        const aliasNorm = normalize(alias);
+        const aliasDistance = levenshtein(normalized, aliasNorm);
+        const aliasMaxLength = Math.max(normalized.length, aliasNorm.length);
+        const aliasThreshold = Math.ceil(aliasMaxLength * 0.3);
+        if (aliasDistance <= aliasThreshold) {
+          const score = Math.round((1 - aliasDistance / aliasMaxLength) * 70);
+          if (!bestMatch || aliasDistance < bestMatch.distance) {
+            bestMatch = { item, distance: aliasDistance, score };
+          }
+        }
+      }
+    }
+  }
+
+  if (bestMatch) {
+    return {
+      canonical_item_id: bestMatch.item.id,
+      confidence: 'fuzzy',
+      matched_name: bestMatch.item.canonical_name,
+      score: bestMatch.score
+    };
+  }
+
+  return null;
+}
+// End inlined canonical matcher
 
 // CORS headers
 const corsHeaders = {
@@ -26,6 +272,8 @@ interface AddToPantryRequest {
   expiry_date?: string;
   added_by?: string;
   source?: string;
+  canonical_item_id?: string | null;  // Pre-matched canonical ID (from recipes/shopping list)
+  normalized_name?: string | null;    // Pre-normalized name
 }
 
 interface AddToPantryResponse {
@@ -68,45 +316,56 @@ Deno.serve(async (req) => {
       notes,
       expiry_date,
       added_by,
-      source = 'manual'
+      source = 'manual',
+      canonical_item_id: provided_canonical_id,
+      normalized_name
     } = requestData;
 
-    console.log(`\n📦 Add to Pantry - v1`);
+    console.log(`\n📦 Add to Pantry - v2 (canonical passthrough)`);
     console.log(`   Item: "${name}"`);
     console.log(`   Household: ${household_id}`);
     console.log(`   Location: ${location}`);
-
-    // Load canonical items for matching
-    console.log('\n📚 Loading canonical items for matching...');
-    const { data: canonicalItems, error: canonicalError } = await supabase
-      .from('canonical_items')
-      .select('id, canonical_name, aliases, category');
-
-    if (canonicalError) {
-      console.error('❌ Error loading canonical items:', canonicalError);
+    if (provided_canonical_id) {
+      console.log(`   ✅ Pre-matched canonical ID: ${provided_canonical_id}`);
     }
 
-    console.log(`   Loaded ${canonicalItems?.length || 0} canonical items`);
-
     // Match item to canonical item
-    let canonical_item_id: string | null = null;
+    let canonical_item_id: string | null = provided_canonical_id || null;
     let matchInfo: any = null;
 
-    if (canonicalItems && canonicalItems.length > 0) {
-      const match = findMatch(name, canonicalItems as CanonicalItem[]);
+    // Only run matching if canonical_item_id was not provided
+    if (!provided_canonical_id) {
+      // Load canonical items for matching
+      console.log('\n📚 Loading canonical items for matching...');
+      const { data: canonicalItems, error: canonicalError } = await supabase
+        .from('canonical_items')
+        .select('id, canonical_name, aliases, category');
 
-      if (match) {
-        canonical_item_id = match.canonical_item_id;
-        matchInfo = {
-          canonical_item_id: match.canonical_item_id,
-          canonical_name: match.matched_name,
-          confidence: match.confidence,
-          score: match.score
-        };
-        console.log(`   ✓ Matched "${name}" → "${match.matched_name}" (${match.confidence}, score: ${match.score})`);
-      } else {
-        console.log(`   ✗ No canonical match for "${name}"`);
+      if (canonicalError) {
+        console.error('❌ Error loading canonical items:', canonicalError);
       }
+
+      console.log(`   Loaded ${canonicalItems?.length || 0} canonical items`);
+
+      if (canonicalItems && canonicalItems.length > 0) {
+        const match = findMatch(name, canonicalItems as CanonicalItem[]);
+
+        if (match) {
+          canonical_item_id = match.canonical_item_id;
+          matchInfo = {
+            canonical_item_id: match.canonical_item_id,
+            canonical_name: match.matched_name,
+            confidence: match.confidence,
+            score: match.score
+          };
+          console.log(`   ✓ Matched "${name}" → "${match.matched_name}" (${match.confidence}, score: ${match.score})`);
+        } else {
+          console.log(`   ✗ No canonical match for "${name}"`);
+        }
+      }
+    } else {
+      // Use provided canonical_item_id (from recipe/shopping list)
+      console.log('   ⏭️  Skipping matching - using provided canonical_item_id');
     }
 
     // Insert pantry item with canonical_item_id
