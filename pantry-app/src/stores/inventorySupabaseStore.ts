@@ -189,22 +189,24 @@ export const useInventorySupabaseStore = create<InventoryState>()(
       addItem: async (item) => {
         const { householdId, items } = get();
 
-        // ✅ CLIENT-SIDE CANONICAL MATCHING (inventory-only)
-        const match = await matchIngredient(item.name);
+        // ✅ TRUST PROVIDED CANONICAL ID (from receipt processing or other sources)
+        // Only do client-side matching if no canonical ID provided
+        let canonical_item_id = item.canonicalItemId || null;
+        let normalized_name = null;
 
-        const itemName = match?.canonical_name || item.name;
-        const canonical_item_id = match?.canonical_item_id || null;
-        const normalized_name = match?.normalized_name || null;
-
-        if (match) {
-          console.log(`🔍 Matched "${item.name}" → "${match.canonical_name}" (${match.canonical_item_id})`);
+        if (!canonical_item_id) {
+          // No canonical ID provided - client will query server for matching
+          // This is a fallback for manual adds without receipt processing
+          console.log(`ℹ️ No canonical ID provided for "${item.name}", server will match`);
+        } else {
+          console.log(`✅ Using provided canonical ID for "${item.name}": ${canonical_item_id}`);
         }
 
         // Create optimistic item
         const tempId = `temp-${Date.now()}`;
         const newItem: InventoryItem = {
           ...item,
-          name: itemName,  // Use canonical name if matched
+          name: item.name,  // ✅ PRESERVE user's exact text (don't overwrite with canonical name)
           canonicalItemId: canonical_item_id,
           normalized: normalized_name,
           id: tempId,
@@ -235,7 +237,7 @@ export const useInventorySupabaseStore = create<InventoryState>()(
           const { data: response, error: edgeFunctionError } = await supabase.functions.invoke('add-to-pantry', {
             body: {
               household_id: householdId,
-              name: itemName,  // Use matched canonical name
+              name: item.name,  // ✅ Send user's original text (not canonical name)
               quantity: item.quantity,
               unit: item.unit,
               location: item.location,

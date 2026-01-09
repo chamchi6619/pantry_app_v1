@@ -24,13 +24,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '../../../core/constants/theme';
 import { supabase } from '../../../lib/supabase';
 import { batchCalculatePantryMatch, type PantryMatchResult } from '../../../services/pantryMatchService';
+import { addToQueue, isInQueue } from '../../../services/queueService';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface RecipeBrowserModalProps {
   visible: boolean;
   onClose: () => void;
   onSelectRecipe: (cookCardId: string) => void;
   householdId: string;
-  mealType?: string; // For context in header
+  mealType?: string; // For context in header (legacy, can be removed)
+  mode?: 'queue' | 'meal_plan'; // NEW: 'queue' for adding to queue, 'meal_plan' for meal planning
 }
 
 interface CookCard {
@@ -40,7 +43,6 @@ interface CookCard {
   cook_time_minutes?: number;
   total_time_minutes?: number;
   servings?: number;
-  cuisine_type?: string;
 }
 
 type SortOption = 'match' | 'name' | 'time';
@@ -51,12 +53,15 @@ export default function RecipeBrowserModal({
   onSelectRecipe,
   householdId,
   mealType,
+  mode = 'queue', // Default to queue mode (new behavior)
 }: RecipeBrowserModalProps) {
+  const { user } = useAuth();
   const [recipes, setRecipes] = useState<CookCard[]>([]);
   const [pantryMatches, setPantryMatches] = useState<Map<string, PantryMatchResult>>(new Map());
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('match');
+  const [addingToQueue, setAddingToQueue] = useState<string | null>(null);
 
   // Fetch recipes and calculate pantry matches
   useEffect(() => {
@@ -71,7 +76,7 @@ export default function RecipeBrowserModal({
       // Fetch cook cards
       const { data, error } = await supabase
         .from('cook_cards')
-        .select('id, title, image_url, cook_time_minutes, total_time_minutes, servings, cuisine_type')
+        .select('id, title, image_url, cook_time_minutes, total_time_minutes, servings')
         .order('created_at', { ascending: false })
         .limit(100);
 
@@ -100,9 +105,7 @@ export default function RecipeBrowserModal({
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        r =>
-          r.title.toLowerCase().includes(query) ||
-          r.cuisine_type?.toLowerCase().includes(query)
+        r => r.title.toLowerCase().includes(query)
       );
     }
 
@@ -129,12 +132,49 @@ export default function RecipeBrowserModal({
     return sorted;
   }, [recipes, searchQuery, sortBy, pantryMatches]);
 
-  const handleSelectRecipe = (recipeId: string) => {
-    onSelectRecipe(recipeId);
-    onClose();
-    // Reset state
-    setSearchQuery('');
-    setSortBy('match');
+  const handleSelectRecipe = async (recipeId: string) => {
+    if (mode === 'queue') {
+      // Add to queue mode
+      if (!user) {
+        console.error('No user found');
+        return;
+      }
+
+      try {
+        setAddingToQueue(recipeId);
+
+        // Check if already in queue
+        const alreadyInQueue = await isInQueue(householdId, recipeId);
+        if (alreadyInQueue) {
+          alert('This recipe is already in your queue');
+          setAddingToQueue(null);
+          return;
+        }
+
+        // Add to queue
+        await addToQueue(user.id, householdId, recipeId, 'user');
+
+        // Success - call callback and close
+        onSelectRecipe(recipeId);
+        onClose();
+
+        // Reset state
+        setSearchQuery('');
+        setSortBy('match');
+        setAddingToQueue(null);
+      } catch (error: any) {
+        console.error('Error adding to queue:', error);
+        alert(error.message || 'Failed to add to queue');
+        setAddingToQueue(null);
+      }
+    } else {
+      // Meal plan mode (legacy)
+      onSelectRecipe(recipeId);
+      onClose();
+      // Reset state
+      setSearchQuery('');
+      setSortBy('match');
+    }
   };
 
   return (
@@ -146,8 +186,12 @@ export default function RecipeBrowserModal({
             <Ionicons name="close" size={28} color={theme.colors.textPrimary} />
           </Pressable>
           <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerTitle}>Add {mealType || 'Meal'}</Text>
-            <Text style={styles.headerSubtitle}>Choose a recipe</Text>
+            <Text style={styles.headerTitle}>
+              {mode === 'queue' ? 'Add to Queue' : `Add ${mealType || 'Meal'}`}
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              {mode === 'queue' ? 'Choose recipes to cook' : 'Choose a recipe'}
+            </Text>
           </View>
           <View style={{ width: 28 }} />
         </View>
@@ -215,6 +259,8 @@ export default function RecipeBrowserModal({
                 recipe={item}
                 pantryMatch={pantryMatches.get(item.id)}
                 onPress={() => handleSelectRecipe(item.id)}
+                isAdding={addingToQueue === item.id}
+                mode={mode}
               />
             )}
             contentContainerStyle={styles.listContent}
@@ -241,9 +287,11 @@ interface RecipeCardProps {
   recipe: CookCard;
   pantryMatch?: PantryMatchResult;
   onPress: () => void;
+  isAdding?: boolean;
+  mode?: 'queue' | 'meal_plan';
 }
 
-function RecipeCard({ recipe, pantryMatch, onPress }: RecipeCardProps) {
+function RecipeCard({ recipe, pantryMatch, onPress, isAdding, mode = 'queue' }: RecipeCardProps) {
   const matchPercent = pantryMatch?.matchPercent || 0;
   const matchColor =
     matchPercent >= 70
@@ -304,15 +352,19 @@ function RecipeCard({ recipe, pantryMatch, onPress }: RecipeCardProps) {
             </View>
           )}
         </View>
-
-        {recipe.cuisine_type && (
-          <Text style={styles.cuisineType}>{recipe.cuisine_type}</Text>
-        )}
       </View>
 
       {/* Add Button */}
       <View style={styles.addButtonContainer}>
-        <Ionicons name="add-circle" size={32} color={theme.colors.primary} />
+        {isAdding ? (
+          <ActivityIndicator size="small" color={theme.colors.primary} />
+        ) : (
+          <Ionicons
+            name={mode === 'queue' ? 'add-circle' : 'checkmark-circle'}
+            size={32}
+            color={theme.colors.primary}
+          />
+        )}
       </View>
     </Pressable>
   );

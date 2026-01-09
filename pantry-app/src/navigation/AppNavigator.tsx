@@ -13,6 +13,8 @@ import { ExploreRecipesScreenSupabase } from '../features/recipes/screens/Explor
 import { ScannerScreen } from '../features/scanner/screens/ScannerScreen';
 import { FixQueueScreen } from '../features/receipt/screens/FixQueueScreen';
 import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
+import { PrivacyPolicyScreen } from '../features/profile/screens/PrivacyPolicyScreen';
+import { TermsOfServiceScreen } from '../features/profile/screens/TermsOfServiceScreen';
 import { PurchaseHistoryScreen } from '../features/receipt/screens/PurchaseHistoryScreen';
 import PasteLinkScreen from '../screens/PasteLinkScreen';
 import { CookCardScreen } from '../screens/CookCardScreen';
@@ -22,6 +24,7 @@ import BrowsePlatformsScreen from '../screens/BrowsePlatformsScreen';
 import MealPlanningScreen from '../features/meal-planning/screens/MealPlanningScreen';
 import RecipesTabbedScreen from '../features/queue/screens/RecipesTabbedScreen';
 import RecipesHeroScreen from '../features/queue/screens/RecipesHeroScreen';
+import { RecipeListScreen } from '../features/queue/screens/RecipeListScreen';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -70,6 +73,7 @@ const RecipeStack = () => (
     }}
   >
     <Stack.Screen name="RecipeList" component={RecipesHeroScreen} />
+    <Stack.Screen name="RecipeListScreen" component={RecipeListScreen} />
     <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} />
     <Stack.Screen name="Recipes" component={RecipesTabbedScreen} />
     <Stack.Screen name="MealPlanning" component={MealPlanningScreen} />
@@ -105,6 +109,36 @@ const ProfileStack = () => (
   >
     <Stack.Screen name="ProfileMain" component={ProfileScreen} />
     <Stack.Screen name="PurchaseHistory" component={PurchaseHistoryScreen} />
+    <Stack.Screen
+      name="PrivacyPolicy"
+      component={PrivacyPolicyScreen}
+      options={{
+        headerShown: true,
+        title: 'Privacy Policy',
+        headerStyle: {
+          backgroundColor: theme.colors.background,
+        },
+        headerTintColor: theme.colors.text,
+        headerTitleStyle: {
+          fontWeight: '600',
+        },
+      }}
+    />
+    <Stack.Screen
+      name="TermsOfService"
+      component={TermsOfServiceScreen}
+      options={{
+        headerShown: true,
+        title: 'Terms of Service',
+        headerStyle: {
+          backgroundColor: theme.colors.background,
+        },
+        headerTintColor: theme.colors.text,
+        headerTitleStyle: {
+          fontWeight: '600',
+        },
+      }}
+    />
   </Stack.Navigator>
 );
 

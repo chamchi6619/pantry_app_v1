@@ -6,7 +6,7 @@
 
 export interface CanonicalItem {
   id: string;
-  canonical_name: string;
+  name: string;
   aliases: string[] | null;
   category: string | null;
 }
@@ -160,11 +160,11 @@ export function findMatch(ingredientName: string, canonicalItems: CanonicalItem[
 
   // 1. EXACT MATCH on canonical name
   for (const item of canonicalItems) {
-    if (normalize(item.canonical_name) === normalized) {
+    if (normalize(item.name) === normalized) {
       return {
         canonical_item_id: item.id,
         confidence: 'exact',
-        matched_name: item.canonical_name,
+        matched_name: item.name,
         score: 100
       };
     }
@@ -178,7 +178,7 @@ export function findMatch(ingredientName: string, canonicalItems: CanonicalItem[
           return {
             canonical_item_id: item.id,
             confidence: 'alias',
-            matched_name: item.canonical_name,
+            matched_name: item.name,
             score: 95
           };
         }
@@ -188,14 +188,14 @@ export function findMatch(ingredientName: string, canonicalItems: CanonicalItem[
 
   // 2.5 SINGULAR/PLURAL MATCH
   for (const item of canonicalItems) {
-    const canonicalNorm = normalize(item.canonical_name);
+    const canonicalNorm = normalize(item.name);
 
     // Check singular/plural variations
     if (canonicalNorm === normalized + 's' || canonicalNorm + 's' === normalized) {
       return {
         canonical_item_id: item.id,
         confidence: 'fuzzy',
-        matched_name: item.canonical_name,
+        matched_name: item.name,
         score: 90
       };
     }
@@ -205,7 +205,7 @@ export function findMatch(ingredientName: string, canonicalItems: CanonicalItem[
       return {
         canonical_item_id: item.id,
         confidence: 'fuzzy',
-        matched_name: item.canonical_name,
+        matched_name: item.name,
         score: 90
       };
     }
@@ -218,7 +218,7 @@ export function findMatch(ingredientName: string, canonicalItems: CanonicalItem[
           return {
             canonical_item_id: item.id,
             confidence: 'alias',
-            matched_name: item.canonical_name,
+            matched_name: item.name,
             score: 88
           };
         }
@@ -226,7 +226,7 @@ export function findMatch(ingredientName: string, canonicalItems: CanonicalItem[
           return {
             canonical_item_id: item.id,
             confidence: 'alias',
-            matched_name: item.canonical_name,
+            matched_name: item.name,
             score: 88
           };
         }
@@ -234,39 +234,47 @@ export function findMatch(ingredientName: string, canonicalItems: CanonicalItem[
     }
   }
 
-  // 3. CONTAINS MATCH (ingredient contains canonical name or vice versa)
-  for (const item of canonicalItems) {
-    const canonicalNorm = normalize(item.canonical_name);
+  // 3. CONTAINS MATCH (prefer longest match to avoid "water" matching before "watermelon")
+  let bestContainsMatch: { item: CanonicalItem; score: number; length: number } | null = null;
 
-    // Skip very short names to avoid false matches
-    if (canonicalNorm.length < 4) continue;
+  for (const item of canonicalItems) {
+    const canonicalNorm = normalize(item.name);
+
+    // Allow 3-letter words if they're common ingredients
+    const allowedShortWords = ['egg', 'oil', 'ham', 'jam', 'tea', 'ice', 'yam', 'pea', 'cod', 'pie'];
+    const minLength = allowedShortWords.includes(canonicalNorm) ? 3 : 4;
+
+    if (canonicalNorm.length < minLength) continue;
 
     // Check if normalized ingredient contains the canonical name
     if (normalized.includes(canonicalNorm)) {
-      return {
-        canonical_item_id: item.id,
-        confidence: 'fuzzy',
-        matched_name: item.canonical_name,
-        score: 80
-      };
+      if (!bestContainsMatch || canonicalNorm.length > bestContainsMatch.length) {
+        bestContainsMatch = { item, score: 80, length: canonicalNorm.length };
+      }
     }
 
     // Check if canonical name contains the ingredient (less common but possible)
     if (canonicalNorm.includes(normalized) && normalized.length >= 4) {
-      return {
-        canonical_item_id: item.id,
-        confidence: 'fuzzy',
-        matched_name: item.canonical_name,
-        score: 75
-      };
+      if (!bestContainsMatch || normalized.length > bestContainsMatch.length) {
+        bestContainsMatch = { item, score: 75, length: normalized.length };
+      }
     }
+  }
+
+  if (bestContainsMatch) {
+    return {
+      canonical_item_id: bestContainsMatch.item.id,
+      confidence: 'fuzzy',
+      matched_name: bestContainsMatch.item.name,
+      score: bestContainsMatch.score
+    };
   }
 
   // 4. FUZZY MATCH using Levenshtein distance
   let bestMatch: { item: CanonicalItem; distance: number; score: number } | null = null;
 
   for (const item of canonicalItems) {
-    const canonicalNorm = normalize(item.canonical_name);
+    const canonicalNorm = normalize(item.name);
     const distance = levenshtein(normalized, canonicalNorm);
 
     // Only consider if distance is small relative to string length
@@ -302,7 +310,7 @@ export function findMatch(ingredientName: string, canonicalItems: CanonicalItem[
     return {
       canonical_item_id: bestMatch.item.id,
       confidence: 'fuzzy',
-      matched_name: bestMatch.item.canonical_name,
+      matched_name: bestMatch.item.name,
       score: bestMatch.score
     };
   }

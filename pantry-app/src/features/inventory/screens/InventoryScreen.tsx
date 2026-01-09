@@ -13,6 +13,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { theme } from '../../../core/constants/theme';
 import { Button } from '../../../core/components/ui/Button';
 import { Input } from '../../../core/components/ui/Input';
@@ -254,10 +255,10 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({
   const getExpiryText = () => {
     if (daysLeft === null || daysLeft > 7) return null;
     if (daysLeft < 0) return '❌ Expired';
-    if (daysLeft === 0) return '🔥 Today';
-    if (daysLeft === 1) return '🔥 1d';
-    if (daysLeft <= 3) return `🔥 ${daysLeft}d`;
-    return `${daysLeft}d`;
+    if (daysLeft === 0) return '🔥 Expires today';
+    if (daysLeft === 1) return `🔥 Expires in 1 day`;
+    if (daysLeft <= 3) return `🔥 Expires in ${daysLeft} days`;
+    return `Expires in ${daysLeft} days`;
   };
 
   return (
@@ -310,6 +311,7 @@ const ItemRow: React.FC<ItemRowProps> = React.memo(({
 export const InventoryScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { householdId } = useAuth();
+  const navigation = useNavigation();
 
   // Use Supabase store
   const items = useInventorySupabaseStore((state) => state.items) as InventoryItem[];
@@ -352,6 +354,11 @@ export const InventoryScreen: React.FC = () => {
     // Apply category filter if any selected
     if (selectedCategories.size > 0) {
       filtered = filtered.filter(item => selectedCategories.has(item.category));
+    }
+
+    // If no filtered items, return empty array to show empty state
+    if (filtered.length === 0) {
+      return [];
     }
 
     // Group by location (convert to title case for display)
@@ -670,7 +677,24 @@ export const InventoryScreen: React.FC = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>📦</Text>
-            <Text style={styles.emptyText}>No items found</Text>
+            <Text style={styles.emptyText}>Your pantry is empty</Text>
+            <Text style={styles.emptySubtext}>
+              Add items to see what recipes you can make
+            </Text>
+            <View style={styles.emptyActions}>
+              <Pressable
+                style={styles.emptyButton}
+                onPress={() => navigation.navigate('Receipt')}
+              >
+                <Text style={styles.emptyButtonText}>Scan Receipt</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.emptyButton, styles.emptyButtonSecondary]}
+                onPress={handleAddItem}
+              >
+                <Text style={[styles.emptyButtonText, styles.emptyButtonTextSecondary]}>Add Manually</Text>
+              </Pressable>
+            </View>
           </View>
         }
       />
@@ -708,7 +732,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
   },
   title: {
-    ...theme.typography.h2,
+    ...theme.typography.h1,
     color: theme.colors.text,
   },
   addItemButton: {
@@ -737,7 +761,8 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: theme.spacing.md,
-    marginBottom: 0,  // No gap - pills container handles spacing
+    marginTop: 16,  // More space from Inventory header
+    marginBottom: -8,  // Pull search bar closer to category pills
   },
   searchInput: {
     backgroundColor: theme.colors.surface,
@@ -814,7 +839,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingTop: 12,
+    paddingBottom: 8,
     backgroundColor: theme.colors.background,
     borderTopWidth: 3,  // Bolder divider
     borderTopColor: theme.colors.border,
@@ -832,6 +858,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...theme.typography.h3,
+    fontSize: 18,
+    fontWeight: '600',
     color: theme.colors.primary,
     flex: 1,
   },
@@ -869,11 +897,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   itemRow: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: '#E5E7EB',
     width: '100%',
     zIndex: 1,
   },
@@ -939,14 +967,47 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xl * 2,
+    paddingHorizontal: theme.spacing.lg,
   },
   emptyIcon: {
     fontSize: 48,
     marginBottom: theme.spacing.md,
   },
   emptyText: {
-    ...theme.typography.body,
-    color: theme.colors.textLight,
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: theme.spacing.lg,
+  },
+  emptyActions: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.md,
+  },
+  emptyButton: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+  },
+  emptyButtonSecondary: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  emptyButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  emptyButtonTextSecondary: {
+    color: theme.colors.text,
   },
   loadingContainer: {
     flex: 1,

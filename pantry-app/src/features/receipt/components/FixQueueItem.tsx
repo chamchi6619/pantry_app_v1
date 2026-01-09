@@ -89,20 +89,15 @@ export function FixQueueItem({
             ) : (
               <TouchableOpacity
                 onPress={() => setIsEditing(true)}
-                style={styles.nameContainer}
+                style={[styles.nameContainer, { marginTop: 2 }]}
               >
                 <Text style={styles.itemName}>{item.parsed_name}</Text>
                 <Ionicons name="pencil" size={14} color="#6B7280" />
               </TouchableOpacity>
             )}
-            <View style={[styles.confidenceBadge, { backgroundColor: confidenceColor + '20' }]}>
-              <Text style={[styles.confidenceText, { color: confidenceColor }]}>
-                {Math.round(item.confidence * 100)}%
-              </Text>
-            </View>
           </View>
 
-          <View style={styles.detailsRow}>
+          <View style={[styles.detailsRow, { marginTop: 10 }]}>
             <View style={styles.quantityContainer}>
               <TouchableOpacity
                 style={styles.qtyButton}
@@ -120,14 +115,12 @@ export function FixQueueItem({
                 <Ionicons name="add" size={16} color="#6B7280" />
               </TouchableOpacity>
             </View>
-
-            <Text style={styles.price}>
-              {formatPrice(item.price_cents)}
-            </Text>
           </View>
-
-          <Text style={styles.rawText}>OCR: {item.raw_text}</Text>
         </View>
+
+        <Text style={[styles.price, { marginRight: 16 }]}>
+          {formatPrice(item.price_cents)}
+        </Text>
 
         <Ionicons
           name={isExpanded ? "chevron-up" : "chevron-down"}
@@ -340,6 +333,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 8,
     marginBottom: 4,
   },
   quantityContainer: {
@@ -374,7 +368,7 @@ const styles = StyleSheet.create({
   },
   expandedContent: {
     padding: 16,
-    paddingTop: 0,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
   },

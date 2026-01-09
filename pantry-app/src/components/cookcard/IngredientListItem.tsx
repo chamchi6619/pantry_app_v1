@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ingredient } from '../../types/CookCard';
 import { ConfidenceChip } from './ConfidenceChip';
+import { useUserPreferences } from '../../hooks/useUserPreferences';
+import { UnitConverter } from '../../features/recipes/utils/unitConverter';
 
 interface IngredientListItemProps {
   ingredient: Ingredient;
@@ -23,12 +25,62 @@ export const IngredientListItem: React.FC<IngredientListItemProps> = ({
   onPress,
   showConfidence = true,
 }) => {
+  const { preferences } = useUserPreferences();
+  const measurementSystem = preferences?.measurement_system || 'imperial';
+  const converter = new UnitConverter();
+
   const formatQuantity = (): string => {
     if (!ingredient.amount) return '';
 
-    let qty = ingredient.amount.toString();
-    if (ingredient.unit) {
-      qty += ` ${ingredient.unit}`;
+    let amount = ingredient.amount;
+    let unit = ingredient.unit || '';
+
+    // Only convert if user prefers metric and we have a unit to convert
+    if (measurementSystem === 'metric' && unit) {
+      // Determine target unit based on original unit type
+      let targetUnit = '';
+
+      if (converter.isVolumeUnit(unit)) {
+        // Convert cups/tbsp/tsp to ml or L
+        if (unit.toLowerCase().includes('cup') || unit.toLowerCase().includes('tbsp') || unit.toLowerCase().includes('tsp')) {
+          targetUnit = 'ml';
+        }
+      } else if (converter.isWeightUnit(unit)) {
+        // Convert lb/oz to g or kg
+        if (unit.toLowerCase().includes('lb') || unit.toLowerCase().includes('oz')) {
+          targetUnit = 'g';
+        }
+      }
+
+      // Attempt conversion if we found a target unit
+      if (targetUnit) {
+        try {
+          const result = converter.convert(amount, unit, targetUnit);
+          if (result.success && result.convertedQuantity !== undefined) {
+            amount = Math.round(result.convertedQuantity * 10) / 10; // Round to 1 decimal
+            unit = targetUnit;
+
+            // Convert large g amounts to kg
+            if (unit === 'g' && amount >= 1000) {
+              amount = Math.round((amount / 1000) * 10) / 10;
+              unit = 'kg';
+            }
+            // Convert large ml amounts to L
+            if (unit === 'ml' && amount >= 1000) {
+              amount = Math.round((amount / 1000) * 10) / 10;
+              unit = 'L';
+            }
+          }
+        } catch (error) {
+          // Conversion failed, keep original
+          console.log(`[IngredientListItem] Conversion failed for ${amount} ${unit}`);
+        }
+      }
+    }
+
+    let qty = amount.toString();
+    if (unit) {
+      qty += ` ${unit}`;
     }
     return qty;
   };

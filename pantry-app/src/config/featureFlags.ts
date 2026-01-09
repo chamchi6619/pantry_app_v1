@@ -18,6 +18,10 @@ export const FEATURE_FLAGS = {
   USE_DB_RECIPES: false,           // Load recipes from Supabase
   SAVE_RECEIPTS_TO_DB: true,       // Save receipt OCR results
 
+  // OCR Configuration
+  OCR_METHOD: 'cloud' as 'cloud' | 'device',  // 'cloud' = Google Cloud Vision API, 'device' = On-device (iOS/ML Kit)
+  SHOW_OCR_METHOD_NOTICE: __DEV__,           // Show OCR method notice in dev mode
+
   // Sync Configuration
   ENABLE_PRESENCE: true,           // Enable presence detection for co-shopping
   ENABLE_BACKUP: true,            // Enable daily backups

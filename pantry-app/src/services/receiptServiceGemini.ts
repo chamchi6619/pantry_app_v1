@@ -16,6 +16,7 @@ export interface ReceiptItem {
   confidence: number;
   needs_review?: boolean;
   selectedLocation?: 'fridge' | 'freezer' | 'pantry';
+  canonical_item_id?: string;  // Canonical item mapping from receipt processing
 }
 
 export interface Receipt {

@@ -9,11 +9,15 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
+  Alert,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { theme } from '../../../core/constants/theme';
 import { Input } from '../../../core/components/ui/Input';
 import { Button } from '../../../core/components/ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
+import { supabase } from '../../../lib/supabase';
 
 export const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -22,6 +26,8 @@ export const AuthScreen: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [useMagicLink, setUseMagicLink] = useState(true);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   const { signInWithEmail, signInWithPassword, signUp, loading } = useAuth();
 
@@ -37,6 +43,66 @@ export const AuthScreen: React.FC = () => {
     } else {
       await signInWithPassword(email, password);
     }
+  };
+
+  const handleForgotPassword = () => {
+    // Pre-fill with email from main form if available
+    setResetEmail(email);
+    setShowResetModal(true);
+  };
+
+  const sendPasswordResetEmail = async () => {
+    if (!resetEmail.trim()) {
+      Alert.alert('Email Required', 'Please enter your email address.');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(resetEmail)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      return;
+    }
+
+    // Confirm with user
+    Alert.alert(
+      'Confirm Email',
+      `Send password reset link to ${resetEmail}?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Send',
+          onPress: async () => {
+            try {
+              const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+                redirectTo: 'pantrypal://reset-password',
+              });
+
+              if (error) throw error;
+
+              // Close modal
+              setShowResetModal(false);
+              setResetEmail('');
+
+              // Show success message
+              Alert.alert(
+                'Email Sent!',
+                `Password reset instructions have been sent to ${resetEmail}. Please check your inbox.`
+              );
+            } catch (error: any) {
+              console.error('Password reset error:', error);
+              Alert.alert(
+                'Error',
+                error?.message || 'Failed to send password reset email. Please try again.'
+              );
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -163,22 +229,61 @@ export const AuthScreen: React.FC = () => {
 
             {!useMagicLink && !isSignUp && (
               <View style={styles.linkContainer}>
-                <Pressable>
+                <Pressable onPress={handleForgotPassword}>
                   <Text style={styles.link}>Forgot password?</Text>
                 </Pressable>
               </View>
             )}
           </View>
 
-          {/* Demo Mode */}
-          <View style={styles.demoContainer}>
-            <Text style={styles.demoText}>Just exploring?</Text>
-            <Pressable style={styles.demoButton}>
-              <Text style={styles.demoButtonText}>Try Demo Mode</Text>
-            </Pressable>
-          </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Password Reset Modal */}
+      <Modal
+        visible={showResetModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowResetModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Reset Password</Text>
+            <Text style={styles.modalDescription}>
+              Enter your email address and we'll send you a link to reset your password.
+            </Text>
+
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Email address"
+              value={resetEmail}
+              onChangeText={setResetEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoFocus
+            />
+
+            <View style={styles.modalButtons}>
+              <Pressable
+                style={[styles.modalButton, styles.modalButtonCancel]}
+                onPress={() => {
+                  setShowResetModal(false);
+                  setResetEmail('');
+                }}
+              >
+                <Text style={styles.modalButtonTextCancel}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.modalButton, styles.modalButtonConfirm]}
+                onPress={sendPasswordResetEmail}
+              >
+                <Text style={styles.modalButtonTextConfirm}>Send Reset Link</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -279,31 +384,69 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  demoContainer: {
-    alignItems: 'center',
-    marginTop: theme.spacing.xl,
-    paddingTop: theme.spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  demoText: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.sm,
-  },
-  demoButton: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-  },
-  demoButtonText: {
-    fontSize: 16,
-    color: theme.colors.primary,
-    fontWeight: '500',
-  },
   eyeIcon: {
     fontSize: 20,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.xl,
+    width: '85%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: theme.spacing.sm,
+  },
+  modalDescription: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.lg,
+    lineHeight: 20,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    fontSize: 16,
+    marginBottom: theme.spacing.lg,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+  },
+  modalButtonCancel: {
+    backgroundColor: theme.colors.background,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  modalButtonConfirm: {
+    backgroundColor: theme.colors.primary,
+  },
+  modalButtonTextCancel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: theme.colors.text,
+  },
+  modalButtonTextConfirm: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#fff',
   },
 });

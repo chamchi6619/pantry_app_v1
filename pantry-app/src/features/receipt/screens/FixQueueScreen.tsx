@@ -166,6 +166,7 @@ export function FixQueueScreen() {
                 category: item.categories || 'Other',
                 location: item.selectedLocation || getSmartLocation(item.categories),
                 notes: `Added from receipt on ${new Date().toLocaleDateString()}`,
+                canonicalItemId: item.canonical_item_id,  // ✅ Pass canonical ID from receipt processing
               });
               addedToInventory++;
             } catch (err) {
@@ -247,10 +248,10 @@ export function FixQueueScreen() {
   };
 
   const renderHeader = () => {
-    // Use receipt total (includes tax) if available, otherwise sum items
-    const totalAmount = receipt?.total_amount_cents || editedItems.reduce((sum, item) => sum + item.price_cents, 0);
-    const subtotalAmount = receipt?.subtotal_cents || editedItems.reduce((sum, item) => sum + item.price_cents, 0);
-    const taxAmount = receipt?.tax_amount_cents || (totalAmount - subtotalAmount);
+    // Always calculate from current items (updates when items deleted)
+    const totalAmount = editedItems.reduce((sum, item) => sum + item.price_cents, 0);
+    const subtotalAmount = editedItems.reduce((sum, item) => sum + item.price_cents, 0);
+    const taxAmount = 0; // Don't show tax since items can be deleted
 
     return (
       <View style={styles.header}>

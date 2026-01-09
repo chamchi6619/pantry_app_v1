@@ -103,7 +103,7 @@ class CanonicalItemsService {
       const { data, error } = await supabase
         .from('canonical_items')
         .select('*')
-        .order('canonical_name');
+        .order('name');
 
       if (error) throw error;
 
@@ -136,7 +136,7 @@ class CanonicalItemsService {
   private transformSupabaseItem(item: CanonicalItem): CanonicalIngredient {
     return {
       id: item.id, // ✅ USE DATABASE UUID, NOT CUSTOM ID!
-      displayName: item.canonical_name,
+      displayName: item.name,
       category: item.category || 'other',
       aliases: item.aliases || [],
       typical_unit: item.typical_unit || undefined,

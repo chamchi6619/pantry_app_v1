@@ -1,0 +1,78 @@
+
+🔍 Testing: Chicken Tacos (mexican)
+======================================================================
+
+📦 API Response Structure:
+  candidates: EXISTS
+  candidates.length: 1
+  promptFeedback: undefined
+  finishReason: MAX_TOKENS
+  safetyRatings: undefined
+  text.length: 627
+  text.preview: ```json
+{
+  "title": "Chicken Tacos",
+  "description": "These vibrant Chicken Tacos feature tender, seasoned chicken nestled in warm tortillas, ready to be piled high with your favorite fresh toppings...
+
+📝 Extracted JSON Preview:
+  starts with: {
+  "title": "Chicken Tacos",
+  "description": "Th
+  ends with: nless Chicken Breasts",
+      "normalized_name": "
+
+❌ JSON Parse Failed:
+  error: Unexpected end of JSON input
+
+🔍 Full extracted text:
+{
+  "title": "Chicken Tacos",
+  "description": "These vibrant Chicken Tacos feature tender, seasoned chicken nestled in warm tortillas, ready to be piled high with your favorite fresh toppings. A perfect blend of savory spices and zesty lime makes this a crowd-pleasing meal for any night of the week.",
+  "category": "mexican",
+  "prep_time_minutes": 25,
+  "cook_time_minutes": 20,
+  "total_time_minutes": 45,
+  "servings": 4,
+  "difficulty": "medium",
+  "tags": ["mexican", "medium", "weeknight-meal"],
+  "ingredients": [
+    {
+      "ingredient_name": "Boneless, Skinless Chicken Breasts",
+      "normalized_name": "
+
+⏳ Waiting 5 seconds...
+
+
+🔍 Testing: Kung Pao Chicken (chinese)
+======================================================================
+
+📦 API Response Structure:
+  candidates: EXISTS
+  candidates.length: 1
+  promptFeedback: undefined
+  finishReason: MAX_TOKENS
+  safetyRatings: undefined
+❌ No text in candidate.content.parts[0]
+  candidate.content: {
+  "role": "model"
+}
+
+⏳ Waiting 5 seconds...
+
+
+🔍 Testing: Pad Thai (thai)
+======================================================================
+
+📦 API Response Structure:
+  candidates: EXISTS
+  candidates.length: 1
+  promptFeedback: undefined
+  finishReason: MAX_TOKENS
+  safetyRatings: undefined
+❌ No text in candidate.content.parts[0]
+  candidate.content: {
+  "role": "model"
+}
+
+⏳ Waiting 5 seconds...
+

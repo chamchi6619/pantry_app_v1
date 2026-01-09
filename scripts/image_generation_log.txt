@@ -1,0 +1,1296 @@
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+📝 FLUX 1.1 PRO PROMPT TEMPLATES
+
+Optimized to avoid hands/people while maintaining quality
+
+======================================================================
+
+Pad See Ew:
+  Professional food photography, Pad See Ew in white ceramic bowl, noodles with visible texture and sauce coating, fresh garnishes on top, chopsticks resting on bowl edge, shot from 45-degree angle, 100mm macro lens, shallow depth of field, natural window light from left, soft shadows, warm color temperature, appetizing, highly detailed, food only, no hands visible, no people
+
+Margherita Pizza:
+  Professional food photography, Margherita Pizza on wooden board, toppings clearly visible, golden crust with char marks, fresh herbs as garnish, shot from 45-degree angle, 100mm macro lens, shallow depth of field, natural window light, rustic presentation, appetizing, highly detailed, food only, no hands visible, no people
+
+Buddha Bowl:
+  Overhead food photography, Buddha Bowl in ceramic bowl, all ingredients arranged in sections and clearly visible, shot from directly above, 50mm lens, bright natural daylight, vibrant colors, fresh appearance, appetizing, highly detailed, food only, no hands visible, no people
+
+Chocolate Chip Cookies:
+  Professional food photography, Chocolate Chip Cookies stacked on wooden board or cooling rack, golden-brown color, texture details visible, shot from eye level, 85mm lens, blurred kitchen background, soft natural morning light, warm tones, cozy atmosphere, professional bakery quality, highly detailed, food only, no hands visible, no people
+
+Grilled Salmon:
+  Professional food photography, Grilled Salmon on white plate, main protein with crispy or seared exterior visible, side vegetables or accompaniments arranged artfully, sauce pooled elegantly, microgreens or fresh herbs as garnish, shot from 45-degree angle, 100mm macro lens, shallow depth of field, natural window light from left, professional restaurant plating, highly detailed, food only, no hands visible, no people
+
+======================================================================
+
+Key Features:
+✅ Specific camera angles (overhead, 45-degree, eye-level)
+✅ Explicit exclusions: "food only, no hands visible, no people"
+✅ No interaction language (no "being served", "fork twirling")
+✅ Static props only ("chopsticks resting", not "chopsticks holding")
+✅ Product photography framing
+
+Estimated success rate: 95%+ for avoiding hands based on test results
+🎨 FLUX 1.1 PRO IMAGE GENERATION
+
+================================================================================
+
+📋 Loading recipes from database...
+
+Found 200 recipes without images
+Estimated cost: $8.00
+Output directory: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images
+
+================================================================================
+
+[1/200] Classic Burger [sandwich]
+  Prompt: Professional food photography, Classic Burger on wooden board or plate, all layers clearly visible, ...
+  ✅ Generated: https://replicate.delivery/xezq/BnJoeKfzMfXt4pUl9eRX3X8TImEiozKgJHH77qlf4W1yuGhsC/tmpn8yw9cvn.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/classic_burger_7f432f08-4747-40e6-95ca-4669615ab80e.webp
+  ✅ Database updated
+
+[2/200] Cheeseburger [sandwich]
+  Prompt: Professional food photography, Cheeseburger on wooden board or plate, all layers clearly visible, fr...
+  ✅ Generated: https://replicate.delivery/xezq/SRXN0seoFT3HSqOeUdjIC552LkQCWfVurrZnGabGlgC8rRIrA/tmp7go3q1mk.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/cheeseburger_aceec6e9-c2bc-43af-ab8d-d9338f82f9fc.webp
+  ✅ Database updated
+
+[3/200] BBQ Ribs [plated_entree]
+  Prompt: Professional food photography, BBQ Ribs on white plate, main protein with crispy or seared exterior ...
+  ✅ Generated: https://replicate.delivery/xezq/Wh7rqgtCubrQA1JlvPFtjES4oaNG7iiQNkZFoISeoPUCbEyKA/tmpyrqqh2sr.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/bbq_ribs_47259b20-cf74-4f30-b463-324b4d9e32bc.webp
+  ✅ Database updated
+
+[4/200] Fried Chicken [plated_entree]
+  Prompt: Professional food photography, Fried Chicken on white plate, main protein with crispy or seared exte...
+  ✅ Generated: https://replicate.delivery/xezq/1YylfkXHMZzZPKoaEXHuk47oJMGZreyDQafqNUMeAfVRxGhsC/tmp3kuaa_db.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/fried_chicken_d850a24c-1864-47ed-b510-cf1b1a38bcf1.webp
+  ✅ Database updated
+
+[5/200] Buffalo Wings [plated_entree]
+  Prompt: Professional food photography, Buffalo Wings on white plate, main protein with crispy or seared exte...
+  ✅ Generated: https://replicate.delivery/xezq/zHM5BpRooILmPVFC6dbb0HdiNuT1UiSidfC6kam61bXIbEyKA/tmpaye3tpdy.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/buffalo_wings_3d981096-8882-4bc4-b56e-21b7c7910b86.webp
+  ✅ Database updated
+
+[6/200] Mac and Cheese [plated_entree]
+  Prompt: Professional food photography, Mac and Cheese on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/IxfVUeVeDUSt8JGPgmFEnSdGt5lTghC5DBULhob35HXosRIrA/tmpjx8ujgmw.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/mac_and_cheese_f55f6885-43db-47da-b2b1-2fde105227ef.webp
+  ✅ Database updated
+
+[7/200] Grilled Cheese Sandwich [sandwich]
+  Prompt: Professional food photography, Grilled Cheese Sandwich on wooden board or plate, all layers clearly ...
+  ✅ Generated: https://replicate.delivery/xezq/ri2xxtfrxM2QLK0JkxnfAYI1S5ffft2zeWYChLUYj799lNCZF/tmpu3kjf_hu.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/grilled_cheese_sandwich_aa10aa0c-77e1-490a-b638-6b5953a1327f.webp
+  ✅ Database updated
+
+[8/200] Philly Cheesesteak [sandwich]
+  Prompt: Professional food photography, Philly Cheesesteak on wooden board or plate, all layers clearly visib...
+  ✅ Generated: https://replicate.delivery/xezq/Q8eOUfPDBfeeWnOmEbmxl9aD00HQfB4BzHssmSJpc2T2mNCZF/tmpx67153_0.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/philly_cheesesteak_81d69524-57cc-4720-aed4-caeb2ed88d1b.webp
+  ✅ Database updated
+
+[9/200] Classic American Meatloaf [plated_entree]
+  Prompt: Professional food photography, Classic American Meatloaf on white plate, main protein with crispy or...
+  ✅ Generated: https://replicate.delivery/xezq/QTeixiOEgbQySSn1e5dy5Din5wD88oGw2Sfq2CWX5HXfZjQWB/tmpaadrqckp.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/classic_american_meatloaf_a4252914-e316-45fc-b6b7-ca7875f856bb.webp
+  ✅ Database updated
+
+[10/200] Chicken Pot Pie [baked_goods]
+  Prompt: Professional food photography, Chicken Pot Pie stacked on wooden board or cooling rack, golden-brown...
+  ✅ Generated: https://replicate.delivery/xezq/rJR0n1mo8RpPOBQYA6gxnF4Rs3V3A2GCqAzQBPwWRV8oNCZF/tmpok4rohw0.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_pot_pie_e78f4360-e9cb-481d-977e-fd8fdf5c5c30.webp
+  ✅ Database updated
+
+📊 Progress: 10/200 (10 success, 0 failed)
+
+[11/200] Mashed Potatoes [plated_entree]
+  Prompt: Professional food photography, Mashed Potatoes on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/fLXbDFOm3jXWQyZ10yZsNiFnPeJTbnzrbpRMReIhtwxWtRIrA/tmpgl0nsljx.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/mashed_potatoes_25a2fb89-fa7b-4f9b-8959-4fc7701d9295.webp
+  ✅ Database updated
+
+[12/200] Classic American Coleslaw [salad]
+  Prompt: Overhead food photography, Classic American Coleslaw in bowl or on plate, all ingredients visible an...
+  ✅ Generated: https://replicate.delivery/xezq/E6XcT1dRQwq0CpGmJVJb6zFKBc3LbcVrfNgXJq1eELWv2IkVA/tmp725k3etk.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/classic_american_coleslaw_33678eb3-0b1a-44e5-b2a7-0f9bf1610902.webp
+  ✅ Database updated
+
+[13/200] Cornbread [plated_entree]
+  Prompt: Professional food photography, Cornbread on white plate, main protein with crispy or seared exterior...
+  ✅ Generated: https://replicate.delivery/xezq/HakTCh2rZ7LAOVBbne5uZHwdrvLulVob2737rR1yX30ZbEyKA/tmp9704hm94.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/cornbread_006108a5-9bc9-463d-bef2-bf79ceafdaff.webp
+  ✅ Database updated
+
+[14/200] Clam Chowder [bowl]
+  Prompt: Overhead food photography, Clam Chowder in ceramic bowl, all ingredients arranged in sections and cl...
+  ✅ Generated: https://replicate.delivery/xezq/IhJxvikef2t1sEeVgoJZajK3rVJPRNsZbngFA6zN6DSutRIrA/tmpuja8nd_8.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/clam_chowder_d3ad69a9-d11a-4585-85bd-deb3b57c098b.webp
+  ✅ Database updated
+
+[15/200] Chicken Noodle Soup [bowl]
+  Prompt: Overhead food photography, Chicken Noodle Soup in ceramic bowl, all ingredients arranged in sections...
+  ✅ Generated: https://replicate.delivery/xezq/dFwhOKt93XKSFFpacC6A3HNpYdhcp3RmabyIALustpqvNCZF/tmpdyhryl6g.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_noodle_soup_bde965ea-11a6-4e00-87fe-85360eec4fee.webp
+  ✅ Database updated
+
+[16/200] Apple Pie [baked_goods]
+  Prompt: Professional food photography, Apple Pie stacked on wooden board or cooling rack, golden-brown color...
+  ✅ Generated: https://replicate.delivery/xezq/XrlZfD2ew0mx8EI6igFyfd7TxWaM6VlyIEsseubjXySLcjQWB/tmp6s44a4gz.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/apple_pie_f68e5aba-5a5e-4195-aa5f-d4e109ff0949.webp
+  ✅ Database updated
+
+[17/200] Chocolate Chip Cookies [baked_goods]
+  Prompt: Professional food photography, Chocolate Chip Cookies stacked on wooden board or cooling rack, golde...
+  ✅ Generated: https://replicate.delivery/xezq/j5q35f3xR4wJT6V5hYAL2WjhhZ7C2cINYffaeTNwdfz24GhsC/tmp4e_2fxma.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chocolate_chip_cookies_cf652ca7-a43c-4df6-bc2c-9e285019c945.webp
+  ✅ Database updated
+
+[18/200] Classic Fluffy Pancakes [baked_goods]
+  Prompt: Professional food photography, Classic Fluffy Pancakes stacked on wooden board or cooling rack, gold...
+  ✅ Generated: https://replicate.delivery/xezq/Pn4vUsVTsx60OB2Otb6E0hHKkY8QZ3ogYbFl1zLR57hyNCZF/tmp0vwfh_z0.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/classic_fluffy_pancakes_ec8e7766-ed0d-4d37-ba9c-baf38aea0e3c.webp
+  ✅ Database updated
+
+[19/200] French Toast [plated_entree]
+  Prompt: Professional food photography, French Toast on white plate, main protein with crispy or seared exter...
+  ✅ Generated: https://replicate.delivery/xezq/PBUA0Be9uc2zFqHJfKhVSfO8vqgALQyR5KnFMenZ6B98cjQWB/tmpwo8pc9ze.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/french_toast_c7b5429f-86c3-40d1-a081-80ad1d283be6.webp
+  ✅ Database updated
+
+[20/200] Brownies [baked_goods]
+  Prompt: Professional food photography, Brownies stacked on wooden board or cooling rack, golden-brown color,...
+  ✅ Generated: https://replicate.delivery/xezq/60bEiakfOmScTCo08N5kw6JClkjBsCAQVVwNI3nmWW0pbEyKA/tmp2j_dt8vc.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/brownies_39c1eca5-778d-4c63-a9e6-f935ff826ea6.webp
+  ✅ Database updated
+
+📊 Progress: 20/200 (20 success, 0 failed)
+
+[21/200] Kung Pao Chicken [plated_entree]
+  Prompt: Professional food photography, Kung Pao Chicken on white plate, main protein with crispy or seared e...
+  ✅ Generated: https://replicate.delivery/xezq/eUEcf3HsdqtLtk3CPTrckl5FqeS6Fe6E7fgN3M8tAnAI7GhsC/tmpe_to9y9k.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/kung_pao_chicken_93787e6d-b9c5-423f-8975-490cfb82a469.webp
+  ✅ Database updated
+
+[22/200] Sweet and Sour Chicken [plated_entree]
+  Prompt: Professional food photography, Sweet and Sour Chicken on white plate, main protein with crispy or se...
+  ✅ Generated: https://replicate.delivery/xezq/xsX7ehfUwEsFAE642ymn41gJPyb0uFWAMEguV90vGOKd3IkVA/tmp4uqak_96.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/sweet_and_sour_chicken_5df6f8c1-8ca5-4dd2-89d6-a365ef31ac82.webp
+  ✅ Database updated
+
+[23/200] Orange Chicken [plated_entree]
+  Prompt: Professional food photography, Orange Chicken on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/i7SZgYap327DDlNUqoxU5VvseJL4FuifcY0mFmccvehCvRIrA/tmpqdwnow9_.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/orange_chicken_8acd8a80-42b2-42c1-b4bd-6a4636afe672.webp
+  ✅ Database updated
+
+[24/200] General Tso's Chicken [plated_entree]
+  Prompt: Professional food photography, General Tso's Chicken on white plate, main protein with crispy or sea...
+  ✅ Generated: https://replicate.delivery/xezq/RpAJVtRvFexmOqHhpQEa1Jg4wbsTFBWZ3Cna2TUorqJybEyKA/tmpovho3gkv.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/general_tso_s_chicken_8495c775-3edf-4c08-b92b-cef37141e039.webp
+  ✅ Database updated
+
+[25/200] Mapo Tofu [plated_entree]
+  Prompt: Professional food photography, Mapo Tofu on white plate, main protein with crispy or seared exterior...
+  ✅ Generated: https://replicate.delivery/xezq/eXAef9LQFSHl5In1K2yKXKmK9ZjFOHA9piRceyo5YJYjeGhsC/tmp25mbrffc.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/mapo_tofu_01929d35-3383-4c9e-b86d-00d743163102.webp
+  ✅ Database updated
+
+[26/200] Beef and Broccoli [plated_entree]
+  Prompt: Professional food photography, Beef and Broccoli on white plate, main protein with crispy or seared ...
+  ✅ Generated: https://replicate.delivery/xezq/e0pJhf5vrbsLeI7fb3TzNarDUHm6AAdXN7arOkiaVEc6eGhsC/tmp40ot2xuq.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/beef_and_broccoli_8b55b922-08cc-42bb-8f2e-b6e876971596.webp
+  ✅ Database updated
+
+[27/200] Mongolian Beef [plated_entree]
+  Prompt: Professional food photography, Mongolian Beef on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/9p4yQlzglPb6I5p2WZXEuy1ZzOxeMWPpAyxfxnrO4Eiz3IkVA/tmpum2pyyhn.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/mongolian_beef_5cfa5629-1a2b-49f8-86ea-6ea93971482f.webp
+  ✅ Database updated
+
+[28/200] Fried Rice [plated_entree]
+  Prompt: Professional food photography, Fried Rice on white plate, main protein with crispy or seared exterio...
+  ✅ Generated: https://replicate.delivery/xezq/fZpz5BFTCO1XPCwsXtVD7CuTgaMSuENcTNsBfBGylTD53IkVA/tmpudgsko3m.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/fried_rice_21a7cc10-d72a-4e49-9a28-ffdbac4b6e33.webp
+  ✅ Database updated
+
+[29/200] Chicken Fried Rice [plated_entree]
+  Prompt: Professional food photography, Chicken Fried Rice on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/BsXm6GNyh6pDL1o3BiNmZA8BjDHfNy9ui7shNtKxEIZAcEyKA/tmpyucxdcrt.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_fried_rice_4858c016-5b0b-436f-a276-0d8d17b743e9.webp
+  ✅ Database updated
+
+[30/200] Vegetable Fried Rice [plated_entree]
+  Prompt: Professional food photography, Vegetable Fried Rice on white plate, main protein with crispy or sear...
+  ✅ Generated: https://replicate.delivery/xezq/7IrxHghcHi6iMJXQdLUPC6LFDDzIT5MyrHjBRBkfrCRDcEyKA/tmphzj8_l8w.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/vegetable_fried_rice_bd2171b7-45b5-40fb-8d7d-16e5a766e041.webp
+  ✅ Database updated
+
+📊 Progress: 30/200 (30 success, 0 failed)
+
+[31/200] Chow Mein [noodles]
+  Prompt: Professional food photography, Chow Mein in white ceramic bowl, noodles with visible texture and sau...
+  ✅ Generated: https://replicate.delivery/xezq/avkyh7xTMU5uHtoYJuVFQgq22UzKRg9gFJQeu7EFzAWGcEyKA/tmpjv1f92hl.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chow_mein_f0e72e67-4770-481a-9baa-27e30e806391.webp
+  ✅ Database updated
+
+[32/200] Lo Mein [noodles]
+  Prompt: Professional food photography, Lo Mein in white ceramic bowl, noodles with visible texture and sauce...
+  ✅ Generated: https://replicate.delivery/xezq/VesNzHBmqgRYQ6Ff7MxytXw3A0nZ6agft2QqtylNnboowRIrA/tmpdml8_9m6.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/lo_mein_da16dbb8-7b0e-42d3-b1dd-df6be4b667ef.webp
+  ✅ Database updated
+
+[33/200] Hot and Sour Soup [bowl]
+  Prompt: Overhead food photography, Hot and Sour Soup in ceramic bowl, all ingredients arranged in sections a...
+  ✅ Generated: https://replicate.delivery/xezq/AEYxLegIOeg5Ok4mJGG9GQ9bQDfcsma05Vf6aGL1qQnmhjQWB/tmpfq2dxwo4.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/hot_and_sour_soup_f1f1d8cd-875a-4c0b-9499-cd0ad59139ac.webp
+  ✅ Database updated
+
+[34/200] Egg Drop Soup [bowl]
+  Prompt: Overhead food photography, Egg Drop Soup in ceramic bowl, all ingredients arranged in sections and c...
+  ✅ Generated: https://replicate.delivery/xezq/ylDxHgh5lfWAB6C4U3976Dg3PQAJOIsSM7o00Wj5ZtyPcEyKA/tmp1onvfpv3.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/egg_drop_soup_fc2690b2-8c71-489c-8ba9-b05210f991f4.webp
+  ✅ Database updated
+
+[35/200] Spring Rolls [plated_entree]
+  Prompt: Professional food photography, Spring Rolls on white plate, main protein with crispy or seared exter...
+  ✅ Generated: https://replicate.delivery/xezq/buUer5hGmuweIUMeWHXe4DcLW9B7ICXm2LOax6sD519OijQWB/tmpvyjdzo8w.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/spring_rolls_69ec0eb6-359d-4b5e-b20c-ee9cea80fde1.webp
+  ✅ Database updated
+
+[36/200] Dumplings (Jiaozi) [plated_entree]
+  Prompt: Professional food photography, Dumplings (Jiaozi) on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/hR9eLHkQAEVacizYNEzOg46zs32RLgiPFJr2L6ZQxJ9TcEyKA/tmpf4uzcw70.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/dumplings_jiaozi_7111895b-6471-420c-b0b2-e53e9e922956.webp
+  ✅ Database updated
+
+[37/200] Peking Duck [plated_entree]
+  Prompt: Professional food photography, Peking Duck on white plate, main protein with crispy or seared exteri...
+  ✅ Generated: https://replicate.delivery/xezq/IVs6wONThkY1Axap067shhHIST07awEVfORtz12zresq4IkVA/tmp5j9vf8sc.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/peking_duck_cfbe92d1-5d95-43dc-8fb7-63768702893e.webp
+  ✅ Database updated
+
+[38/200] Sweet and Sour Pork [plated_entree]
+  Prompt: Professional food photography, Sweet and Sour Pork on white plate, main protein with crispy or seare...
+  ✅ Generated: https://replicate.delivery/xezq/LB1eTz1EfRnJ9URxM51Md8r1y93goMcV9lGaqxozzAHy4IkVA/tmp37lseez1.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/sweet_and_sour_pork_35f6f587-6ec3-4e59-b74f-c2269ee8deef.webp
+  ✅ Database updated
+
+[39/200] Char Siu (BBQ Pork) [plated_entree]
+  Prompt: Professional food photography, Char Siu (BBQ Pork) on white plate, main protein with crispy or seare...
+  ✅ Generated: https://replicate.delivery/xezq/lpShZVxFDWrrNpMfhiOr12OOBCOeeDqnwXyKpwC8DuywxRIrA/tmphicsh3iw.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/char_siu_bbq_pork_e58bb6a8-66cc-4798-b043-499c50b8351f.webp
+  ✅ Database updated
+
+[40/200] Wontons in Chili Oil [plated_entree]
+  Prompt: Professional food photography, Wontons in Chili Oil on white plate, main protein with crispy or sear...
+  ✅ Generated: https://replicate.delivery/xezq/gYzA6H4Z19LnO9eFrCeVfMiKyrYkeoIrmvO4JXL3DNA1jjQWB/tmpbsreytl6.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/wontons_in_chili_oil_c7085944-e4a4-4037-9dac-31c5a3722310.webp
+  ✅ Database updated
+
+📊 Progress: 40/200 (40 success, 0 failed)
+
+[41/200] Quinoa Buddha Bowl [bowl]
+  Prompt: Overhead food photography, Quinoa Buddha Bowl in ceramic bowl, all ingredients arranged in sections ...
+  ✅ Generated: https://replicate.delivery/xezq/8lV56w1H0zqrNBdijsYKrh2Xb74xsWSf11yyIJyv6LVgcEyKA/tmpzr2r3apu.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/quinoa_buddha_bowl_6e45f916-8268-4cbe-8f1d-337541e5e8b0.webp
+  ✅ Database updated
+
+[42/200] Poke Bowl [bowl]
+  Prompt: Overhead food photography, Poke Bowl in ceramic bowl, all ingredients arranged in sections and clear...
+  ✅ Generated: https://replicate.delivery/xezq/9BwedQTE32RjRKAeHDVGhcHPoAWREMeAiuAyATX3GHmJyRIrA/tmprcffweem.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/poke_bowl_7fecb9a2-d710-4085-8cfa-9647a9b3a385.webp
+  ✅ Database updated
+
+[43/200] Grilled Salmon with Vegetables [plated_entree]
+  Prompt: Professional food photography, Grilled Salmon with Vegetables on white plate, main protein with cris...
+  ✅ Generated: https://replicate.delivery/xezq/slER4oL53WaoM1y5FtQ84q9MnMexTubEKmiXmL5KmerI5IkVA/tmpiwxua2lg.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/grilled_salmon_with_vegetables_84e5cac2-fb2d-4845-a493-596c91d2a40f.webp
+  ✅ Database updated
+
+[44/200] Baked Chicken Breast [plated_entree]
+  Prompt: Professional food photography, Baked Chicken Breast on white plate, main protein with crispy or sear...
+  ✅ Generated: https://replicate.delivery/xezq/tKqXpUGJmip6AFuKnQeSpdjC4PPGmZyOBel6XvgdPqMM5IkVA/tmputyauoxx.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/baked_chicken_breast_0fbd2c28-f664-4dfd-9e0f-0768134285a4.webp
+  ✅ Database updated
+
+[45/200] Lemon Herb Chicken [plated_entree]
+  Prompt: Professional food photography, Lemon Herb Chicken on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/LO2hwUyKeqQwDaB0u38zmsCLjCVLDHwMIze4ZZeEwNPhyRIrA/tmpa12n7nmy.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/lemon_herb_chicken_49fb4319-3d84-4c62-8517-f5e6968c1232.webp
+  ✅ Database updated
+
+[46/200] Grilled Shrimp Skewers [plated_entree]
+  Prompt: Professional food photography, Grilled Shrimp Skewers on white plate, main protein with crispy or se...
+  ✅ Generated: https://replicate.delivery/xezq/bdZjln6NIk4fOSuISq2mks57GaTrWtGenVbYnS1XyIlU5IkVA/tmph7igoc93.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/grilled_shrimp_skewers_68803655-9685-436a-965c-0b95dc30bc04.webp
+  ✅ Database updated
+
+[47/200] Zucchini Noodles (Zoodles) [noodles]
+  Prompt: Professional food photography, Zucchini Noodles (Zoodles) in white ceramic bowl, noodles with visibl...
+  ✅ Generated: https://replicate.delivery/xezq/zUsg3fBIuA2EeUFUoXAeXPNjSuYTVzFdeVmQFIr1huBkljQWB/tmps_32_c_4.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/zucchini_noodles_zoodles_0a16bc44-a101-4fea-a6da-603f8aed6954.webp
+  ✅ Database updated
+
+[48/200] Cauliflower Rice Bowl [bowl]
+  Prompt: Overhead food photography, Cauliflower Rice Bowl in ceramic bowl, all ingredients arranged in sectio...
+  ✅ Generated: https://replicate.delivery/xezq/FyQi9mVj0iImHBlRfCVLQDBOelYPb3h8q2rhF9pdnIdj5IkVA/tmp86aynhwu.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/cauliflower_rice_bowl_858751ea-8fb9-486f-b24f-217d0ef1b9b9.webp
+  ✅ Database updated
+
+[49/200] Greek Yogurt Parfait [plated_entree]
+  Prompt: Professional food photography, Greek Yogurt Parfait on white plate, main protein with crispy or sear...
+  ✅ Generated: https://replicate.delivery/xezq/ty9GETW9EsqSHdDXCXN3kRKVTtiLfQIliWUbD3nc0Ui0cEyKA/tmp5ge7dfmd.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/greek_yogurt_parfait_66afcb0b-1c0f-43e7-a5f6-8767a6cdc2cf.webp
+  ✅ Database updated
+
+[50/200] Acai Bowl [bowl]
+  Prompt: Overhead food photography, Acai Bowl in ceramic bowl, all ingredients arranged in sections and clear...
+  ✅ Generated: https://replicate.delivery/xezq/2vvZBvP8JoIAA5a9rV89k6CsLKnuGJKi8lR4m8yeUw03cEyKA/tmp3_lnb_3v.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/acai_bowl_d35f0268-a6f8-4e62-b8e3-869ac5c282e2.webp
+  ✅ Database updated
+
+📊 Progress: 50/200 (50 success, 0 failed)
+
+[51/200] Green Smoothie [beverage]
+  Prompt: Professional beverage photography, Green Smoothie in clear glass or cup on white surface, drink clea...
+  ✅ Generated: https://replicate.delivery/xezq/YqvE6boynZLXFhaZAMkyfifSefHaiHYo6ckniLfzSlNmOHhsC/tmp0fc00ilf.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/green_smoothie_fd60b843-b7b9-46b5-b600-d607431addce.webp
+  ✅ Database updated
+
+[52/200] Vegetable Stir Fry [plated_entree]
+  Prompt: Professional food photography, Vegetable Stir Fry on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/lOeabDtTYEVBFqmGS9NovRugxb0c3dLjfe2tSQPPMzxwzRIrA/tmplczwxa6l.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/vegetable_stir_fry_6ae82b3b-1287-4e1b-9467-242e61bb37c2.webp
+  ✅ Database updated
+
+[53/200] Roasted Brussels Sprouts [plated_entree]
+  Prompt: Professional food photography, Roasted Brussels Sprouts on white plate, main protein with crispy or ...
+  ✅ Generated: https://replicate.delivery/xezq/MtluaQbYzHbINhFUwhUcysZg4TV09beg9GRvdNo1Gqse5IkVA/tmpvhl220tc.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/roasted_brussels_sprouts_40ed3130-0f17-45ee-8489-396269e4e9b9.webp
+  ✅ Database updated
+
+[54/200] Sweet Potato Bowl [bowl]
+  Prompt: Overhead food photography, Sweet Potato Bowl in ceramic bowl, all ingredients arranged in sections a...
+  ✅ Generated: https://replicate.delivery/xezq/56zTvQsWOwIMB1pFTK1B4P1If1wqdfJGSxLKDeOMtJePojQWB/tmplvkmijli.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/sweet_potato_bowl_99c9df02-1891-4aaa-bf82-c9e5641c7f36.webp
+  ✅ Database updated
+
+[55/200] Chicken and Veggie Wrap [sandwich]
+  Prompt: Professional food photography, Chicken and Veggie Wrap on wooden board or plate, all layers clearly ...
+  ✅ Generated: https://replicate.delivery/xezq/nmUT5LYi5y5IBBRXkiqjENZtEua74PnY5v1bvHIAeQoDdEyKA/tmpv6mbh2gw.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_and_veggie_wrap_8822366d-7a84-4308-9503-da87e73304f5.webp
+  ✅ Database updated
+
+[56/200] Egg White Omelette [plated_entree]
+  Prompt: Professional food photography, Egg White Omelette on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/UBM0JtDQTfTICizsF5tUJexjG0pAsdZ1bi7LxWkzfn3Y0RIrA/tmpskhoaayj.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/egg_white_omelette_d050ede3-a815-46ff-b7ec-ce8149b48587.webp
+  ✅ Database updated
+
+[57/200] Chia Pudding [plated_entree]
+  Prompt: Professional food photography, Chia Pudding on white plate, main protein with crispy or seared exter...
+  ✅ Generated: https://replicate.delivery/xezq/k4etBRXeewczCpayZT6FcsN0mJu6uuEVilTg401OjxeApjQWB/tmpj5lzi6ug.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chia_pudding_799e4a69-8a1f-45ab-b47e-33116efb19b2.webp
+  ✅ Database updated
+
+[58/200] Protein Pancakes [baked_goods]
+  Prompt: Professional food photography, Protein Pancakes stacked on wooden board or cooling rack, golden-brow...
+  ✅ Generated: https://replicate.delivery/xezq/gNqBSawZjjY6DB0VN6s4l6V70qVEGfAg292pzjzY6wpLdEyKA/tmphoz2gh9q.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/protein_pancakes_effb03b7-903d-4b32-8e5e-3f800b1037ac.webp
+  ✅ Database updated
+
+[59/200] Baked Cod with Lemon [plated_entree]
+  Prompt: Professional food photography, Baked Cod with Lemon on white plate, main protein with crispy or sear...
+  ✅ Generated: https://replicate.delivery/xezq/0y20UDfPBXQ1PqftiokatTCf43kscE46p8XjaNj80hB20RIrA/tmpmlqch8iz.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/baked_cod_with_lemon_bb4c8713-e855-43a6-907c-590384a5a471.webp
+  ✅ Database updated
+
+[60/200] Spinach and Feta Stuffed Chicken [plated_entree]
+  Prompt: Professional food photography, Spinach and Feta Stuffed Chicken on white plate, main protein with cr...
+  ✅ Generated: https://replicate.delivery/xezq/m7fUccxray3kBSYv6tcpyJhSVBTnG47wJvOMM9S9evih6IkVA/tmpcn8trn95.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/spinach_and_feta_stuffed_chicken_f820135a-9e08-4f04-b401-14f9b4183af2.webp
+  ✅ Database updated
+
+📊 Progress: 60/200 (60 success, 0 failed)
+
+[61/200] Butter Chicken [plated_entree]
+  Prompt: Professional food photography, Butter Chicken on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/3sfiCG43OA2VYaWXn8vcqK2AFbFpIxVckiER9wWv6shSdEyKA/tmpgvtt0_3u.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/butter_chicken_fed91280-aa86-4e07-9a29-08ca970e7028.webp
+  ✅ Database updated
+
+[62/200] Chicken Tikka Masala [plated_entree]
+  Prompt: Professional food photography, Chicken Tikka Masala on white plate, main protein with crispy or sear...
+  ✅ Generated: https://replicate.delivery/xezq/kqne7v4pudymfkGTVgkvfeoaeeNT9Xpba7cyfEka95lGUdEyKA/tmpqd6wojts.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_tikka_masala_c6381aaa-50fb-4811-8685-f69ec68e2c70.webp
+  ✅ Database updated
+
+[63/200] Chicken Curry [plated_entree]
+  Prompt: Professional food photography, Chicken Curry on white plate, main protein with crispy or seared exte...
+  ✅ Generated: https://replicate.delivery/xezq/INXT1EDE30aWPdChI3fiWwcfmnKgCcMtwODDUHq5kjvu6IkVA/tmpsy32wvzi.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_curry_80d626cc-756c-4dc3-a747-0d03eb080fb5.webp
+  ✅ Database updated
+
+[64/200] Palak Paneer [plated_entree]
+  Prompt: Professional food photography, Palak Paneer on white plate, main protein with crispy or seared exter...
+  ✅ Generated: https://replicate.delivery/xezq/87dPXxdBrwYoLJZshuIDsPYR6vKFWhJNHRJvHjxvFyBtOCZF/tmpm4xio1eq.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/palak_paneer_348418b6-c269-427b-b5bc-f6644db394eb.webp
+  ✅ Database updated
+
+[65/200] Chana Masala [plated_entree]
+  Prompt: Professional food photography, Chana Masala on white plate, main protein with crispy or seared exter...
+  ✅ Generated: https://replicate.delivery/xezq/x9gdTEW7ZgbnINU8YD2b0GPVJqYf3ZkRXDvKrI9hOf836IkVA/tmpjg6z1vhw.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chana_masala_8c14f1ab-54ae-4f70-b16a-4711ff72c689.webp
+  ✅ Database updated
+
+[66/200] Dal Makhani [plated_entree]
+  Prompt: Professional food photography, Dal Makhani on white plate, main protein with crispy or seared exteri...
+  ✅ Generated: https://replicate.delivery/xezq/Ca13GnCfWlQbFKKSCTrZnHBAVbP2SPwTUc3o3uutfBr76IkVA/tmp2fl7f1pw.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/dal_makhani_29e98623-04d5-4cd0-b999-2ea8b80bb565.webp
+  ✅ Database updated
+
+[67/200] Dal Tadka [pizza]
+  Prompt: Professional food photography, Dal Tadka on wooden board, toppings clearly visible, golden crust wit...
+  ✅ Generated: https://replicate.delivery/xezq/xlvD9YGsu4rWG9zqBA2cWbe2l4TffcC2jcyqzlGWK63frjQWB/tmpe5f4nr21.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/dal_tadka_eff8cebb-1387-4a8c-9fac-3c3382e5a703.webp
+  ✅ Database updated
+
+[68/200] Tandoori Chicken [plated_entree]
+  Prompt: Professional food photography, Tandoori Chicken on white plate, main protein with crispy or seared e...
+  ✅ Generated: https://replicate.delivery/xezq/Vi5FenU7yuxiIinCbrRJJS73Jrwp6mdkkYL2TlwIoSYhdEyKA/tmprmq2zxxc.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tandoori_chicken_5cdf0fd4-deba-4a4c-b3a1-e8f6f3788e84.webp
+  ✅ Database updated
+
+[69/200] Chicken Biryani [plated_entree]
+  Prompt: Professional food photography, Chicken Biryani on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/fe8ayskhAdh6Lk2DsSNjHPQCuK7JNlLnUVVLEenrdkbN2RIrA/tmpxa6g3_fx.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_biryani_925b7fbf-8318-4190-a83f-7c5713d82d2b.webp
+  ✅ Database updated
+
+[70/200] Vegetable Biryani [plated_entree]
+  Prompt: Professional food photography, Vegetable Biryani on white plate, main protein with crispy or seared ...
+  ✅ Generated: https://replicate.delivery/xezq/buSjTSYxidp9PVAq8FFnEAzYTqXdpi4ea740RKZu7nYldEyKA/tmp25udy44o.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/vegetable_biryani_e83e17c9-233e-4ecd-b0a9-ee3ebef19067.webp
+  ✅ Database updated
+
+📊 Progress: 70/200 (70 success, 0 failed)
+
+[71/200] Naan Bread [pizza]
+  Prompt: Professional food photography, Naan Bread on wooden board, toppings clearly visible, golden crust wi...
+  ✅ Generated: https://replicate.delivery/xezq/nVnLluuaVTLyIlG1whsS086dMReYgsrFsfR3iRr8Eh7O7IkVA/tmp47xhyh5s.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/naan_bread_7b3cd0e2-9757-42f8-bd1d-94a31dab2ed4.webp
+  ✅ Database updated
+
+[72/200] Garlic Naan [pizza]
+  Prompt: Professional food photography, Garlic Naan on wooden board, toppings clearly visible, golden crust w...
+  ✅ Generated: https://replicate.delivery/xezq/yPlsw85waHbHLVAUqvz8CFEWK4yjLnrE1R8UyAZ8hOV0OCZF/tmpyyjnfslv.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/garlic_naan_a18219b0-bf3a-49b6-832a-d3541431c966.webp
+  ✅ Database updated
+
+[73/200] Roti [pizza]
+  Prompt: Professional food photography, Roti on wooden board, toppings clearly visible, golden crust with cha...
+  ✅ Generated: https://replicate.delivery/xezq/GvKCVWUutIKmHNvQt4VLiDebC8eDgAJuYle1rFrz72Ft2RIrA/tmpc5h3iznx.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/roti_0e747811-9fdc-4367-934d-801d7e9985fd.webp
+  ✅ Database updated
+
+[74/200] Samosas [plated_entree]
+  Prompt: Professional food photography, Samosas on white plate, main protein with crispy or seared exterior v...
+  ✅ Generated: https://replicate.delivery/xezq/khzr7up2RaIsLZckg4f2ho5yogvawedtCeA7ly77PASz2RIrA/tmpv9l6vkzy.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/samosas_6ea5bf9e-6c3e-4755-bd42-7e176e5b1da2.webp
+  ✅ Database updated
+
+[75/200] Pakoras [plated_entree]
+  Prompt: Professional food photography, Pakoras on white plate, main protein with crispy or seared exterior v...
+  ✅ Generated: https://replicate.delivery/xezq/qnhlNohs3hbHLlrT8U7tGUC3QIvgBxftYuqdsgHjoKzvdEyKA/tmpk1cr1lwn.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/pakoras_48d318a8-a0a2-4476-ad13-c7bd6dcf2b9c.webp
+  ✅ Database updated
+
+[76/200] Aloo Gobi (Potato Cauliflower) [plated_entree]
+  Prompt: Professional food photography, Aloo Gobi (Potato Cauliflower) on white plate, main protein with cris...
+  ✅ Generated: https://replicate.delivery/xezq/kDx8kG00WH7iKNCWQRPH5xHKQffZ8sru0RK3Ivof9e9OujQWB/tmpzte9qito.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/aloo_gobi_potato_cauliflower_521b2b07-cb9b-4e80-9c14-317a9f472df4.webp
+  ✅ Database updated
+
+[77/200] Vindaloo [plated_entree]
+  Prompt: Professional food photography, Vindaloo on white plate, main protein with crispy or seared exterior ...
+  ✅ Generated: https://replicate.delivery/xezq/50GfoXfxIThd3EpfjtYZqe43TtsgyOkdzpQ2VyD0DgWjujQWB/tmpjjp_c3a0.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/vindaloo_22320840-63a1-4cef-9e3e-518161daa9d2.webp
+  ✅ Database updated
+
+[78/200] Rogan Josh [plated_entree]
+  Prompt: Professional food photography, Rogan Josh on white plate, main protein with crispy or seared exterio...
+  ✅ Generated: https://replicate.delivery/xezq/f3WCZIFHKUyPISCrf4nVIa2ZBH4gI730xW21kxsL8kYu7IkVA/tmpeve15ncs.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/rogan_josh_a3b5df6d-e3ae-41e1-a281-4fa4f23386f8.webp
+  ✅ Database updated
+
+[79/200] Gulab Jamun [plated_entree]
+  Prompt: Professional food photography, Gulab Jamun on white plate, main protein with crispy or seared exteri...
+  ✅ Generated: https://replicate.delivery/xezq/XcztirWL404VEhc6hcWvyNbOH51vG8Hos92TUveoQJq5dEyKA/tmpajczlcfo.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/gulab_jamun_02ee9c47-7941-4de7-bc93-d4764a521d53.webp
+  ✅ Database updated
+
+[80/200] Mango Lassi [beverage]
+  Prompt: Professional beverage photography, Mango Lassi in clear glass or cup on white surface, drink clearly...
+  ✅ Generated: https://replicate.delivery/xezq/jYlk1aSkzFq8BBDXTES9eqp4feRMppMtmzwFNtGHHuZ23RIrA/tmp05n3sqj6.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/mango_lassi_e08baa81-082a-4232-a7cf-b6779d8f8732.webp
+  ✅ Database updated
+
+📊 Progress: 80/200 (80 success, 0 failed)
+
+[81/200] Spaghetti Carbonara [noodles]
+  Prompt: Professional food photography, Spaghetti Carbonara in white ceramic bowl, noodles with visible textu...
+  ✅ Generated: https://replicate.delivery/xezq/2f22PBWmkRx8Jq0VwfV4ZfdLhbCaA8npzBfLx6DaNjxAwjQWB/tmp3fl_s0hn.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/spaghetti_carbonara_fbeb52bc-821e-400b-8c31-5b7953016439.webp
+  ✅ Database updated
+
+[82/200] Spaghetti Bolognese [noodles]
+  Prompt: Professional food photography, Spaghetti Bolognese in white ceramic bowl, noodles with visible textu...
+  ✅ Generated: https://replicate.delivery/xezq/lRCIFe0RSL1BLyU1j8OWQGWe4EqNMWLs0VeTeHr1gbapwjQWB/tmpdna3_kyz.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/spaghetti_bolognese_7b57376d-f66e-4d04-881a-88a93c6df05b.webp
+  ✅ Database updated
+
+[83/200] Fettuccine Alfredo [noodles]
+  Prompt: Professional food photography, Fettuccine Alfredo in white ceramic bowl, noodles with visible textur...
+  ✅ Generated: https://replicate.delivery/xezq/kjGmyEQre72eXkNa58CE1qFBKkZI9fOL3WeGf5E5TnoSiHhsC/tmphs8l5l2u.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/fettuccine_alfredo_8e287bf1-9e35-4e39-935b-3e65484c90a0.webp
+  ✅ Database updated
+
+[84/200] Cacio e Pepe [noodles]
+  Prompt: Professional food photography, Cacio e Pepe in white ceramic bowl, noodles with visible texture and ...
+  ✅ Generated: https://replicate.delivery/xezq/wVNIAG1ZoEJcBl7apt9JqkdpQavInzlCmt7Lh5JtilUFPCZF/tmp8bpcial1.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/cacio_e_pepe_97400d95-36fe-424c-8279-3e50d384b611.webp
+  ✅ Database updated
+
+[85/200] Pizza Margherita [pizza]
+  Prompt: Professional food photography, Pizza Margherita on wooden board, toppings clearly visible, golden cr...
+  ✅ Generated: https://replicate.delivery/xezq/frGTVcqNd3Qre0gZK5KKYKsKoqDXSvrvwO2t3uPnImvZ8IkVA/tmpzh__4q2m.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/pizza_margherita_26d574af-e193-4e64-a9dd-3758923d88a5.webp
+  ✅ Database updated
+
+[86/200] Chicken Parmigiana [plated_entree]
+  Prompt: Professional food photography, Chicken Parmigiana on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/mgmeheM5crkaWE5T6CnMeymQAxCB93FwYt55Jd9EQwY84RIrA/tmpxf_p4hf9.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_parmigiana_ce971d83-5d5e-4d06-9ad1-9647c87c3879.webp
+  ✅ Database updated
+
+[87/200] Risotto alla Milanese [bowl]
+  Prompt: Overhead food photography, Risotto alla Milanese in ceramic bowl, all ingredients arranged in sectio...
+  ✅ Generated: https://replicate.delivery/xezq/ZRZVuyiXsZ5TM1aCfz1zEAB4cexgZNwma70ym3rHmKWk8IkVA/tmpuonrciz7.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/risotto_alla_milanese_2ecab346-87df-46a0-8ed9-d375bb97e481.webp
+  ✅ Database updated
+
+[88/200] Risotto ai Funghi [bowl]
+  Prompt: Overhead food photography, Risotto ai Funghi in ceramic bowl, all ingredients arranged in sections a...
+  ✅ Generated: https://replicate.delivery/xezq/0g1VWeCiQetdh0zk2cxjp7I8VtfNZGdQyFFDVc2cmd2Z5RIrA/tmp_x9h4tck.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/risotto_ai_funghi_e6d3a983-1cbf-43c9-a197-2e8b47504939.webp
+  ✅ Database updated
+
+[89/200] Ossobuco [bowl]
+  Prompt: Overhead food photography, Ossobuco in ceramic bowl, all ingredients arranged in sections and clearl...
+  ✅ Generated: https://replicate.delivery/xezq/xiKoU3ItZmq1OhSirR3sRL21lL2YclunfHppCxgqtjhYeIkVA/tmpcrmziy48.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/ossobuco_0804e229-f3d7-4732-a346-2575e56ea1bb.webp
+  ✅ Database updated
+
+[90/200] Minestrone Soup [bowl]
+  Prompt: Overhead food photography, Minestrone Soup in ceramic bowl, all ingredients arranged in sections and...
+  ✅ Generated: https://replicate.delivery/xezq/fDxkTwsZZQw9Fyz5YqW0uZA4w1Oetj59D0Cz8HjZ7t518IkVA/tmp4xkqkwpt.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/minestrone_soup_1324dae9-f2b0-4523-8fcd-b60f59721ecd.webp
+  ✅ Database updated
+
+📊 Progress: 90/200 (90 success, 0 failed)
+
+[91/200] Caprese Salad [salad]
+  Prompt: Overhead food photography, Caprese Salad in bowl or on plate, all ingredients visible and arranged c...
+  ✅ Generated: https://replicate.delivery/xezq/Ki4e6PdcxjyrSy6WKL4f70bnenfNKPOJKkVcnO8DIPC1zjQWB/tmptynbg8vh.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/caprese_salad_b2bf1319-1846-46aa-835f-589c6fb4feea.webp
+  ✅ Database updated
+
+[92/200] Bruschetta [plated_entree]
+  Prompt: Professional food photography, Bruschetta on white plate, main protein with crispy or seared exterio...
+  ✅ Generated: https://replicate.delivery/xezq/rMxuurmzpB7MGNIkpTxheKYvHViPW4abUdpTfKtXxJ7C9IkVA/tmp3mket9kx.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/bruschetta_3d1a1f10-5996-4096-8ad1-ec296c0f93c4.webp
+  ✅ Database updated
+
+[93/200] Arancini [plated_entree]
+  Prompt: Professional food photography, Arancini on white plate, main protein with crispy or seared exterior ...
+  ✅ Generated: https://replicate.delivery/xezq/I7GQ1GVKfTRfI0E4FbG4bivblWXBaqJ0RiaNYe36uWfi0jQWB/tmpmf1ffjkp.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/arancini_8a14c376-4fcb-4b38-8d00-c6ebbeb526fc.webp
+  ✅ Database updated
+
+[94/200] Tiramisu [plated_entree]
+  Prompt: Professional food photography, Tiramisu on white plate, main protein with crispy or seared exterior ...
+  ✅ Generated: https://replicate.delivery/xezq/LfUoK0cWDGSuIyayeYrLeFjkOLqMxByBkMKpFlPV9EUY6RIrA/tmpggm90nyb.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tiramisu_807cac3e-490b-48a1-9ea6-191eddb768e8.webp
+  ✅ Database updated
+
+[95/200] Panna Cotta [plated_entree]
+  Prompt: Professional food photography, Panna Cotta on white plate, main protein with crispy or seared exteri...
+  ✅ Generated: https://replicate.delivery/xezq/T5pg4yGsRrLvDZ2cgHxLbACk1iyihue3O0CS0H10o8npeIkVA/tmpxxw24g_2.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/panna_cotta_30ff5478-1196-4344-aa13-6f51a35683d7.webp
+  ✅ Database updated
+
+[96/200] Focaccia [sandwich]
+  Prompt: Professional food photography, Focaccia on wooden board or plate, all layers clearly visible, fresh ...
+  ✅ Generated: https://replicate.delivery/xezq/8ZR0QQGDcr41HBbdqcWtcsfynlATRAsWvQhTgGFJNYaseIkVA/tmprz2_o_38.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/focaccia_94973e5d-3f33-4dff-888d-6f0c44f878f7.webp
+  ✅ Database updated
+
+[97/200] Ravioli with Ricotta [noodles]
+  Prompt: Professional food photography, Ravioli with Ricotta in white ceramic bowl, noodles with visible text...
+  ✅ Generated: https://replicate.delivery/xezq/imUejzVu8kz0e0HFeq6gg8xBIQNt44Rq3ArwwbNzAuvf1jQWB/tmpnm7_24va.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/ravioli_with_ricotta_afc7a366-3b08-4240-8d46-f5b194f1495a.webp
+  ✅ Database updated
+
+[98/200] Saltimbocca [plated_entree]
+  Prompt: Professional food photography, Saltimbocca on white plate, main protein with crispy or seared exteri...
+  ✅ Generated: https://replicate.delivery/xezq/x2kPAAMPWXZaNN2BGLep8F8bGRV9DMrbfLijUyNfXfSU2jQWB/tmp_k4x5e9h.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/saltimbocca_6e65f157-f08c-43ae-a31d-ce8765342086.webp
+  ✅ Database updated
+
+[99/200] Gnocchi with Tomato Sauce [plated_entree]
+  Prompt: Professional food photography, Gnocchi with Tomato Sauce on white plate, main protein with crispy or...
+  ✅ Generated: https://replicate.delivery/xezq/yPT1PMDXLSbsPRZbdYRHwc5S9n5CrvdxKicIHfyyqR40eIkVA/tmpm5q70c25.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/gnocchi_with_tomato_sauce_eed73470-83d9-4120-b1ec-4aba50b577d1.webp
+  ✅ Database updated
+
+[100/200] Lasagna Bolognese [noodles]
+  Prompt: Professional food photography, Lasagna Bolognese in white ceramic bowl, noodles with visible texture...
+  ✅ Generated: https://replicate.delivery/xezq/lMHKHV0hcF5FDhNhs1MKllJzoWyQr17fteAe2fUKeGtYuHhsC/tmp_cgivm4x.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/lasagna_bolognese_6d4d35be-af08-471b-894b-a54035aff5ec.webp
+  ✅ Database updated
+
+📊 Progress: 100/200 (100 success, 0 failed)
+
+[101/200] Chicken Teriyaki [plated_entree]
+  Prompt: Professional food photography, Chicken Teriyaki on white plate, main protein with crispy or seared e...
+  ✅ Generated: https://replicate.delivery/xezq/KDrq8IRJiOamHpf6eLUlnhdvZNLbwEJbSLtlLWEAmoX49IkVA/tmpmw8mizmw.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_teriyaki_bccfcaa9-1b8b-457a-88ac-84b565cc05e3.webp
+  ✅ Database updated
+
+[102/200] Beef Teriyaki [plated_entree]
+  Prompt: Professional food photography, Beef Teriyaki on white plate, main protein with crispy or seared exte...
+  ✅ Generated: https://replicate.delivery/xezq/LM1FLmlbzqqcIhjmiJ6Em7KF8lQfnZFbXQegaiy15KvAeRIrA/tmpfoiydolp.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/beef_teriyaki_73c8c6dc-11c4-409c-b4d2-8809a9b3717e.webp
+  ✅ Database updated
+
+[103/200] Salmon Teriyaki [plated_entree]
+  Prompt: Professional food photography, Salmon Teriyaki on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/b92kja8RPP7FE5NCOwLLW4eoGEYSOiQhYxWBYagJi6FCfIkVA/tmp0wknobst.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/salmon_teriyaki_77c4ab34-ff63-4d4b-9e2b-09b7cbd8f8e6.webp
+  ✅ Database updated
+
+[104/200] Chicken Katsu [plated_entree]
+  Prompt: Professional food photography, Chicken Katsu on white plate, main protein with crispy or seared exte...
+  ✅ Generated: https://replicate.delivery/xezq/tZGlfmE5kQzPDyBV24hxqfM049nhHGpyYSx3FVW26F8JeRIrA/tmpq2s43brl.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_katsu_f1e84734-df3e-46cd-8279-7b6cb34acb27.webp
+  ✅ Database updated
+
+[105/200] Tonkatsu (Pork Cutlet) [plated_entree]
+  Prompt: Professional food photography, Tonkatsu (Pork Cutlet) on white plate, main protein with crispy or se...
+  ✅ Generated: https://replicate.delivery/xezq/bWQpYzFic1bZLBnk55Wo8afmp21Ip1x1fkTIxmUFJ5RNeRIrA/tmph2nxaqcv.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tonkatsu_pork_cutlet_452aafc4-e6a4-459c-bc39-53520c647896.webp
+  ✅ Database updated
+
+[106/200] Tempura [plated_entree]
+  Prompt: Professional food photography, Tempura on white plate, main protein with crispy or seared exterior v...
+  ✅ Generated: https://replicate.delivery/xezq/MjCbWfYADgQRACuLzKrza7TNr4TDNwqm6cmfWSiUH8zReRIrA/tmp90fl5q7n.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tempura_f8b32ee8-6c8d-4e51-8281-7ccf4d80384a.webp
+  ✅ Database updated
+
+[107/200] Gyoza [plated_entree]
+  Prompt: Professional food photography, Gyoza on white plate, main protein with crispy or seared exterior vis...
+  ✅ Generated: https://replicate.delivery/xezq/jFEW3rrBJRYYAVoZNh3wS1g0Q6IAjztN3gpr6k4LrtvlPCZF/tmphbjr3doj.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/gyoza_fa2e2e60-49ea-48a7-828d-9967d58f42f5.webp
+  ✅ Database updated
+
+[108/200] Ramen [bowl]
+  Prompt: Overhead food photography, Ramen in ceramic bowl, all ingredients arranged in sections and clearly v...
+  ✅ Generated: https://replicate.delivery/xezq/NR1XJ3zTujIXNV7zduHJtGUBOqlkyDWjOAN7p5XDuSrmPCZF/tmpn9x8b1d0.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/ramen_dcbb5de8-aa13-4ef3-a592-55ce95e44b98.webp
+  ✅ Database updated
+
+[109/200] Udon Soup [bowl]
+  Prompt: Overhead food photography, Udon Soup in ceramic bowl, all ingredients arranged in sections and clear...
+  ✅ Generated: https://replicate.delivery/xezq/flyQKks3ftjFykCZhyYNw9dJrFVeYtTh9naDLXMLkfG45jQWB/tmptrgnf051.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/udon_soup_083dad2a-d215-471d-a846-353258c6ce0a.webp
+  ✅ Database updated
+
+[110/200] Yakisoba [noodles]
+  Prompt: Professional food photography, Yakisoba in white ceramic bowl, noodles with visible texture and sauc...
+  ✅ Generated: https://replicate.delivery/xezq/QEoMIo778i6KEZnY4jFwb2fgPEdj9VheW6QqYNMq2rlleRIrA/tmpvhcaxxz2.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/yakisoba_c1758d8b-7bb0-4d88-b7d3-767cc27bbd11.webp
+  ✅ Database updated
+
+📊 Progress: 110/200 (110 success, 0 failed)
+
+[111/200] Okonomiyaki [plated_entree]
+  Prompt: Professional food photography, Okonomiyaki on white plate, main protein with crispy or seared exteri...
+  ✅ Generated: https://replicate.delivery/xezq/yXo4qHvxbH5JExxQIbP2Xtoy9sSVAirP4YBVzhsGULbqPCZF/tmp187udsmr.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/okonomiyaki_13a6c8e0-1738-4dbb-a880-f652c92d4c07.webp
+  ✅ Database updated
+
+[112/200] Takoyaki [plated_entree]
+  Prompt: Professional food photography, Takoyaki on white plate, main protein with crispy or seared exterior ...
+  ✅ Generated: https://replicate.delivery/xezq/BwhJeSyslUVe1k8F8LGcQXmBY9PoMf5FrZL6PYxJVn5i9RIrA/tmpeqmfo2xc.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/takoyaki_a1e6826e-9ca7-4700-991a-e0e2328f0e84.webp
+  ✅ Database updated
+
+[113/200] Miso Soup [bowl]
+  Prompt: Overhead food photography, Miso Soup in ceramic bowl, all ingredients arranged in sections and clear...
+  ✅ Generated: https://replicate.delivery/xezq/Ra7H1rpXq9qJCVQ63M6SeSeReg1cBAUUFV4Kd5mNnT879RIrA/tmpwl0mlga3.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/miso_soup_a6988cd9-1fc2-4ab1-84be-7971f03e6a30.webp
+  ✅ Database updated
+
+[114/200] California Roll [plated_entree]
+  Prompt: Professional food photography, California Roll on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/pMBnPOYBst4WIhCYeP6w08ERtfxq9JTQfd2MqM8spOJCejQWB/tmprzytcr_j.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/california_roll_4813b88c-843e-45c0-a8fb-a26bd7fa2fd7.webp
+  ✅ Database updated
+
+[115/200] Spicy Tuna Roll [plated_entree]
+  Prompt: Professional food photography, Spicy Tuna Roll on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/RNuVAH7kgEqfSqLSpaSWgWzbBRzGGzo1efe3tKUMDyud8jQWB/tmpml3zqiyb.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/spicy_tuna_roll_9544c6e7-6cb3-4c43-a564-49cf1d931852.webp
+  ✅ Database updated
+
+[116/200] Onigiri (Rice Balls) [plated_entree]
+  Prompt: Professional food photography, Onigiri (Rice Balls) on white plate, main protein with crispy or sear...
+  ✅ Generated: https://replicate.delivery/xezq/y8ss7NuaT8rsIVzutRC6gljxfOyjkqkKAC4LfJ8Y6pnNfRIrA/tmprq2lavob.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/onigiri_rice_balls_c97ff63e-7356-484d-8d6b-48fa06278797.webp
+  ✅ Database updated
+
+[117/200] Tamagoyaki (Japanese Omelette) [plated_entree]
+  Prompt: Professional food photography, Tamagoyaki (Japanese Omelette) on white plate, main protein with cris...
+  ✅ Generated: https://replicate.delivery/xezq/2JhCvtng0J6FApBtYm85Se7RBEV6E5e1egMmzKeCCwKH9jQWB/tmp76n940oo.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tamagoyaki_japanese_omelette_ef48052d-f4b3-4153-a009-50b6cacb013a.webp
+  ✅ Database updated
+
+[118/200] Classic Chicken Karaage [plated_entree]
+  Prompt: Professional food photography, Classic Chicken Karaage on white plate, main protein with crispy or s...
+  ✅ Generated: https://replicate.delivery/xezq/mlUohNcB4QYeTy6flFeqOIhra7jdNQrzMi4aWuSwTcvqejQWB/tmp012yydp7.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/classic_chicken_karaage_bd8d9f56-c246-489d-987c-152e2123eb7a.webp
+  ✅ Database updated
+
+[119/200] Beef Bowl (Gyudon) [bowl]
+  Prompt: Overhead food photography, Beef Bowl (Gyudon) in ceramic bowl, all ingredients arranged in sections ...
+  ✅ Generated: https://replicate.delivery/xezq/G9TwUe9BVx34FaK9sK1kCVgKbfkgJgqzWiN2aSXHMcHZfRIrA/tmpgz0_q5fd.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/beef_bowl_gyudon_facbd053-7be8-4c15-8d39-504f248c8f74.webp
+  ✅ Database updated
+
+[120/200] Matcha Ice Cream [baked_goods]
+  Prompt: Professional food photography, Matcha Ice Cream stacked on wooden board or cooling rack, golden-brow...
+  ✅ Generated: https://replicate.delivery/xezq/zfeKgIDo8Ije0IslWd8wcTq2eOrym3NQmHVK1tSH5ab69jQWB/tmpim6xu3pw.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/matcha_ice_cream_f43e6e21-6a00-417a-9c84-e0268a067c52.webp
+  ✅ Database updated
+
+📊 Progress: 120/200 (120 success, 0 failed)
+
+[121/200] Bibimbap [plated_entree]
+  Prompt: Professional food photography, Bibimbap on white plate, main protein with crispy or seared exterior ...
+  ✅ Generated: https://replicate.delivery/xezq/O2WIvblzUKokHNMFr2aHPfUufQphniv7JjMw8e0HNK2FfjQWB/tmpvkm6if32.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/bibimbap_c6a492ab-464d-4024-9fa2-41ac44869fd3.webp
+  ✅ Database updated
+
+[122/200] Bulgogi (Beef) [plated_entree]
+  Prompt: Professional food photography, Bulgogi (Beef) on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/gRFvkWwNaZawOFn6kb3p5b28lqsCCxQ4e8NlTIEbeyYnfRIrA/tmpv0kqkx7i.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/bulgogi_beef_2a778af2-46a8-4e0b-b39a-ab4ff5b958d0.webp
+  ✅ Database updated
+
+[123/200] Kimchi Fried Rice [plated_entree]
+  Prompt: Professional food photography, Kimchi Fried Rice on white plate, main protein with crispy or seared ...
+  ✅ Generated: https://replicate.delivery/xezq/iLdDRA3ByVZiF9cQC3XgtsWbGcTuteAj6pqN9lDWEaq1fIkVA/tmpzdqff7e6.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/kimchi_fried_rice_b227427d-c2ef-49e9-bbee-8d0eadde00f0.webp
+  ✅ Database updated
+
+[124/200] Korean Fried Chicken [plated_entree]
+  Prompt: Professional food photography, Korean Fried Chicken on white plate, main protein with crispy or sear...
+  ✅ Generated: https://replicate.delivery/xezq/CrGYvEDPS4qLCVsfp05CLuuwkwfqsVuKH0z7L29X6wHvfRIrA/tmpq3bzq2q7.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/korean_fried_chicken_e0bc3132-b1a4-4a21-b15a-1115d9910f91.webp
+  ✅ Database updated
+
+[125/200] Tteokbokki (Spicy Rice Cakes) [baked_goods]
+  Prompt: Professional food photography, Tteokbokki (Spicy Rice Cakes) stacked on wooden board or cooling rack...
+  ✅ Generated: https://replicate.delivery/xezq/cJPrYQl00H4xEdiNYfejykuw54BxxVnYfqxEQerVSewf8PCZF/tmpsztnsyyw.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tteokbokki_spicy_rice_cakes_d90a9bac-d59b-4ccc-8551-b4d4165081ea.webp
+  ✅ Database updated
+
+[126/200] Japchae (Glass Noodles) [noodles]
+  Prompt: Professional food photography, Japchae (Glass Noodles) in white ceramic bowl, noodles with visible t...
+  ✅ Generated: https://replicate.delivery/xezq/P41f7rgyVDV4WiKTfhP8PvyeqiQS0IUXhMEVeSe7kt84ePCZF/tmp7leuy2ut.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/japchae_glass_noodles_1115cbf3-1e61-47bd-8240-179209745c20.webp
+  ✅ Database updated
+
+[127/200] Sundubu Jjigae (Tofu Stew) [bowl]
+  Prompt: Overhead food photography, Sundubu Jjigae (Tofu Stew) in ceramic bowl, all ingredients arranged in s...
+  ✅ Generated: https://replicate.delivery/xezq/CotiHcHBOW5DIVfpeFLemTqRfH2fNhTDaA1HJjvlekzSffIkVA/tmp56pqar_w.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/sundubu_jjigae_tofu_stew_a691d4c1-7091-4bf3-8364-9b98274d324a.webp
+  ✅ Database updated
+
+[128/200] Galbi (Short Ribs) [plated_entree]
+  Prompt: Professional food photography, Galbi (Short Ribs) on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/DQv2ISbY2c5XFtDMBjN9fUkNyKNXe2IqoV3PQbVidM0CAJkVA/tmp1z8ea0vg.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/galbi_short_ribs_b51725da-9894-4508-9e77-3528c1a89448.webp
+  ✅ Database updated
+
+[129/200] Samgyeopsal (Pork Belly) [plated_entree]
+  Prompt: Professional food photography, Samgyeopsal (Pork Belly) on white plate, main protein with crispy or ...
+  ✅ Generated: https://replicate.delivery/xezq/MIvbiiCEDS7xDdzIKqiWdvoaXkien9M31desqKy30QNGAJkVA/tmp9kfh5a0t.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/samgyeopsal_pork_belly_3995e03a-2595-4ad0-9f08-29744a2bc83a.webp
+  ✅ Database updated
+
+[130/200] Korean Corn Dogs [plated_entree]
+  Prompt: Professional food photography, Korean Corn Dogs on white plate, main protein with crispy or seared e...
+  ✅ Generated: https://replicate.delivery/xezq/YeeeKoIEeRVqSRBJPKoeX5S10NayakfkChJYd5aqpTGoCQCZF/tmpojkpwyn5.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/korean_corn_dogs_139090bb-167d-4f90-a8f0-1256a6f41c94.webp
+  ✅ Database updated
+
+📊 Progress: 130/200 (130 success, 0 failed)
+
+[131/200] Kimchi Pancake [plated_entree]
+  Prompt: Professional food photography, Kimchi Pancake on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/4sZ3RnyZJoq1FdIecTt9PiSZROtmEsqSkQhF0fRqX8JOAJkVA/tmpjcqxcrns.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/kimchi_pancake_af820fa5-a2eb-4a87-8401-edd159da25b9.webp
+  ✅ Database updated
+
+[132/200] Dak Galbi (Spicy Chicken) [plated_entree]
+  Prompt: Professional food photography, Dak Galbi (Spicy Chicken) on white plate, main protein with crispy or...
+  ✅ Generated: https://replicate.delivery/xezq/pViiNztJgmoEONdIF9AaQZANq5gYenj8Uv2HgXSEUf0RAJkVA/tmpfcnevgo6.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/dak_galbi_spicy_chicken_550b4521-6769-4afb-a1e9-e6594aede38d.webp
+  ✅ Database updated
+
+[133/200] Jajangmyeon (Black Bean Noodles) [noodles]
+  Prompt: Professional food photography, Jajangmyeon (Black Bean Noodles) in white ceramic bowl, noodles with ...
+  ✅ Generated: https://replicate.delivery/xezq/x3jUAzo1Te2VFqe7wgtS1CiIMo5fKSLs9gca4vaHRzHqASIrA/tmpddzrvix0.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/jajangmyeon_black_bean_noodles_104c5b80-52f5-4558-b28a-c438a8b17ac5.webp
+  ✅ Database updated
+
+[134/200] Korean Beef Stew [bowl]
+  Prompt: Overhead food photography, Korean Beef Stew in ceramic bowl, all ingredients arranged in sections an...
+  ✅ Generated: https://replicate.delivery/xezq/vYyPdNJ4I4LpJFRfIbzS6Qgj9ZjQYOg3ZHRTL8GDURFNgEyKA/tmpayeof4il.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/korean_beef_stew_aa6f46b5-26f6-40d3-a583-70ea8ce1a731.webp
+  ✅ Database updated
+
+[135/200] Bingsu (Shaved Ice) [plated_entree]
+  Prompt: Professional food photography, Bingsu (Shaved Ice) on white plate, main protein with crispy or seare...
+  ✅ Generated: https://replicate.delivery/xezq/S6Tq2u6pXfTtYSkfiBXPjDfhxYNNs71Uema4JK9JgdT8BkQWB/tmpdilfdrgs.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/bingsu_shaved_ice_eac06bdd-4261-4792-aaae-ed9c4cb9c9e7.webp
+  ✅ Database updated
+
+[136/200] Hotteok (Sweet Pancakes) [baked_goods]
+  Prompt: Professional food photography, Hotteok (Sweet Pancakes) stacked on wooden board or cooling rack, gol...
+  ✅ Generated: https://replicate.delivery/xezq/tZDxfl6ShnXJFiOPrZf1UTe8WfoGuxC7JF5UgZlsxiegEIhsC/tmp9kj36dbt.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/hotteok_sweet_pancakes_b167efe6-2989-46ac-90ea-5c725ec15363.webp
+  ✅ Database updated
+
+[137/200] Gimbap [plated_entree]
+  Prompt: Professional food photography, Gimbap on white plate, main protein with crispy or seared exterior vi...
+  ✅ Generated: https://replicate.delivery/xezq/GvbzWgjtzoo5BdNInkF1NFNyfI76u9fvKizlkSOO5gFoAJkVA/tmptdqvf3a_.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/gimbap_452c8c19-08a5-4477-a728-edc0db57b8f5.webp
+  ✅ Database updated
+
+[138/200] Dakgangjeong (Sweet Crispy Chicken) [plated_entree]
+  Prompt: Professional food photography, Dakgangjeong (Sweet Crispy Chicken) on white plate, main protein with...
+  ✅ Generated: https://replicate.delivery/xezq/LHjtk9CdieyvSKNbf8IYn2iF6dQgDJ1YUI8T1LbJfeHzCkQWB/tmps8vfzr_s.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/dakgangjeong_sweet_crispy_chicken_61625577-bfad-4f03-ac55-7e3291f6655e.webp
+  ✅ Database updated
+
+[139/200] Kimchi Jjigae (Kimchi Stew) [bowl]
+  Prompt: Overhead food photography, Kimchi Jjigae (Kimchi Stew) in ceramic bowl, all ingredients arranged in ...
+  ✅ Generated: https://replicate.delivery/xezq/f5ZtlPHami1uVKcFFBrS8mB2n1wfVv8QvaCEf2RpgzngBSIrA/tmpe9mngopy.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/kimchi_jjigae_kimchi_stew_38b1ffb1-dfe9-4f50-b383-a9a3c7065db0.webp
+  ✅ Database updated
+
+[140/200] Mandu (Dumplings) [bowl]
+  Prompt: Overhead food photography, Mandu (Dumplings) in ceramic bowl, all ingredients arranged in sections a...
+  ✅ Generated: https://replicate.delivery/xezq/uFrbe8az9HTEayJcSFU96UUdFDLiuecWMWE5v10AC4yzAJkVA/tmprw0eg85i.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/mandu_dumplings_f359d9e7-cfa8-4e6f-b682-fd09473897f4.webp
+  ✅ Database updated
+
+📊 Progress: 140/200 (140 success, 0 failed)
+
+[141/200] Tacos al Pastor [sandwich]
+  Prompt: Professional food photography, Tacos al Pastor on wooden board or plate, all layers clearly visible,...
+  ✅ Generated: https://replicate.delivery/xezq/tG5Qgxvb3P7uDtRfjVTqIlKiKyClhwRH5gKzG69QQZscgEyKA/tmp69zhwkud.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tacos_al_pastor_b176e422-9c04-4bdb-bc64-0453afd78d5b.webp
+  ✅ Database updated
+
+[142/200] Chicken Tacos [sandwich]
+  Prompt: Professional food photography, Chicken Tacos on wooden board or plate, all layers clearly visible, f...
+  ✅ Generated: https://replicate.delivery/xezq/gm3eprhFPsTNZ6IrvtE2gRZi3G36D4mFQh8YxW0awikeAJkVA/tmp87aebpks.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_tacos_3c8145e6-a59f-4fb9-8510-567035f4581f.webp
+  ✅ Database updated
+
+[143/200] Beef Tacos [sandwich]
+  Prompt: Professional food photography, Beef Tacos on wooden board or plate, all layers clearly visible, fres...
+  ✅ Generated: https://replicate.delivery/xezq/lQmepZ2UvoT6WiQZ08EEjNKpONEKzm58EBGIp1jHAZ0ggEyKA/tmp7ld04k5f.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/beef_tacos_5ee1488e-2cdd-4508-88c1-399a8b2cc85a.webp
+  ✅ Database updated
+
+[144/200] Fish Tacos [sandwich]
+  Prompt: Professional food photography, Fish Tacos on wooden board or plate, all layers clearly visible, fres...
+  ✅ Generated: https://replicate.delivery/xezq/v8dZL3o1dMo4AhZTc7uVYI8pfej58cN84FPa8VzRp4zEBJkVA/tmpk0_v1frm.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/fish_tacos_fcb95651-0023-4d21-ae1e-017a7859584a.webp
+  ✅ Database updated
+
+[145/200] Chicken Enchiladas [plated_entree]
+  Prompt: Professional food photography, Chicken Enchiladas on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/30V8CgqwdUqTNBBSWz5u32yFdixXDFfTT8rvMxR4OEeIBJkVA/tmpaucsd0z5.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_enchiladas_384d950d-62a7-4fa4-ba47-52675b7c2f52.webp
+  ✅ Database updated
+
+[146/200] Beef Enchiladas [plated_entree]
+  Prompt: Professional food photography, Beef Enchiladas on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/6toD7MxiaMqEJF9xKKbvWCGBsnMzOvui6qpFHYIqQXvTQCZF/tmpypvoxdmi.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/beef_enchiladas_e08dd60f-4459-4e53-91ef-39078ce19de9.webp
+  ✅ Database updated
+
+[147/200] Cheese Quesadillas [sandwich]
+  Prompt: Professional food photography, Cheese Quesadillas on wooden board or plate, all layers clearly visib...
+  ✅ Generated: https://replicate.delivery/xezq/7HwK8BH8X34LJtxqZfckED4g5fxAtWZhLDeEXrG4J7YnCSIrA/tmpopgukw95.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/cheese_quesadillas_e8bee5bd-179d-4bea-9547-aab5b8456409.webp
+  ✅ Database updated
+
+[148/200] Chicken Quesadillas [sandwich]
+  Prompt: Professional food photography, Chicken Quesadillas on wooden board or plate, all layers clearly visi...
+  ✅ Generated: https://replicate.delivery/xezq/rHfvOr630v1uHiq4zKRL2cG1o5p7GgXFGBv641Ys0K7sgEyKA/tmpg9ogndhb.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_quesadillas_ce45d70e-c984-4645-bd9e-84b58582972a.webp
+  ✅ Database updated
+
+[149/200] Chicken Burrito [sandwich]
+  Prompt: Professional food photography, Chicken Burrito on wooden board or plate, all layers clearly visible,...
+  ✅ Generated: https://replicate.delivery/xezq/SUZRrymkkj4ILVzyIPd5Viri5ARb7pVot6ewq0cr2gKvgEyKA/tmpb0o1vbmy.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_burrito_20672679-9bd3-42cb-a521-93dc0d332a62.webp
+  ✅ Database updated
+
+[150/200] Guacamole [plated_entree]
+  Prompt: Professional food photography, Guacamole on white plate, main protein with crispy or seared exterior...
+  ✅ Generated: https://replicate.delivery/xezq/CMT0HYKLuB51LlDcCn2v7R6Sy4P8DOjHomRfGFv9RfqiBJkVA/tmpl7_nw9dl.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/guacamole_31e7af47-16bf-47a5-940c-ebdc287c2808.webp
+  ✅ Database updated
+
+📊 Progress: 150/200 (150 success, 0 failed)
+
+[151/200] Pico de Gallo [sandwich]
+  Prompt: Professional food photography, Pico de Gallo on wooden board or plate, all layers clearly visible, f...
+  ✅ Generated: https://replicate.delivery/xezq/RqX2NmeY06UOCyPp4R3QnAi1ILCYTCZVZs8T0MGBBsMzgEyKA/tmp_dpxm42z.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/pico_de_gallo_65001a6d-eed9-4d0e-8ffa-708f99042711.webp
+  ✅ Database updated
+
+[152/200] Chips and Salsa [plated_entree]
+  Prompt: Professional food photography, Chips and Salsa on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/ZS5OW8D6dDY6Ftv9ytLdyo6o6HK5I0yyeeJrsfaY6KIbDSIrA/tmpsw1ylgx6.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chips_and_salsa_9f1a257b-c953-47e9-9d20-81c60590a7c9.webp
+  ✅ Database updated
+
+[153/200] Elote (Mexican Street Corn) [plated_entree]
+  Prompt: Professional food photography, Elote (Mexican Street Corn) on white plate, main protein with crispy ...
+  ✅ Generated: https://replicate.delivery/xezq/BAW6H7NpZHJQONlHt6fsyKe51SsRl5NY44rPSS6H9jLxBJkVA/tmp5mzbdo9z.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/elote_mexican_street_corn_94f8c85f-7e17-46c5-bdab-50fd80c9a581.webp
+  ✅ Database updated
+
+[154/200] Pozole Rojo (Red Pork and Hominy Stew) [bowl]
+  Prompt: Overhead food photography, Pozole Rojo (Red Pork and Hominy Stew) in ceramic bowl, all ingredients a...
+  ✅ Generated: https://replicate.delivery/xezq/8jBtjfDL14WTTKkXHuzujbEPXlXfQD9V2ilNOPtNZNK1BJkVA/tmpl_chvf6o.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/pozole_rojo_red_pork_and_hominy_stew_a2144048-22e2-4e6d-a542-9e11a595eff5.webp
+  ✅ Database updated
+
+[155/200] Chicken Tortilla Soup [bowl]
+  Prompt: Overhead food photography, Chicken Tortilla Soup in ceramic bowl, all ingredients arranged in sectio...
+  ✅ Generated: https://replicate.delivery/xezq/n8FzgoMGZC4GF1PQ4fErMfbYZFefMIZDRDMDmoYVWweHPIhsC/tmpx0pw8qgd.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_tortilla_soup_88c65efd-22fb-4a74-8452-ae0e8c329a66.webp
+  ✅ Database updated
+
+[156/200] Chilaquiles Rojos [plated_entree]
+  Prompt: Professional food photography, Chilaquiles Rojos on white plate, main protein with crispy or seared ...
+  ✅ Generated: https://replicate.delivery/xezq/4W3zxO5g8S4XOlPpPz7MJebOkQWSOe1fLBe1fUoKMhjhPIhsC/tmpecmn56rh.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chilaquiles_rojos_ab074ff3-5268-4894-97cc-ced83e2170cd.webp
+  ✅ Database updated
+
+[157/200] Tamales [plated_entree]
+  Prompt: Professional food photography, Tamales on white plate, main protein with crispy or seared exterior v...
+  ✅ Generated: https://replicate.delivery/xezq/fjgQ54r5TE3OHaTz3eped7J778r2ENYBmiY8M3HuTpyAESIrA/tmpbeeygutu.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tamales_56061aab-75cf-4dcd-bee9-d8f9d9ff78a8.webp
+  ✅ Database updated
+
+[158/200] Churros [plated_entree]
+  Prompt: Professional food photography, Churros on white plate, main protein with crispy or seared exterior v...
+  ✅ Generated: https://replicate.delivery/xezq/7K6k5eY5aYTKekmkY0KyKibydAdc6AWNNuYfiYTxU6PLESIrA/tmp73otv48j.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/churros_44d50114-aa2d-45c6-a5b8-c81f4b1fa696.webp
+  ✅ Database updated
+
+[159/200] Tres Leches Cake [baked_goods]
+  Prompt: Professional food photography, Tres Leches Cake stacked on wooden board or cooling rack, golden-brow...
+  ✅ Generated: https://replicate.delivery/xezq/4GFom8aSEoLjKlNuBDFNlzb5nYToW4kicY4k2MkjLWliQCZF/tmp9k0yahv4.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tres_leches_cake_7f729d75-cf91-496b-a2dc-9dda56c15968.webp
+  ✅ Database updated
+
+[160/200] Mexican Rice [bowl]
+  Prompt: Overhead food photography, Mexican Rice in ceramic bowl, all ingredients arranged in sections and cl...
+  ✅ Generated: https://replicate.delivery/xezq/4wJEkg1Q1FY3LRhsfGpmRuOYQ3HBANQvfbIkYBT7ThhNCJkVA/tmpf3s8y_39.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/mexican_rice_b08ee31a-1453-4b90-83ff-2a8c6ea9e8ef.webp
+  ✅ Database updated
+
+📊 Progress: 160/200 (160 success, 0 failed)
+
+[161/200] Aglio e Olio (Garlic Pasta) [noodles]
+  Prompt: Professional food photography, Aglio e Olio (Garlic Pasta) in white ceramic bowl, noodles with visib...
+  ✅ Generated: https://replicate.delivery/xezq/Mvx63xTer6VGHqMlLsaqixGNponkvgyRGVcuNEdzj3uIhEyKA/tmp1a2ngq00.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/aglio_e_olio_garlic_pasta_47191eab-9597-462a-b720-7d448b8af7cf.webp
+  ✅ Database updated
+
+[162/200] Scrambled Eggs [plated_entree]
+  Prompt: Professional food photography, Scrambled Eggs on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/lUbwNrfrboQ5bqBh0cgaYe8fOtCCJbzFtGmyUD1qrjcqESIrA/tmp8jsl4v_i.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/scrambled_eggs_51bddbce-0907-446e-be0f-d7d1cacc0d35.webp
+  ✅ Database updated
+
+[163/200] Fried Eggs [plated_entree]
+  Prompt: Professional food photography, Fried Eggs on white plate, main protein with crispy or seared exterio...
+  ✅ Generated: https://replicate.delivery/xezq/FeWqXLSgF3Q9T6jJz8dyGEUfkOYfSVbiZjFPOjcKvrejJkQWB/tmpa36btzxv.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/fried_eggs_ccb42e4f-d552-4180-8613-12aff261bdb8.webp
+  ✅ Database updated
+
+[164/200] Omelette [plated_entree]
+  Prompt: Professional food photography, Omelette on white plate, main protein with crispy or seared exterior ...
+  ✅ Generated: https://replicate.delivery/xezq/5wglSp8LShZyAlR3dloNQeyNezUvAKt2h8hTAeajfBIzJkQWB/tmpz0qosb12.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/omelette_fc324c0b-457b-41cc-88f2-05f9efa3aa80.webp
+  ✅ Database updated
+
+[165/200] Avocado Toast [plated_entree]
+  Prompt: Professional food photography, Avocado Toast on white plate, main protein with crispy or seared exte...
+  ✅ Generated: https://replicate.delivery/xezq/70muGegKmUWjWC1HgfDBjSxrPO1epr07RefLM2ve6SkHoQCZF/tmp34bqvpy3.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/avocado_toast_6db8eafa-0322-4f55-973c-9ac84b13ed69.webp
+  ✅ Database updated
+
+[166/200] Caprese Sandwich [sandwich]
+  Prompt: Professional food photography, Caprese Sandwich on wooden board or plate, all layers clearly visible...
+  ✅ Generated: https://replicate.delivery/xezq/E6AXRbZkg5JkOdijxe8VCJGQVLtufOzgK0VVeQUuD5yGFSIrA/tmpx6_4hev4.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/caprese_sandwich_700ef177-12c0-40c8-95c1-03570dc0803b.webp
+  ✅ Database updated
+
+[167/200] Greek Salad [salad]
+  Prompt: Overhead food photography, Greek Salad in bowl or on plate, all ingredients visible and arranged col...
+  ✅ Generated: https://replicate.delivery/xezq/Aef534axBGledJqne3d6YIrtRIG1Kgl9fzq6GCuxWyRPVIhsC/tmpzwzp6d4w.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/greek_salad_a3a9dae4-0ec2-4e09-b42a-0e2cc9fb4406.webp
+  ✅ Database updated
+
+[168/200] Caesar Salad [salad]
+  Prompt: Overhead food photography, Caesar Salad in bowl or on plate, all ingredients visible and arranged co...
+  ✅ Generated: https://replicate.delivery/xezq/vBKjTlT8xFaFCF07MjjqPB2wkZGafilNnK7KD8QsJ2gWhEyKA/tmp371_p1bu.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/caesar_salad_e0ce5a84-73a6-4366-af54-f065febe004b.webp
+  ✅ Database updated
+
+[169/200] Chicken Caesar Salad [salad]
+  Prompt: Overhead food photography, Chicken Caesar Salad in bowl or on plate, all ingredients visible and arr...
+  ✅ Generated: https://replicate.delivery/xezq/nFXvtt5214qHKBiBnregcW8gS03hfeIEaRu8nQ7q4QDlFSIrA/tmp9_x_5v_v.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/chicken_caesar_salad_23b78c02-3c2b-489f-b157-62f49c71c7d4.webp
+  ✅ Database updated
+
+[170/200] Tuna Salad [salad]
+  Prompt: Overhead food photography, Tuna Salad in bowl or on plate, all ingredients visible and arranged colo...
+  ✅ Generated: https://replicate.delivery/xezq/PIp8lMMJPa4sI158UVbTxihLUPNYDoyttMQ4h32teRObhEyKA/tmpdn862_wj.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tuna_salad_0af6917a-f8d0-449c-9560-af6a816a35ac.webp
+  ✅ Database updated
+
+📊 Progress: 170/200 (170 success, 0 failed)
+
+[171/200] Egg Salad Sandwich [salad]
+  Prompt: Overhead food photography, Egg Salad Sandwich in bowl or on plate, all ingredients visible and arran...
+  ✅ Generated: https://replicate.delivery/xezq/fb7R4hISwXxUNStBzJJ02Ku9f8beTLVePWcm1RYVegWgXIhsC/tmpbki8l_po.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/egg_salad_sandwich_0cbc0023-4685-4b5d-bfea-d92f3380edb6.webp
+  ✅ Database updated
+
+[172/200] Grilled Chicken Breast [plated_entree]
+  Prompt: Professional food photography, Grilled Chicken Breast on white plate, main protein with crispy or se...
+  ✅ Generated: https://replicate.delivery/xezq/5MMxhlI5EaYeE6H9IHaAZ3NDG0NBgzsme2RdVBTAWnlBDJkVA/tmp5u8kov5v.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/grilled_chicken_breast_fb6ac6be-af5f-40fc-8806-c547de413d69.webp
+  ✅ Database updated
+
+[173/200] Pan-Seared Salmon [plated_entree]
+  Prompt: Professional food photography, Pan-Seared Salmon on white plate, main protein with crispy or seared ...
+  ✅ Generated: https://replicate.delivery/xezq/ymOcRcoLM9byLZUSCKDM2JRWfje4ySV1geeyoqPYRwVUMkQWB/tmp2mru825x.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/pan_seared_salmon_75f602eb-066a-4850-91c6-1a9d9090e617.webp
+  ✅ Database updated
+
+[174/200] Shrimp Scampi [noodles]
+  Prompt: Professional food photography, Shrimp Scampi in white ceramic bowl, noodles with visible texture and...
+  ✅ Generated: https://replicate.delivery/xezq/xeFQI6YVEetPGUazC84TgXalqhe1FZ9LOh9LhF2l9c1SGSIrA/tmpse8h63u2.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/shrimp_scampi_9f038bb5-b5f3-4d28-8927-a24de6cd1ba5.webp
+  ✅ Database updated
+
+[175/200] Stir Fry Vegetables [plated_entree]
+  Prompt: Professional food photography, Stir Fry Vegetables on white plate, main protein with crispy or seare...
+  ✅ Generated: https://replicate.delivery/xezq/ufCenxzSwxvofpnwams2BhDeciyZgNUrf9QTCOIHefnDnhEyKA/tmp8o8zsazf.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/stir_fry_vegetables_7cec8570-9673-41e5-833e-b3ae815fb40c.webp
+  ✅ Database updated
+
+[176/200] Tomato Soup [bowl]
+  Prompt: Overhead food photography, Tomato Soup in ceramic bowl, all ingredients arranged in sections and cle...
+  ✅ Generated: https://replicate.delivery/xezq/vNaScf5qD1WVTStpplfLMkS4lZvC9urIAsdWEa2BN7GSDJkVA/tmpdiwqew2m.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tomato_soup_cdb196f7-124e-4940-92b3-7b58c2f0a3df.webp
+  ✅ Database updated
+
+[177/200] Quesadilla [sandwich]
+  Prompt: Professional food photography, Quesadilla on wooden board or plate, all layers clearly visible, fres...
+  ✅ Generated: https://replicate.delivery/xezq/WWky7plmE9YJBlrf8uYOSaGgJNcvu0sLUNbZfuHkiO7WDJkVA/tmpz6ri79vk.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/quesadilla_bd22ad11-3700-42ea-97ae-634bd2d94dc3.webp
+  ✅ Database updated
+
+[178/200] Smoothie Bowl [bowl]
+  Prompt: Overhead food photography, Smoothie Bowl in ceramic bowl, all ingredients arranged in sections and c...
+  ✅ Generated: https://replicate.delivery/xezq/TbaG6RsQ5xInMZIx3MR2RCdwvy9OzwCYWCjeZjBCc0CthEyKA/tmpqatoo605.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/smoothie_bowl_6f6a61fb-0af9-44ac-b8d4-260b5c43b759.webp
+  ✅ Database updated
+
+[179/200] Protein Shake [beverage]
+  Prompt: Professional beverage photography, Protein Shake in clear glass or cup on white surface, drink clear...
+  ✅ Generated: https://replicate.delivery/xezq/vAibbtmS9oK0EhQCNhmTOn88C9oI4uflOknROs5fLnIdDJkVA/tmpsorjnjts.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/protein_shake_a2a2c3aa-df91-417c-9835-08766853c4ea.webp
+  ✅ Database updated
+
+[180/200] Overnight Oats [plated_entree]
+  Prompt: Professional food photography, Overnight Oats on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/YGjvqWKs8KqlH513Ovku5SQMJ8H0YoRAqRJNwtXwvm44QCZF/tmpw2ex8lbb.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/overnight_oats_bbd06b2b-e572-4f20-89cb-391b5c959473.webp
+  ✅ Database updated
+
+📊 Progress: 180/200 (180 success, 0 failed)
+
+[181/200] Pad Thai [noodles]
+  Prompt: Professional food photography, Pad Thai in white ceramic bowl, noodles with visible texture and sauc...
+  ✅ Generated: https://replicate.delivery/xezq/WMQ6NVFZGE7OFVFkkmneJ9FEaeHoRI9cHL1yxu0EpyFnDJkVA/tmp7v6a_pq3.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/pad_thai_9c4beaf1-9ad3-408a-9e50-a306c2322077.webp
+  ✅ Database updated
+
+[182/200] Green Curry Chicken [bowl]
+  Prompt: Overhead food photography, Green Curry Chicken in ceramic bowl, all ingredients arranged in sections...
+  ✅ Generated: https://replicate.delivery/xezq/hEyKYldnwJ7SFF6yRSUGKx7D8dxDxxDskfly0oDnenHtDJkVA/tmp625omx2g.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/green_curry_chicken_44826fb3-1bfb-46ce-b954-f0131d43cf3e.webp
+  ✅ Database updated
+
+[183/200] Red Curry Chicken [bowl]
+  Prompt: Overhead food photography, Red Curry Chicken in ceramic bowl, all ingredients arranged in sections a...
+  ✅ Generated: https://replicate.delivery/xezq/VgoWMQq7M5YLPxswmpzarAhUHKwqe23L5ISLnZCpyYT5hEyKA/tmpy9p2uvzy.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/red_curry_chicken_eb8f3e3b-4564-4747-87e8-7f42b8480620.webp
+  ✅ Database updated
+
+[184/200] Massaman Curry [plated_entree]
+  Prompt: Professional food photography, Massaman Curry on white plate, main protein with crispy or seared ext...
+  ✅ Generated: https://replicate.delivery/xezq/qFv53jecflpWqEhfxkQtYP14eQDocplDp6up9D9480LjPkQWB/tmpadcq3205.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/massaman_curry_70fe2593-8c35-464e-9e44-35626cf558df.webp
+  ✅ Database updated
+
+[185/200] Panang Curry [plated_entree]
+  Prompt: Professional food photography, Panang Curry on white plate, main protein with crispy or seared exter...
+  ✅ Generated: https://replicate.delivery/xezq/wG5gln1S3m69CJa9py93Ktw3fMe9eLyuNiW3fuVoET30PkQWB/tmpcy6dgpix.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/panang_curry_31968f04-a66a-4a73-857f-5f4db350f46e.webp
+  ✅ Database updated
+
+[186/200] Tom Yum Soup [bowl]
+  Prompt: Overhead food photography, Tom Yum Soup in ceramic bowl, all ingredients arranged in sections and cl...
+  ✅ Generated: https://replicate.delivery/xezq/hVCkMcHFz66eSKqDe7651uUvQelAPRpaTmBv6et71QeugIhsC/tmpjdf1_m03.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tom_yum_soup_dedac17b-f5c2-4338-bcef-50c3034eaebd.webp
+  ✅ Database updated
+
+[187/200] Tom Kha Gai (Coconut Chicken Soup) [bowl]
+  Prompt: Overhead food photography, Tom Kha Gai (Coconut Chicken Soup) in ceramic bowl, all ingredients arran...
+  ✅ Generated: https://replicate.delivery/xezq/UQozny3Gu6rjHJb3VeYDwXIOX7J5sefB5ZqtBjIzAhemQkQWB/tmpih8d4qjj.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/tom_kha_gai_coconut_chicken_soup_72a213b3-f446-4e09-9729-9129d7df2c01.webp
+  ✅ Database updated
+
+[188/200] Pad See Ew [noodles]
+  Prompt: Professional food photography, Pad See Ew in white ceramic bowl, noodles with visible texture and sa...
+  ✅ Generated: https://replicate.delivery/xezq/ReWNdghgbXz7Hiq1JRrbHX3Z3cvsWcfd5LyuyQsHZCkNEJkVA/tmp96yys5f1.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/pad_see_ew_c995dd8e-9965-4779-ac65-5c612a83458d.webp
+  ✅ Database updated
+
+[189/200] Drunken Noodles (Pad Kee Mao) [noodles]
+  Prompt: Professional food photography, Drunken Noodles (Pad Kee Mao) in white ceramic bowl, noodles with vis...
+  ✅ Generated: https://replicate.delivery/xezq/sAIXEMYt2e1rYq1qfy74kYV67aZ8OaZJR3FfKTqK6lyjISIrA/tmp6fgzq24l.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/drunken_noodles_pad_kee_mao_d5851d7e-a6dc-4970-997e-eaba3d3dd23a.webp
+  ✅ Database updated
+
+[190/200] Thai Basil Chicken [plated_entree]
+  Prompt: Professional food photography, Thai Basil Chicken on white plate, main protein with crispy or seared...
+  ✅ Generated: https://replicate.delivery/xezq/X9Velvz71QR1ZKzfok0ManuFUwAvCpdEZAu6uGJHVptYEJkVA/tmpzprl5xtd.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/thai_basil_chicken_ed6e9b1b-f5b3-4e81-8cdc-794d8e43c0cc.webp
+  ✅ Database updated
+
+📊 Progress: 190/200 (190 success, 0 failed)
+
+[191/200] Thai Fried Rice [plated_entree]
+  Prompt: Professional food photography, Thai Fried Rice on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/aQx1wwcJ8cLDFtpmJgpLxKyGxJUQyEBjFP6M3p7fMepgEJkVA/tmp_3gpyecv.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/thai_fried_rice_97ec2999-6f16-41d3-bd34-f78459530b0e.webp
+  ✅ Database updated
+
+[192/200] Som Tam (Papaya Salad) [salad]
+  Prompt: Overhead food photography, Som Tam (Papaya Salad) in bowl or on plate, all ingredients visible and a...
+  ✅ Generated: https://replicate.delivery/xezq/JheaqvnnmXUdf0qe5lZY7vi2i5i4Qque4bheHBHFj3PpkIhsC/tmpq0rdvwh6.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/som_tam_papaya_salad_9cde366e-e69f-4513-a9fb-418815893bd7.webp
+  ✅ Database updated
+
+[193/200] Larb Gai (Chicken Salad) [salad]
+  Prompt: Overhead food photography, Larb Gai (Chicken Salad) in bowl or on plate, all ingredients visible and...
+  ✅ Generated: https://replicate.delivery/xezq/fi3hkgpA4Z2xVy1Lsx5j7OG4ktkxR2eGDj2FZyoVrYErEJkVA/tmplar1m6a8.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/larb_gai_chicken_salad_d97cbf24-aefb-44af-a82e-1987e4eed331.webp
+  ✅ Database updated
+
+[194/200] Satay Chicken [plated_entree]
+  Prompt: Professional food photography, Satay Chicken on white plate, main protein with crispy or seared exte...
+  ✅ Generated: https://replicate.delivery/xezq/KUAEYdiINaIfJKUjbc9pwPkS76Tf7qfbRfIQlxdzBPgHTkQWB/tmp8pw9uk8n.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/satay_chicken_f77c4e4d-5f4d-497a-a38e-561c5425c5cf.webp
+  ✅ Database updated
+
+[195/200] Spring Rolls [plated_entree]
+  Prompt: Professional food photography, Spring Rolls on white plate, main protein with crispy or seared exter...
+  ✅ Generated: https://replicate.delivery/xezq/tg9MfMeIj3gDCEEgdNTUKY1hgfdfOEwPPVxFpeDGi6VtmIhsC/tmpbk0dowm8.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/spring_rolls_efe57d5e-a84c-482a-87bc-06d03b8f1c04.webp
+  ✅ Database updated
+
+[196/200] Thai Fish Cakes [plated_entree]
+  Prompt: Professional food photography, Thai Fish Cakes on white plate, main protein with crispy or seared ex...
+  ✅ Generated: https://replicate.delivery/xezq/dTrIyNpVbVKaHdynW7NHTrqy7eGPT2Qjtgx9yQLbxTlciEyKA/tmprvrl2_hm.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/thai_fish_cakes_d0f6b5b8-fc47-4ab6-8db4-b475e5fb3a43.webp
+  ✅ Database updated
+
+[197/200] Mango Sticky Rice [plated_entree]
+  Prompt: Professional food photography, Mango Sticky Rice on white plate, main protein with crispy or seared ...
+  ✅ Generated: https://replicate.delivery/xezq/RVhMoPEc43o8FhguyP8wWcVC1fwfMv4W6hjPCx9lwOI8EJkVA/tmpic9qt8ot.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/mango_sticky_rice_93d39d5d-47e5-4bbe-a381-39a7baa3cbf5.webp
+  ✅ Database updated
+
+[198/200] Khao Soi [bowl]
+  Prompt: Overhead food photography, Khao Soi in ceramic bowl, all ingredients arranged in sections and clearl...
+  ✅ Generated: https://replicate.delivery/xezq/oNsyeMR5EjxGBaa8A9U0rBSEpF1PNuG9VtvX0JqQqFYgiEyKA/tmpqh18_v5o.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/khao_soi_13148404-32b7-47dd-b8ef-1a97e0663a9a.webp
+  ✅ Database updated
+
+[199/200] Pad Krapow (Basil Stir Fry) [plated_entree]
+  Prompt: Professional food photography, Pad Krapow (Basil Stir Fry) on white plate, main protein with crispy ...
+  ✅ Generated: https://replicate.delivery/xezq/V33TWTCvHC6DKBv24lf5If9ctdTcqhGf7p1LWE23aOJJKSIrA/tmpxhbovjyh.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/pad_krapow_basil_stir_fry_10296b51-9eb7-4f1a-906c-304f7cbb9d71.webp
+  ✅ Database updated
+
+[200/200] Thai Tea [beverage]
+  Prompt: Professional beverage photography, Thai Tea in clear glass or cup on white surface, drink clearly vi...
+  ✅ Generated: https://replicate.delivery/xezq/9G3Pgwg8saYnOVG1bi4x0ItND0oaSFeFpx2Ify2SRcVKFJkVA/tmp0575u_01.webp
+  💾 Saved: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images/thai_tea_87475be5-680c-450f-9d33-1f08c58ba724.webp
+  ✅ Database updated
+
+📊 Progress: 200/200 (200 success, 0 failed)
+
+================================================================================
+📊 FINAL SUMMARY
+================================================================================
+Total recipes: 200
+✅ Success: 200
+❌ Failed: 0
+💰 Actual cost: $8.00
+📁 Images saved to: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images
+
+💾 Full results saved to: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/generation_results.json
+
+✨ Generation complete!

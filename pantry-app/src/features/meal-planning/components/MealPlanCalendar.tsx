@@ -29,6 +29,8 @@ interface MealPlanCalendarProps {
   weekStartDate: string; // ISO date string (Monday)
   onAddMeal: (date: string, mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack') => void;
   onMealPress: (meal: PlannedMeal) => void;
+  onMealLongPress?: (meal: PlannedMeal) => void; // Optional: long-press for edit menu
+  onExtractMeal?: (meal: PlannedMeal) => void; // Optional: extract text-only meal to cook_card
   onRemoveMeal: (mealId: string) => void;
 }
 
@@ -51,6 +53,8 @@ export default function MealPlanCalendar({
   weekStartDate,
   onAddMeal,
   onMealPress,
+  onMealLongPress,
+  onExtractMeal,
   onRemoveMeal,
 }: MealPlanCalendarProps) {
   // Generate 7 days starting from weekStartDate
@@ -113,6 +117,8 @@ export default function MealPlanCalendar({
                       meal={meal}
                       mealType={mealType}
                       onPress={() => onMealPress(meal)}
+                      onLongPress={onMealLongPress ? () => onMealLongPress(meal) : undefined}
+                      onExtract={onExtractMeal ? () => onExtractMeal(meal) : undefined}
                       onRemove={() => onRemoveMeal(meal.id)}
                     />
                   ) : (
@@ -149,12 +155,18 @@ interface MealCardProps {
   meal: PlannedMeal;
   mealType: string;
   onPress: () => void;
+  onLongPress?: () => void;
+  onExtract?: () => void;
   onRemove: () => void;
 }
 
-function MealCard({ meal, mealType, onPress, onRemove }: MealCardProps) {
+function MealCard({ meal, mealType, onPress, onLongPress, onExtract, onRemove }: MealCardProps) {
   const cookCard = meal.cook_card;
+  const isExtracted = meal.is_extracted || !!meal.cook_card_id;
   const pantryMatch = meal.pantry_match_percent || 0;
+
+  // Get meal title (from cook_card or meal_title field)
+  const mealTitle = meal.meal_title || cookCard?.title || 'Untitled Meal';
 
   // Determine pantry match color
   const matchColor =
@@ -165,7 +177,12 @@ function MealCard({ meal, mealType, onPress, onRemove }: MealCardProps) {
       : theme.colors.pantryMatch.low;
 
   return (
-    <Pressable style={styles.mealCard} onPress={onPress}>
+    <Pressable
+      style={styles.mealCard}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={500}
+    >
       {/* Recipe Image */}
       {cookCard?.image_url ? (
         <View style={styles.mealImageContainer}>
@@ -186,31 +203,54 @@ function MealCard({ meal, mealType, onPress, onRemove }: MealCardProps) {
             size={32}
             color={theme.colors.textSecondary}
           />
+          {/* Text-Only Badge */}
+          {!isExtracted && (
+            <View style={styles.textOnlyBadge}>
+              <Text style={styles.textOnlyBadgeText}>📝</Text>
+            </View>
+          )}
         </View>
       )}
 
       {/* Meal Info */}
       <View style={styles.mealInfo}>
         <Text style={styles.mealTitle} numberOfLines={2}>
-          {cookCard?.title || 'Untitled Recipe'}
+          {mealTitle}
         </Text>
 
-        {/* Pantry Match Badge */}
-        <View style={styles.mealMetadata}>
-          <View style={[styles.pantryBadge, { backgroundColor: matchColor }]}>
-            <Text style={styles.pantryBadgeText}>{Math.round(pantryMatch)}%</Text>
-          </View>
-
-          {/* Missing Ingredients Count */}
-          {(meal.missing_ingredients_count || 0) > 0 && (
-            <View style={styles.missingBadge}>
-              <Ionicons name="alert-circle-outline" size={12} color={theme.colors.error} />
-              <Text style={styles.missingText}>
-                {meal.missing_ingredients_count} missing
-              </Text>
+        {/* Pantry Match Badge (only for extracted meals) */}
+        {isExtracted ? (
+          <View style={styles.mealMetadata}>
+            <View style={[styles.pantryBadge, { backgroundColor: matchColor }]}>
+              <Text style={styles.pantryBadgeText}>{Math.round(pantryMatch)}%</Text>
             </View>
-          )}
-        </View>
+
+            {/* Missing Ingredients Count */}
+            {(meal.missing_ingredients_count || 0) > 0 && (
+              <View style={styles.missingBadge}>
+                <Ionicons name="alert-circle-outline" size={12} color={theme.colors.error} />
+                <Text style={styles.missingText}>
+                  {meal.missing_ingredients_count} missing
+                </Text>
+              </View>
+            )}
+          </View>
+        ) : (
+          <View style={styles.mealMetadata}>
+            <View style={styles.textOnlyIndicator}>
+              <Ionicons name="text-outline" size={12} color={theme.colors.textSecondary} />
+              <Text style={styles.textOnlyText}>Text-only</Text>
+            </View>
+          </View>
+        )}
+
+        {/* Extract Button (for text-only meals) */}
+        {!isExtracted && onExtract && (
+          <Pressable style={styles.extractButton} onPress={onExtract}>
+            <Ionicons name="arrow-up-circle-outline" size={14} color={theme.colors.primary} />
+            <Text style={styles.extractButtonText}>Extract Recipe</Text>
+          </Pressable>
+        )}
 
         {/* Status Indicators */}
         <View style={styles.statusRow}>
@@ -379,6 +419,31 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: theme.colors.error,
   },
+  textOnlyBadge: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    padding: 4,
+  },
+  textOnlyBadgeText: {
+    fontSize: 16,
+  },
+  textOnlyIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+  },
+  textOnlyText: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -398,6 +463,22 @@ const styles = StyleSheet.create({
     top: 4,
     right: 4,
     padding: 4,
+  },
+  extractButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: '#EFF6FF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  extractButtonText: {
+    fontSize: 11,
+    color: theme.colors.primary,
+    fontWeight: '600',
   },
 
   // Empty Slot

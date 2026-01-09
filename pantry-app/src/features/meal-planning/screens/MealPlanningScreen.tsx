@@ -23,11 +23,17 @@ import { theme } from '../../../core/constants/theme';
 import { useAuth } from '../../../contexts/AuthContext';
 import MealPlanCalendar from '../components/MealPlanCalendar';
 import RecipeBrowserModal from '../components/RecipeBrowserModal';
+import AddMealModal from '../components/AddMealModal';
+import EditMealModal from '../components/EditMealModal';
+import ExtractMealModal from '../components/ExtractMealModal';
 import {
   getOrCreateActiveMealPlan,
   getMealsForPlan,
   addMealToPlan,
+  addTextOnlyMealToPlan,
   removeMealFromPlan,
+  updatePlannedMeal,
+  markMealAsCooked,
   getMealPlanSummary,
   getCurrentWeekRange,
   type MealPlan,
@@ -67,7 +73,16 @@ export default function MealPlanningScreen() {
     totalMissingIngredients: number;
   } | null>(null);
 
-  // Recipe browser modal state
+  // Add meal modal state (lightweight text-first)
+  const [addMealModalVisible, setAddMealModalVisible] = useState(false);
+
+  // Edit meal modal state
+  const [editingMeal, setEditingMeal] = useState<PlannedMeal | null>(null);
+
+  // Extract meal modal state (for upgrading text-only meals)
+  const [extractingMeal, setExtractingMeal] = useState<PlannedMeal | null>(null);
+
+  // Recipe browser modal state (for browsing saved recipes)
   const [browserVisible, setBrowserVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
@@ -101,7 +116,16 @@ export default function MealPlanningScreen() {
       // Load meals for this plan
       console.log('[MealPlanning] Loading meals for plan...');
       const planMeals = await getMealsForPlan(plan.id);
-      console.log('[MealPlanning] Loaded meals:', planMeals.length);
+      console.log('[MealPlanning] Loaded meals:', {
+        count: planMeals.length,
+        meals: planMeals.map(m => ({
+          id: m.id,
+          title: m.meal_title || m.cook_card?.title,
+          date: m.planned_date,
+          type: m.meal_type,
+          isExtracted: m.is_extracted,
+        }))
+      });
       setMeals(planMeals);
 
       // Load summary statistics
@@ -151,11 +175,63 @@ export default function MealPlanningScreen() {
     loadMealPlan();
   };
 
-  // Open recipe browser for specific meal slot
+  // Open add meal modal (lightweight text-first approach)
   const handleAddMeal = (date: string, mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack') => {
+    console.log('[MealPlanning] Add meal clicked:', { date, mealType });
     setSelectedDate(date);
     setSelectedMealType(mealType);
-    setBrowserVisible(true);
+    setAddMealModalVisible(true); // Default to lightweight modal
+  };
+
+  // Open recipe browser from AddMealModal
+  const handleBrowseRecipes = () => {
+    setAddMealModalVisible(false);
+    // Small delay to allow modal close animation
+    setTimeout(() => {
+      setBrowserVisible(true);
+    }, 300);
+  };
+
+  // Handle saving text-only meal (no extraction, instant save)
+  const handleSaveTextMeal = async (
+    mealTitle: string,
+    plannedDate: string,
+    mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack',
+    sourceUrl?: string
+  ) => {
+    if (!mealPlan) return;
+
+    try {
+      console.log('[MealPlanning] Saving text meal:', {
+        mealTitle,
+        plannedDate,
+        mealType,
+        mealPlanId: mealPlan.id,
+        currentWeek: {
+          start: getCurrentWeekRange(weekOffset).start,
+          end: getCurrentWeekRange(weekOffset).end,
+        }
+      });
+
+      await addTextOnlyMealToPlan(
+        mealPlan.id,
+        mealTitle,
+        plannedDate,
+        mealType,
+        sourceUrl
+      );
+
+      console.log('[MealPlanning] ✅ Meal saved, reloading plan...');
+
+      // Close modal and reload
+      setAddMealModalVisible(false);
+      await loadMealPlan(); // Wait for reload to complete
+
+      Alert.alert('Success', `"${mealTitle}" added to your meal plan!`);
+    } catch (error) {
+      console.error('[MealPlanning] ❌ Error saving text meal:', error);
+      Alert.alert('Error', 'Failed to save meal. Please try again.');
+    }
   };
 
   // Add selected recipe to meal plan
@@ -212,6 +288,91 @@ export default function MealPlanningScreen() {
     if (meal.cook_card?.id) {
       navigation.navigate('CookCard' as never, { cookCardId: meal.cook_card.id } as never);
     }
+  };
+
+  // Long-press to show edit menu
+  const handleMealLongPress = (meal: PlannedMeal) => {
+    const mealTitle = meal.meal_title || meal.cook_card?.title || 'Meal';
+
+    Alert.alert(
+      mealTitle,
+      'Choose an action',
+      [
+        {
+          text: 'Edit',
+          onPress: () => setEditingMeal(meal),
+        },
+        {
+          text: 'Mark as Cooked',
+          onPress: () => handleMarkCooked(meal.id),
+        },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => handleRemoveMeal(meal.id),
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
+  // Save edited meal
+  const handleSaveEdit = async (updates: {
+    meal_title?: string;
+    planned_date: string;
+    meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  }) => {
+    if (!editingMeal) return;
+
+    try {
+      await updatePlannedMeal(editingMeal.id, updates);
+
+      // Check if date changed to show appropriate message
+      const dateChanged = updates.planned_date !== editingMeal.planned_date;
+
+      setEditingMeal(null);
+      loadMealPlan();
+
+      if (dateChanged) {
+        const newDate = new Date(updates.planned_date).toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+        });
+        Alert.alert('Success', `Meal moved to ${newDate}`);
+      } else {
+        Alert.alert('Success', 'Meal updated successfully');
+      }
+    } catch (error) {
+      console.error('Error updating meal:', error);
+      Alert.alert('Error', 'Failed to update meal');
+    }
+  };
+
+  // Mark meal as cooked
+  const handleMarkCooked = async (mealId: string) => {
+    try {
+      await markMealAsCooked(mealId);
+      loadMealPlan();
+      Alert.alert('Success', 'Meal marked as cooked!');
+    } catch (error) {
+      console.error('Error marking meal as cooked:', error);
+      Alert.alert('Error', 'Failed to mark meal as cooked');
+    }
+  };
+
+  // Open extraction modal for text-only meal
+  const handleExtractMeal = (meal: PlannedMeal) => {
+    setExtractingMeal(meal);
+  };
+
+  // Handle successful extraction (reload meal plan to show updated card)
+  const handleExtracted = () => {
+    setExtractingMeal(null);
+    loadMealPlan();
   };
 
   // Generate meal plan with AI
@@ -470,6 +631,8 @@ export default function MealPlanningScreen() {
             weekStartDate={weekRange.start}
             onAddMeal={handleAddMeal}
             onMealPress={handleMealPress}
+            onMealLongPress={handleMealLongPress}
+            onExtractMeal={handleExtractMeal}
             onRemoveMeal={handleRemoveMeal}
           />
         </View>
@@ -514,7 +677,37 @@ export default function MealPlanningScreen() {
         </View>
       </ScrollView>
 
-      {/* Recipe Browser Modal */}
+      {/* Add Meal Modal (Lightweight Text-First) */}
+      <AddMealModal
+        visible={addMealModalVisible}
+        onClose={() => setAddMealModalVisible(false)}
+        onSave={handleSaveTextMeal}
+        onBrowseRecipes={handleBrowseRecipes}
+        preselectedDate={selectedDate}
+        preselectedMealType={selectedMealType}
+      />
+
+      {/* Edit Meal Modal */}
+      <EditMealModal
+        visible={!!editingMeal}
+        meal={editingMeal}
+        onClose={() => setEditingMeal(null)}
+        onSave={handleSaveEdit}
+      />
+
+      {/* Extract Meal Modal (Upgrade text-only meals to extracted cook cards) */}
+      {user && household && (
+        <ExtractMealModal
+          visible={!!extractingMeal}
+          meal={extractingMeal}
+          userId={user.id}
+          householdId={household.id}
+          onClose={() => setExtractingMeal(null)}
+          onExtracted={handleExtracted}
+        />
+      )}
+
+      {/* Recipe Browser Modal (For Browsing Saved Recipes) */}
       <RecipeBrowserModal
         visible={browserVisible}
         onClose={() => setBrowserVisible(false)}

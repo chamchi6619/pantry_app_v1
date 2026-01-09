@@ -11,7 +11,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 // Inlined canonical matcher (from _shared/canonicalMatcher.ts)
 interface CanonicalItem {
   id: string;
-  canonical_name: string;
+  name: string;
   aliases: string[] | null;
   category: string | null;
 }
@@ -123,11 +123,11 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
 
   // 1. EXACT MATCH on canonical name
   for (const item of canonicalItems) {
-    if (normalize(item.canonical_name) === normalized) {
+    if (normalize(item.name) === normalized) {
       return {
         canonical_item_id: item.id,
         confidence: 'exact',
-        matched_name: item.canonical_name,
+        matched_name: item.name,
         score: 100
       };
     }
@@ -141,7 +141,7 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
           return {
             canonical_item_id: item.id,
             confidence: 'alias',
-            matched_name: item.canonical_name,
+            matched_name: item.name,
             score: 95
           };
         }
@@ -151,12 +151,12 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
 
   // 2.5 SINGULAR/PLURAL MATCH
   for (const item of canonicalItems) {
-    const canonicalNorm = normalize(item.canonical_name);
+    const canonicalNorm = normalize(item.name);
     if (canonicalNorm === normalized + 's' || canonicalNorm + 's' === normalized) {
       return {
         canonical_item_id: item.id,
         confidence: 'fuzzy',
-        matched_name: item.canonical_name,
+        matched_name: item.name,
         score: 90
       };
     }
@@ -164,7 +164,7 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
       return {
         canonical_item_id: item.id,
         confidence: 'fuzzy',
-        matched_name: item.canonical_name,
+        matched_name: item.name,
         score: 90
       };
     }
@@ -175,7 +175,7 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
           return {
             canonical_item_id: item.id,
             confidence: 'alias',
-            matched_name: item.canonical_name,
+            matched_name: item.name,
             score: 88
           };
         }
@@ -183,7 +183,7 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
           return {
             canonical_item_id: item.id,
             confidence: 'alias',
-            matched_name: item.canonical_name,
+            matched_name: item.name,
             score: 88
           };
         }
@@ -193,13 +193,13 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
 
   // 3. CONTAINS MATCH
   for (const item of canonicalItems) {
-    const canonicalNorm = normalize(item.canonical_name);
+    const canonicalNorm = normalize(item.name);
     if (canonicalNorm.length < 4) continue;
     if (normalized.includes(canonicalNorm)) {
       return {
         canonical_item_id: item.id,
         confidence: 'fuzzy',
-        matched_name: item.canonical_name,
+        matched_name: item.name,
         score: 80
       };
     }
@@ -207,7 +207,7 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
       return {
         canonical_item_id: item.id,
         confidence: 'fuzzy',
-        matched_name: item.canonical_name,
+        matched_name: item.name,
         score: 75
       };
     }
@@ -216,7 +216,7 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
   // 4. FUZZY MATCH using Levenshtein distance
   let bestMatch: { item: CanonicalItem; distance: number; score: number } | null = null;
   for (const item of canonicalItems) {
-    const canonicalNorm = normalize(item.canonical_name);
+    const canonicalNorm = normalize(item.name);
     const distance = levenshtein(normalized, canonicalNorm);
     const maxLength = Math.max(normalized.length, canonicalNorm.length);
     const threshold = Math.ceil(maxLength * 0.3);
@@ -246,7 +246,7 @@ function findMatch(ingredientName: string, canonicalItems: CanonicalItem[]): Mat
     return {
       canonical_item_id: bestMatch.item.id,
       confidence: 'fuzzy',
-      matched_name: bestMatch.item.canonical_name,
+      matched_name: bestMatch.item.name,
       score: bestMatch.score
     };
   }
@@ -280,7 +280,7 @@ interface AddToPantryResponse {
   item?: any;
   canonical_match?: {
     canonical_item_id: string;
-    canonical_name: string;
+    name: string;
     confidence: string;
     score?: number;
   };
@@ -294,15 +294,29 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
+    // Create client with user's auth token for RLS enforcement
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
-        auth: {
-          persistSession: false,
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
         },
       }
     );
+
+    // Verify authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const requestData = await req.json() as AddToPantryRequest;
     const {
@@ -319,7 +333,36 @@ Deno.serve(async (req) => {
       canonical_item_id: provided_canonical_id
     } = requestData;
 
-    console.log(`\n📦 Add to Pantry - v2 (canonical passthrough)`);
+    // Validate required fields
+    if (!household_id || !name || !quantity || !unit || !location) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Missing required fields: household_id, name, quantity, unit, location'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
+    }
+
+    // Validate location enum
+    if (!['fridge', 'freezer', 'pantry'].includes(location)) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Invalid location. Must be: fridge, freezer, or pantry'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
+    }
+
+    console.log(`\n📦 Add to Pantry - v3 (with auth & validation)`);
+    console.log(`   User: ${user.id}`);
     console.log(`   Item: "${name}"`);
     console.log(`   Household: ${household_id}`);
     console.log(`   Location: ${location}`);
@@ -335,9 +378,9 @@ Deno.serve(async (req) => {
     if (!provided_canonical_id) {
       // Load canonical items for matching
       console.log('\n📚 Loading canonical items for matching...');
-      const { data: canonicalItems, error: canonicalError } = await supabase
+      const { data: canonicalItems, error: canonicalError } = await supabaseClient
         .from('canonical_items')
-        .select('id, canonical_name, aliases, category');
+        .select('id, name, aliases, category');
 
       if (canonicalError) {
         console.error('❌ Error loading canonical items:', canonicalError);
@@ -352,7 +395,7 @@ Deno.serve(async (req) => {
           canonical_item_id = match.canonical_item_id;
           matchInfo = {
             canonical_item_id: match.canonical_item_id,
-            canonical_name: match.matched_name,
+            name: match.matched_name,
             confidence: match.confidence,
             score: match.score
           };
@@ -367,8 +410,9 @@ Deno.serve(async (req) => {
     }
 
     // Insert pantry item with canonical_item_id
+    // RLS policy will automatically validate user has access to household_id
     console.log('\n💾 Inserting to pantry_items...');
-    const { data: pantryItem, error: insertError } = await supabase
+    const { data: pantryItem, error: insertError } = await supabaseClient
       .from('pantry_items')
       .insert({
         household_id,

@@ -1,0 +1,1587 @@
+# Comprehensive Global Cuisine Dish Database
+
+## East Asian Cuisines
+
+### Chinese Cuisine
+
+**Sichuan Dishes:**
+- Mapo Tofu
+- Kung Pao Chicken
+- Twice Cooked Pork
+- Dan Dan Noodles
+- Sichuan Hot Pot
+- Fish-Flavored Shredded Pork
+- Sliced Beef and Ox Organs in Chili Sauce (Fuqi Feipian)
+- Zhangcha Duck
+
+**Cantonese Dishes:**
+- Char Siu (BBQ Pork)
+- White Cut Chicken
+- Cantonese Roasted Goose
+- Beef Chow Fun
+- Sweet and Sour Pork
+- Siu Mai
+- Har Gow
+- Char Siu Bao
+- Lo Mai Gai
+- Cheong Fun
+- Egg Tarts
+- Turnip Cake
+
+**Shanghai/Jiangsu Dishes:**
+- Xiaolongbao (Soup Dumplings)
+- Lion's Head Meatballs
+- Shanghai Scallion Pancakes
+- Red-Braised Pork Belly
+- Yangzhou Fried Rice
+- Sweet and Sour Squirrel Fish
+- Nanjing Salted Duck
+
+**Beijing/Northern Dishes:**
+- Peking Duck
+- Zhajiangmian
+- Beijing Hot Pot
+- Mongolian Hot Pot
+- Jiaozi (Dumplings)
+
+**Regional Chinese Specialties:**
+- Dongpo Pork (Zhejiang/Hangzhou)
+- West Lake Fish (Hangzhou)
+- Crossing the Bridge Noodles (Yunnan)
+- Roujiamo (Chinese Hamburger, Shaanxi)
+- Biang Biang Noodles (Shaanxi)
+- Lanzhou Beef Noodles
+- Hot Dry Noodles (Wuhan)
+- Guilin Rice Noodles
+- Snail Rice Noodles (Guangxi)
+- Dapanji (Big Plate Chicken, Xinjiang)
+- Hot and Sour Soup
+- Egg Drop Soup
+- Wonton Soup
+- Spring Rolls
+- Scallion Pancakes
+- Tea Eggs
+- Century Eggs
+- Chow Mein
+- Lo Mein
+- Egg Fried Rice
+- Congee
+- Zongzi
+- Mooncakes
+- Eight Treasure Rice
+- Nian Gao
+
+### Japanese Cuisine
+
+**Rice Dishes:**
+- Gohan (Steamed Rice)
+- Onigiri (Rice Balls)
+- Ochazuke
+- Kamameshi
+- Omurice
+- Gyudon
+- Katsudon
+- Oyakodon
+- Tendon
+- Unadon
+- Kaisendon
+
+**Sushi:**
+- Nigiri-zushi
+- Maki-zushi (Rolls)
+- Chirashizushi
+- Inarizushi
+- Temaki (Hand Rolls)
+
+**Noodles:**
+- Ramen (Shoyu, Miso, Tonkotsu, Shio)
+- Tsukemen
+- Udon (Kitsune, Tempura, Nabeyaki)
+- Soba (Zaru Soba, Tempura Soba)
+- Yakisoba
+- Yaki Udon
+- Somen
+
+**Deep-Fried Dishes:**
+- Tempura
+- Tonkatsu
+- Chicken Katsu
+- Karaage
+- Kushikatsu
+- Korokke
+- Agedashi Tofu
+
+**Grilled Dishes:**
+- Yakitori
+- Yakiniku
+- Teriyaki
+- Unagi (Grilled Eel)
+- Gyoza
+- Okonomiyaki
+- Takoyaki
+- Teppanyaki
+
+**Hot Pots:**
+- Sukiyaki
+- Shabu-shabu
+- Chanko Nabe
+- Oden
+
+**Other Dishes:**
+- Sashimi
+- Miso Soup
+- Nikujaga
+- Edamame
+- Natto
+- Tamagoyaki
+- Chawanmushi
+
+**Regional Specialties:**
+- Genghis Khan (Hokkaido)
+- Soup Curry (Hokkaido)
+- Monjayaki (Tokyo)
+- Hitsumabushi (Nagoya)
+- Miso Katsu (Nagoya)
+- Goya Champuru (Okinawa)
+- Rafute (Okinawa)
+
+**Desserts:**
+- Mochi
+- Dango
+- Taiyaki
+- Dorayaki
+- Daifuku
+- Anmitsu
+- Kakigori
+- Matcha Ice Cream
+
+### Korean Cuisine
+
+**Rice Dishes:**
+- Bibimbap
+- Dolsot Bibimbap
+- Gimbap
+- Kimchi Bokkeumbap
+- Yakbap
+
+**Noodles:**
+- Naengmyeon
+- Japchae
+- Jajangmyeon
+- Jjamppong
+- Kalguksu
+- Ramyeon
+
+**Kimchi & Pickles:**
+- Baechu Kimchi
+- Kkakdugi
+- Mul Kimchi
+- Oi Sobagi
+
+**Grilled Meats:**
+- Bulgogi
+- Galbi/Kalbi
+- Samgyeopsal
+- Dak Galbi
+
+**Stews & Soups:**
+- Kimchi Jjigae
+- Doenjang Jjigae
+- Sundubu Jjigae
+- Budae Jjigae
+- Galbitang
+- Samgyetang
+- Seolleongtang
+- Yukgaejang
+- Tteokguk
+- Miyeok Guk
+
+**Pancakes & Jeon:**
+- Pajeon
+- Kimchi Buchimgae
+- Bindaetteok
+- Haemul Pajeon
+
+**Other Dishes:**
+- Tteokbokki
+- Mandu
+- Galbijjim
+- Andong Jjimdak
+- Yukhoe
+
+**Desserts:**
+- Patbingsu
+- Hotteok
+- Yakgwa
+
+---
+
+## Southeast Asian Cuisines
+
+### Thai Cuisine
+
+**Curries:**
+- Green Curry (Kaeng Khiao Wan)
+- Red Curry (Kaeng Phet)
+- Massaman Curry
+- Panang Curry
+- Yellow Curry (Kaeng Kari)
+
+**Soups:**
+- Tom Yum Kung
+- Tom Kha Kai
+- Tom Saep
+
+**Noodles:**
+- Pad Thai
+- Pad See Ew
+- Pad Kee Mao (Drunken Noodles)
+- Khao Soi
+- Rad Na
+- Phat Wun Sen
+
+**Rice Dishes:**
+- Khao Man Kai
+- Khao Kha Mu
+- Khao Phat (Fried Rice)
+- Khao Mok (Thai Biryani)
+
+**Salads:**
+- Som Tam
+- Larb/Lap
+- Yam Wun Sen
+- Yam Nuea Yang
+- Nam Tok
+
+**Grilled/Fried:**
+- Gai Yang
+- Satay
+- Kai Thot
+- Pla Sam Rot
+
+**Other Dishes:**
+- Thot Man Pla (Fish Cakes)
+- Hoi Thod (Oyster Omelet)
+
+**Desserts:**
+- Mango Sticky Rice
+- Khanom Krok
+
+### Vietnamese Cuisine
+
+**Soups & Noodles:**
+- Pho (Bo/Ga)
+- Bun Bo Hue
+- Bun Rieu
+- Hu Tieu
+- Mi Quang
+- Cao Lau
+- Banh Canh
+
+**Other Noodle Dishes:**
+- Bun Cha
+- Bun Thit Nuong
+- Com Tam
+
+**Spring Rolls & Wraps:**
+- Goi Cuon (Fresh Spring Rolls)
+- Cha Gio (Fried Spring Rolls)
+- Banh Xeo
+- Banh Cuon
+- Bo La Lot
+
+**Other Dishes:**
+- Banh Mi
+- Ca Kho To
+- Thit Kho
+- Canh Chua
+
+### Indonesian Cuisine
+
+**Rice & Noodles:**
+- Nasi Goreng
+- Nasi Uduk
+- Mie Goreng
+
+**Main Dishes:**
+- Rendang
+- Satay
+- Soto Ayam
+- Rawon
+- Bakso
+- Ayam Goreng
+- Gado-Gado
+- Pecel
+
+**Snacks:**
+- Tempeh Goreng
+- Tahu Goreng
+- Lumpia
+- Siomay
+- Martabak
+- Pempek
+
+### Malaysian Cuisine
+
+**Rice & Noodles:**
+- Nasi Lemak
+- Nasi Goreng
+- Laksa (Penang/Curry)
+- Char Kway Teow
+- Hokkien Mee
+- Mee Goreng
+
+**Other Dishes:**
+- Rendang
+- Satay
+- Roti Canai
+- Murtabak
+- Bak Kut Teh
+- Chicken Rice
+- Rojak
+- Cendol
+
+### Filipino Cuisine
+
+**Main Dishes:**
+- Adobo
+- Sinigang
+- Kare-Kare
+- Lechon
+- Sisig
+- Bicol Express
+- Bulalo
+- Menudo
+- Kaldereta
+- Crispy Pata
+
+**Noodles & Rice:**
+- Pancit Canton
+- Pancit Bihon
+- Pancit Palabok
+- Arroz Caldo
+
+**Other Dishes:**
+- Lumpia
+- Ukoy
+- Empanada
+- Tapsilog
+
+**Desserts:**
+- Halo-Halo
+- Leche Flan
+- Bibingka
+- Turon
+
+### Singaporean Cuisine
+
+- Hainanese Chicken Rice
+- Chilli Crab
+- Laksa
+- Char Kway Teow
+- Hokkien Mee
+- Bak Chor Mee
+- Roti Prata
+- Satay
+- Fish Head Curry
+
+### Burmese Cuisine
+
+- Mohinga
+- Shan Noodles
+- Lahpet Thoke (Tea Leaf Salad)
+- Ohn No Khao Swe
+
+### Cambodian Cuisine
+
+- Amok Trey
+- Nom Banh Chok
+- Kuy Teav
+- Lok Lak
+- Bai Sach Chrouk
+
+### Laotian Cuisine
+
+- Laap/Larb
+- Tam Mak Hoong
+- Khao Piak Sen
+- Or Lam
+- Sai Oua
+
+---
+
+## South Asian Cuisines
+
+### Indian Cuisine
+
+**North Indian:**
+- Butter Chicken
+- Chicken Tikka Masala
+- Rogan Josh
+- Palak Paneer
+- Chana Masala
+- Dal Makhani
+- Tandoori Chicken
+- Biryani (Various styles)
+- Naan
+- Roti
+- Paratha
+- Samosa
+- Pakora
+- Chaat
+
+**South Indian:**
+- Idli
+- Dosa (Masala Dosa, Mysore Masala Dosa)
+- Vada
+- Uttapam
+- Appam
+- Puttu
+- Sambar
+- Rasam
+- Biryani (Hyderabadi)
+- Payasam
+
+**Bengali:**
+- Machher Jhol
+- Ilish Bhapa
+- Chingri Malai Curry
+- Kosha Mangsho
+- Roshogolla
+- Sandesh
+- Mishti Doi
+
+**Gujarati:**
+- Dhokla
+- Khandvi
+- Undhiyu
+- Thepla
+
+**Goan:**
+- Vindaloo
+- Fish Curry
+- Xacuti
+- Bebinca
+
+**Other Regional:**
+- Vada Pav (Maharashtra)
+- Pav Bhaji (Maharashtra)
+- Dal Baati Churma (Rajasthan)
+- Laal Maas (Rajasthan)
+
+**Desserts:**
+- Gulab Jamun
+- Jalebi
+- Rasgulla
+- Kheer
+- Gajar ka Halwa
+- Kulfi
+- Barfi
+- Ladoo
+
+### Pakistani Cuisine
+
+**Main Dishes:**
+- Nihari
+- Haleem
+- Karahi Gosht
+- Chapli Kabab
+- Seekh Kabab
+- Biryani (Sindhi/Pakistani)
+- Pulao
+
+**Breads:**
+- Naan
+- Roti
+- Paratha
+- Kulcha
+
+**Other:**
+- Samosa
+- Pakora
+
+### Bangladeshi Cuisine
+
+- Hilsa Curry (Ilish Maach)
+- Kacchi Biryani
+- Panta Bhat
+- Fuchka
+- Chotpoti
+
+### Sri Lankan Cuisine
+
+**Curries:**
+- Fish Ambul Thiyal
+- Kukul Mas Curry
+- Pol Sambol
+
+**Other Dishes:**
+- Kottu Roti
+- Hoppers (Egg Hoppers, String Hoppers)
+- Lamprais
+- Kiribath
+- Watalappan
+
+### Nepali Cuisine
+
+- Dal Bhat Tarkari
+- Momo
+- Sekuwa
+- Sel Roti
+- Thukpa
+
+---
+
+## Western European Cuisines
+
+### Italian Cuisine
+
+**Pasta:**
+- Spaghetti Carbonara
+- Bucatini all'Amatriciana
+- Cacio e Pepe
+- Tagliatelle al Ragù Bolognese
+- Lasagna Bolognese
+- Tortellini
+- Ravioli
+- Orecchiette con Cime di Rapa
+- Pasta alla Norma
+- Pasta con le Sarde
+
+**Pizza:**
+- Pizza Napoletana
+- Pizza Margherita
+
+**Risotto:**
+- Risotto alla Milanese
+- Risotto ai Porcini
+
+**Meat Dishes:**
+- Ossobuco
+- Cotoletta alla Milanese
+- Bistecca alla Fiorentina
+- Saltimbocca alla Romana
+- Porchetta
+
+**Seafood:**
+- Fritto Misto
+- Spaghetti alle Vongole
+
+**Soups:**
+- Minestrone
+- Ribollita
+- Pappa al Pomodoro
+
+**Appetizers:**
+- Bruschetta
+- Caprese Salad
+- Antipasto
+
+**Breads & Sides:**
+- Focaccia
+- Ciabatta
+- Arancini
+- Supplì
+
+**Desserts:**
+- Tiramisu
+- Panna Cotta
+- Cannoli
+- Gelato
+- Panettone
+- Pandoro
+- Sfogliatelle
+- Baba al Rum
+- Cassata
+
+### French Cuisine
+
+**Classic Dishes:**
+- Boeuf Bourguignon
+- Coq au Vin
+- Pot-au-Feu
+- Blanquette de Veau
+- Cassoulet
+- Bouillabaisse
+- Ratatouille
+- Quiche Lorraine
+- Soupe à l'Oignon
+- Steak au Poivre
+- Confit de Canard
+- Foie Gras
+- Escargots de Bourgogne
+- Croque Monsieur
+- Croque Madame
+
+**Regional:**
+- Choucroute Garnie (Alsace)
+- Tarte Flambée (Alsace)
+- Fondue Savoyarde
+- Raclette
+- Tartiflette
+- Gratin Dauphinois
+- Bouillabaisse (Provence)
+- Salade Niçoise (Nice)
+
+**Breads & Pastries:**
+- Baguette
+- Croissant
+- Pain au Chocolat
+- Brioche
+
+**Desserts:**
+- Crème Brûlée
+- Profiteroles
+- Éclairs
+- Macarons
+- Tarte Tatin
+- Clafoutis
+- Mousse au Chocolat
+- Mille-feuille
+- Madeleines
+
+### Spanish Cuisine
+
+**Main Dishes:**
+- Paella (Valenciana, Mixta, Negra)
+- Tortilla Española
+- Gazpacho
+- Salmorejo
+- Fabada Asturiana
+
+**Tapas:**
+- Patatas Bravas
+- Gambas al Ajillo
+- Croquetas
+- Pimientos de Padrón
+- Pulpo a la Gallega
+- Jamón Ibérico
+- Jamón Serrano
+- Boquerones en Vinagre
+- Chorizo
+- Calamares a la Romana
+
+**Regional:**
+- Bacalao al Pil-Pil (Basque)
+- Pa amb Tomàquet (Catalan)
+- Escalivada (Catalan)
+- Fideuà (Catalan)
+
+**Desserts:**
+- Churros con Chocolate
+- Crema Catalana
+- Tarta de Santiago
+- Flan
+- Turrón
+
+### Portuguese Cuisine
+
+**Main Dishes:**
+- Bacalhau à Brás
+- Bacalhau com Natas
+- Carne de Porco à Alentejana
+- Arroz de Pato
+- Francesinha
+- Cozido à Portuguesa
+- Ameijoas à Bulhão Pato
+
+**Soups:**
+- Caldo Verde
+
+**Desserts:**
+- Pastéis de Nata
+- Arroz Doce
+- Bolo Rei
+- Queijadas
+
+### Greek Cuisine
+
+**Appetizers (Meze):**
+- Tzatziki
+- Taramosalata
+- Melitzanosalata
+- Dolmades
+- Spanakopita
+- Tiropita
+- Saganaki
+
+**Main Dishes:**
+- Moussaka
+- Pastitsio
+- Souvlaki
+- Gyros
+- Kleftiko
+- Stifado
+- Giouvetsi
+
+**Salads:**
+- Horiatiki (Greek Salad)
+
+**Soups:**
+- Avgolemono
+- Fasolada
+
+**Desserts:**
+- Baklava
+- Galaktoboureko
+- Loukoumades
+- Kataifi
+
+### British Cuisine
+
+- Fish and Chips
+- Roast Beef with Yorkshire Pudding
+- Shepherd's Pie
+- Cottage Pie
+- Bangers and Mash
+- Toad in the Hole
+- Full English Breakfast
+- Cornish Pasty
+- Beef Wellington
+- Scotch Eggs
+- Pork Pies
+- Sticky Toffee Pudding
+- Eton Mess
+- Trifle
+
+### Irish Cuisine
+
+- Irish Stew
+- Colcannon
+- Boxty
+- Coddle
+- Bacon and Cabbage
+- Irish Soda Bread
+
+### Dutch Cuisine
+
+- Stamppot
+- Erwtensoep
+- Bitterballen
+- Stroopwafels
+- Poffertjes
+
+### Belgian Cuisine
+
+- Moules-Frites
+- Carbonnade Flamande
+- Waterzooi
+- Belgian Waffles
+- Belgian Chocolate
+
+### Swiss Cuisine
+
+- Fondue
+- Raclette
+- Rösti
+- Zürcher Geschnetzeltes
+
+### Austrian Cuisine
+
+- Wiener Schnitzel
+- Tafelspitz
+- Sachertorte
+- Apfelstrudel
+- Kaiserschmarrn
+
+---
+
+## Central & Eastern European Cuisines
+
+### German Cuisine
+
+- Sauerbraten
+- Schnitzel
+- Bratwurst
+- Currywurst
+- Schweinshaxe
+- Rouladen
+- Königsberger Klopse
+- Spätzle
+- Sauerkraut
+- Kartoffelpuffer
+- Schwarzwälder Kirschtorte
+- Pretzels
+
+### Polish Cuisine
+
+**Main Dishes:**
+- Pierogi
+- Gołąbki
+- Bigos
+- Kotlet Schabowy
+- Żurek
+- Barszcz
+
+**Soups:**
+- Rosół
+- Kapuśniak
+- Flaki
+
+**Desserts:**
+- Pączki
+- Sernik
+- Makowiec
+
+### Hungarian Cuisine
+
+- Goulash (Gulyás)
+- Chicken Paprikash
+- Pörkölt
+- Stuffed Peppers (Töltött Paprika)
+- Lángos
+- Dobos Torte
+
+### Russian Cuisine
+
+**Soups:**
+- Borscht
+- Shchi
+- Solyanka
+
+**Main Dishes:**
+- Pelmeni
+- Vareniki
+- Beef Stroganoff
+- Chicken Kiev
+- Golubtsy
+
+**Sides:**
+- Blini
+- Syrniki
+- Pirozhki
+
+**Desserts:**
+- Medovik
+
+### Czech Cuisine
+
+- Svíčková
+- Vepřo Knedlo Zelo
+- Goulash
+- Smažený Sýr
+- Trdelník
+
+### Romanian Cuisine
+
+- Sarmale
+- Mămăligă
+- Mici/Mititei
+- Ciorbă de Burtă
+
+### Ukrainian Cuisine
+
+- Borscht
+- Varenyky
+- Holubtsi
+- Chicken Kiev
+- Salo
+
+### Slovak Cuisine
+
+- Bryndzové Halušky
+- Kapustnica
+
+### Croatian Cuisine
+
+- Crni Rižot
+- Pašticada
+- Štrukli
+- Sarma
+
+### Serbian Cuisine
+
+- Ćevapčići
+- Pljeskavica
+- Sarma
+- Gibanica
+
+### Bulgarian Cuisine
+
+- Shopska Salata
+- Banitsa
+- Moussaka (Bulgarian style)
+- Kavarma
+
+---
+
+## Middle Eastern Cuisines
+
+### Lebanese Cuisine
+
+**Meze:**
+- Hummus
+- Baba Ghanoush
+- Labneh
+- Tabbouleh
+- Fattoush
+- Kibbeh
+- Falafel
+
+**Main Dishes:**
+- Shawarma
+- Kafta Kebab
+- Shish Taouk
+
+**Desserts:**
+- Baklava
+- Knafeh
+- Maamoul
+
+### Turkish Cuisine
+
+**Meze:**
+- Cacık
+- Muhammara
+- Çiğ Köfte
+- Dolma
+
+**Kebabs:**
+- Adana Kebap
+- Iskender Kebap
+- Shish Kebab
+- Döner Kebab
+
+**Other Dishes:**
+- Lahmacun
+- Pide
+- Börek
+- Gözleme
+- Karnıyarık
+- İmam Bayıldı
+
+**Desserts:**
+- Baklava
+- Künefe
+- Turkish Delight (Lokum)
+- Sütlaç
+- Kazandibi
+
+**Soups:**
+- Mercimek Çorbası
+
+### Persian/Iranian Cuisine
+
+**Rice Dishes:**
+- Chelo (with Tahdig)
+- Zereshk Polo
+- Baghali Polo
+- Tahchin
+
+**Stews (Khoresh):**
+- Ghormeh Sabzi
+- Gheimeh
+- Fesenjan
+
+**Kebabs:**
+- Kabab Koobideh
+- Kabab-e Barg
+- Joojeh Kabab
+
+**Other:**
+- Ash-e Reshteh
+- Abgoosht
+
+**Desserts:**
+- Sholeh Zard
+- Bastani
+- Faloodeh
+
+### Israeli Cuisine
+
+- Hummus
+- Falafel
+- Shakshuka
+- Sabich
+- Jerusalem Mixed Grill
+- Schnitzel
+- Bourekas
+
+### Syrian/Jordanian/Palestinian Cuisine
+
+- Mansaf (Jordanian)
+- Maqluba
+- Musakhan
+- Kibbeh
+- Fattoush
+- Kunafa
+
+### Iraqi Cuisine
+
+- Masgouf
+- Kubba
+- Dolma
+- Kleicha
+
+### Yemeni Cuisine
+
+- Mandi
+- Saltah
+- Fahsa
+- Lahoh
+- Bint al-Sahn
+
+---
+
+## African Cuisines
+
+### North African
+
+**Moroccan:**
+- Couscous
+- Tagine (various types)
+- Pastilla/B'stilla
+- Harira
+- Mechoui
+- Zaalouk
+- M'hanncha
+
+**Egyptian:**
+- Koshari
+- Ful Medames
+- Ta'ameya
+- Molokhia
+- Mahshi
+- Hawawshi
+- Umm Ali
+- Basbousa
+- Konafa
+
+**Tunisian:**
+- Brik
+- Shakshouka
+- Lablabi
+- Merguez
+- Makroudh
+
+**Algerian:**
+- Couscous Algérien
+- Chorba
+- Mhadjeb
+- Rechta
+
+### West African
+
+**Nigerian:**
+- Jollof Rice
+- Egusi Soup
+- Fufu
+- Pounded Yam
+- Suya
+- Moin Moin
+- Akara
+- Pepper Soup
+- Puff-Puff
+- Chin Chin
+
+**Ghanaian:**
+- Jollof Rice
+- Fufu
+- Banku
+- Kenkey
+- Waakye
+- Red Red
+- Groundnut Soup
+- Kelewele
+
+**Senegalese:**
+- Thieboudienne
+- Yassa
+- Mafe
+- Dibi
+
+**Other West African:**
+- Attiéké (Ivorian)
+- Kedjenou (Ivorian)
+
+### East African
+
+**Ethiopian:**
+- Injera
+- Doro Wat
+- Kitfo
+- Tibs
+- Shiro Wat
+- Misir Wat
+- Gomen
+- Beyaynetu
+
+**Kenyan:**
+- Ugali
+- Nyama Choma
+- Sukuma Wiki
+- Irio
+- Githeri
+- Pilau
+- Mandazi
+
+**Tanzanian:**
+- Ugali
+- Chipsi Mayai
+- Pilau
+- Mchuzi wa Samaki
+
+**Ugandan:**
+- Matoke
+- Luwombo
+- Rolex
+- Katogo
+
+**Somali:**
+- Bariis
+- Suqaar
+- Sambusa
+- Canjeero
+
+### Southern African
+
+**South African:**
+- Bobotie
+- Bunny Chow
+- Braai/Boerewors
+- Biltong
+- Potjiekos
+- Pap
+- Chakalaka
+- Vetkoek
+- Malva Pudding
+- Koeksisters
+
+**Zimbabwean:**
+- Sadza
+- Dovi
+- Kapenta
+- Mopane Worms
+
+**Mozambican:**
+- Peri-Peri Chicken
+- Matapa
+- Xima
+
+---
+
+## Latin American Cuisines
+
+### Mexican Cuisine
+
+**Tacos:**
+- Tacos al Pastor
+- Tacos de Carnitas
+- Tacos de Carne Asada
+- Tacos de Pescado
+
+**Traditional Dishes:**
+- Mole Poblano
+- Chiles en Nogada
+- Pozole
+- Cochinita Pibil
+- Barbacoa
+- Birria
+- Chilaquiles
+- Enchiladas
+
+**Other:**
+- Tamales
+- Burritos
+- Quesadillas
+- Tortas
+- Tlayudas
+- Sopes
+- Huaraches
+- Tostadas
+- Elote
+- Guacamole
+- Pico de Gallo
+- Churros
+- Tres Leches Cake
+- Flan
+
+### Brazilian Cuisine
+
+**Main Dishes:**
+- Feijoada
+- Moqueca
+- Vatapá
+- Acarajé
+- Churrasco
+- Picanha
+
+**Snacks:**
+- Pão de Queijo
+- Coxinha
+- Pastel
+- Bolinho de Bacalhau
+
+**Sides:**
+- Farofa
+- Couve Refogada
+
+**Desserts:**
+- Brigadeiro
+- Beijinho
+- Quindim
+- Açaí na Tigela
+
+### Peruvian Cuisine
+
+**Main Dishes:**
+- Ceviche
+- Lomo Saltado
+- Ají de Gallina
+- Causa Rellena
+- Anticuchos
+- Pollo a la Brasa
+
+**Rice Dishes:**
+- Arroz con Pollo
+- Arroz Chaufa
+
+**Soups:**
+- Chupe de Camarones
+
+**Desserts:**
+- Suspiro a la Limeña
+- Picarones
+
+### Argentine Cuisine
+
+**Main Dishes:**
+- Asado
+- Empanadas
+- Milanesa
+- Locro
+- Choripán
+
+**Sides:**
+- Chimichurri
+- Provoleta
+
+**Desserts:**
+- Alfajores
+- Dulce de Leche
+- Flan con Dulce de Leche
+- Medialunas
+
+### Colombian Cuisine
+
+**Main Dishes:**
+- Bandeja Paisa
+- Ajiaco
+- Sancocho
+- Lechona
+
+**Arepas:**
+- Arepa de Huevo
+- Arepa con Queso
+
+**Others:**
+- Empanadas
+- Patacones
+
+**Desserts:**
+- Arequipe
+- Obleas
+- Buñuelos
+
+### Chilean Cuisine
+
+- Cazuela
+- Pastel de Choclo
+- Empanadas de Pino
+- Completo
+- Curanto
+- Sopaipillas
+- Manjar
+
+### Venezuelan Cuisine
+
+- Pabellón Criollo
+- Arepas
+- Cachapas
+- Hallacas
+- Tequeños
+- Quesillo
+
+### Ecuadorian Cuisine
+
+- Ceviche
+- Encebollado
+- Hornado
+- Fritada
+- Bolón de Verde
+- Llapingachos
+
+### Bolivian Cuisine
+
+- Salteñas
+- Silpancho
+- Fricasé
+- Pique Macho
+
+### Uruguayan Cuisine
+
+- Chivito
+- Asado
+- Milanesa
+- Alfajores
+
+### Central American
+
+**Costa Rican:**
+- Gallo Pinto
+- Casado
+- Chifrijo
+
+**Guatemalan:**
+- Pepián
+- Kak'ik
+- Fiambre
+- Rellenitos
+
+**El Salvadoran:**
+- Pupusas
+- Yuca Frita con Chicharrón
+
+**Honduran:**
+- Baleadas
+- Sopa de Caracol
+
+**Nicaraguan:**
+- Gallo Pinto
+- Nacatamal
+- Vigorón
+
+**Panamanian:**
+- Sancocho
+- Ropa Vieja
+- Carimañolas
+
+---
+
+## Caribbean Cuisines
+
+### Jamaican Cuisine
+
+- Jerk Chicken
+- Jerk Pork
+- Ackee and Saltfish
+- Brown Stew Chicken
+- Curry Goat
+- Oxtail Stew
+- Escovitch Fish
+- Rice and Peas
+- Beef Patty
+- Festival
+- Bammy
+- Rum Cake
+
+### Cuban Cuisine
+
+- Ropa Vieja
+- Picadillo
+- Lechón Asado
+- Cuban Sandwich
+- Moros y Cristianos
+- Yuca con Mojo
+- Tostones
+- Flan Cubano
+- Tres Leches
+
+### Puerto Rican Cuisine
+
+- Mofongo
+- Arroz con Gandules
+- Pernil
+- Alcapurrias
+- Bacalaítos
+- Pasteles
+- Tostones
+- Tembleque
+- Coquito
+
+### Haitian Cuisine
+
+- Griot
+- Tassot
+- Diri ak Djon Djon
+- Soup Joumou
+- Pikliz
+- Pain Patate
+
+### Trinidad & Tobago
+
+- Doubles
+- Roti
+- Callaloo
+- Pelau
+- Bake and Shark
+- Curry Goat
+
+### Barbados
+
+- Cou-Cou and Flying Fish
+- Pudding and Souse
+- Jug Jug
+- Fish Cakes
+- Conkies
+
+### Dominican Republic
+
+- Sancocho
+- La Bandera
+- Mangú
+- Chicharrón de Pollo
+- Moro
+- Pastelón
+- Habichuelas con Dulce
+
+### Bahamas
+
+- Cracked Conch
+- Conch Fritters
+- Conch Salad
+- Peas 'n Rice
+- Guava Duff
+
+### Other Caribbean
+
+- Oil Down (Grenada)
+- Green Fig and Saltfish (Saint Lucia)
+- Goat Water (Saint Kitts)
+- Fungee and Pepperpot (Antigua)
+
+---
+
+## Other Regional Cuisines
+
+### Nordic/Scandinavian
+
+**Swedish:**
+- Köttbullar (Swedish Meatballs)
+- Gravlax
+- Surströmming
+- Kanelbullar
+- Prinsesstårta
+
+**Norwegian:**
+- Fårikål
+- Lutefisk
+- Rakfisk
+- Pinnekjøtt
+
+**Danish:**
+- Smørrebrød
+- Frikadeller
+- Stegt Flæsk
+- Æbleskiver
+- Wienerbrød
+
+**Finnish:**
+- Karjalanpiirakka
+- Lohikeitto
+- Poronkäristys
+- Korvapuusti
+
+**Icelandic:**
+- Hákarl
+- Skyr
+- Plokkfiskur
+- Pylsur
+
+### North American Regional
+
+**Southern US:**
+- Fried Chicken
+- Barbecue (Ribs, Brisket, Pulled Pork)
+- Cornbread
+- Collard Greens
+- Grits
+- Biscuits and Gravy
+- Pecan Pie
+
+**Cajun/Creole:**
+- Gumbo
+- Jambalaya
+- Crawfish Étouffée
+- Red Beans and Rice
+- Po' Boy
+- Beignets
+- Bananas Foster
+
+**Tex-Mex:**
+- Chili con Carne
+- Fajitas
+- Nachos
+- Queso
+- Texas BBQ Brisket
+- Breakfast Tacos
+
+**New England:**
+- New England Clam Chowder
+- Lobster Rolls
+- Boston Baked Beans
+- Fried Clams
+
+**Canadian:**
+- Poutine
+- Tourtière
+- Montreal Smoked Meat
+- Butter Tarts
+- Nanaimo Bars
+
+### Australian Cuisine
+
+- Meat Pies
+- Lamingtons
+- Pavlova
+- ANZAC Biscuits
+- Vegemite
+- Tim Tams
+- Barramundi
+
+### New Zealand Cuisine
+
+- Hāngī
+- Pavlova
+- Whitebait Fritters
+- Hokey Pokey Ice Cream
+- Lolly Cake
+
+### Pacific Island
+
+**Hawaiian:**
+- Poke
+- Kalua Pig
+- Laulau
+- Poi
+- Loco Moco
+- Spam Musubi
+- Haupia
+
+**Samoan:**
+- Palusami
+- Oka I'a
+- Sapasui
+
+**Tongan:**
+- Lū Pulu
+- 'Ota 'ika
+
+### Central Asian
+
+**Uzbek:**
+- Plov/Osh
+- Samsa
+- Shashlik
+- Manti
+- Lagman
+
+**Kazakh:**
+- Beshbarmak
+- Kazy
+- Baursak
+- Kumys
+
+---
+
+**Total Coverage:** This comprehensive database includes over 1,200 major dishes from more than 100 cuisines worldwide, organized by region and cuisine. Each dish is significant, popular, or iconic in its respective culinary tradition, providing extensive coverage for a global recipe database suitable for implementing with schema.org recipe schema.

@@ -87,3 +87,5 @@ nohup.out
 *Test*.tsx
 scripts/test_*
 test/
+venv/
+ytdlp-service/node_modules/

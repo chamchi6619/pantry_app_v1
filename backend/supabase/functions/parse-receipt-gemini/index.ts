@@ -297,7 +297,7 @@ ${ocr_text}`;
     console.log('📚 Loading canonical items for matching...');
     const { data: canonicalItems } = await supabase
       .from('canonical_items')
-      .select('id, canonical_name, aliases, category');
+      .select('id, name, aliases, category');
 
     console.log(`   Loaded ${canonicalItems?.length || 0} canonical items`);
 

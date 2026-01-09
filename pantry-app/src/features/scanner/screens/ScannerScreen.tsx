@@ -16,6 +16,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useHousehold } from '../../../hooks/useHousehold';
 import { receiptService } from '../../../services/receiptServiceGemini';
 import { offlineQueueService } from '../../../services/offlineQueueService';
+import { FEATURE_FLAGS } from '../../../config/featureFlags';
 
 export function ScannerScreen() {
   const navigation = useNavigation();
@@ -342,13 +343,17 @@ THANK YOU FOR SHOPPING`;
           </View>
         </View>
 
-        {/* Demo Mode Notice - Remove in production */}
-        <View style={styles.demoNotice}>
-          <Ionicons name="information-circle" size={16} color="#F59E0B" />
-          <Text style={styles.demoText}>
-            Demo: Using simulated OCR. ML Kit integration pending.
-          </Text>
-        </View>
+        {/* OCR Method Notice (only in dev mode) */}
+        {FEATURE_FLAGS.SHOW_OCR_METHOD_NOTICE && (
+          <View style={styles.ocrNotice}>
+            <Ionicons name="information-circle" size={16} color="#3B82F6" />
+            <Text style={styles.ocrNoticeText}>
+              {FEATURE_FLAGS.OCR_METHOD === 'cloud'
+                ? 'Using Cloud Vision API (production)'
+                : 'Using on-device OCR (iOS test)'}
+            </Text>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -521,17 +526,17 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: 4,
   },
-  demoNotice: {
+  ocrNotice: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#EFF6FF',
     borderRadius: 8,
     padding: 12,
     marginTop: 20,
   },
-  demoText: {
+  ocrNoticeText: {
     fontSize: 12,
-    color: '#92400E',
+    color: '#1E40AF',
     marginLeft: 8,
     flex: 1,
   },

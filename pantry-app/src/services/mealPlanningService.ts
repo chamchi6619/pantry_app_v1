@@ -26,7 +26,10 @@ export interface MealPlan {
 export interface PlannedMeal {
   id: string;
   meal_plan_id: string;
-  cook_card_id: string;
+  cook_card_id?: string; // Optional - can be null for text-only meals
+  meal_title?: string; // For lightweight planning without cook_card
+  source_url?: string; // Optional recipe URL reference
+  is_extracted: boolean; // TRUE if cook_card exists, FALSE if text-only
   planned_date: string; // ISO date string
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   pantry_match_percent?: number;
@@ -52,7 +55,9 @@ export interface CreateMealPlanInput {
 
 export interface AddMealToPlanInput {
   meal_plan_id: string;
-  cook_card_id: string;
+  cook_card_id?: string; // Optional - for text-only meals
+  meal_title?: string; // Required if cook_card_id is not provided
+  source_url?: string; // Optional recipe URL
   planned_date: string;
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
 }
@@ -221,28 +226,52 @@ export async function deleteMealPlan(planId: string): Promise<void> {
 }
 
 /**
- * Add a meal to a plan
+ * Add a meal to a plan (supports both text-only and extracted meals)
  */
 export async function addMealToPlan(
   input: AddMealToPlanInput,
   householdId: string
 ): Promise<PlannedMeal> {
-  // Calculate pantry match
-  const pantryMatch = await calculatePantryMatch(input.cook_card_id, householdId);
+  // Validate: must have either cook_card_id OR meal_title
+  if (!input.cook_card_id && !input.meal_title) {
+    throw new Error('Must provide either cook_card_id or meal_title');
+  }
+
+  let pantryMatch: PantryMatchResult | null = null;
+  let mealTitle = input.meal_title;
+
+  // If cook_card_id provided, calculate pantry match and get title
+  if (input.cook_card_id) {
+    pantryMatch = await calculatePantryMatch(input.cook_card_id, householdId);
+
+    // Get cook_card title if meal_title not provided
+    if (!mealTitle) {
+      const { data: cookCard } = await supabase
+        .from('cook_cards')
+        .select('title')
+        .eq('id', input.cook_card_id)
+        .single();
+
+      mealTitle = cookCard?.title || 'Untitled Meal';
+    }
+  }
 
   const { data, error } = await supabase
     .from('planned_meals')
     .insert({
       meal_plan_id: input.meal_plan_id,
-      cook_card_id: input.cook_card_id,
+      cook_card_id: input.cook_card_id || null,
+      meal_title: mealTitle,
+      source_url: input.source_url || null,
+      is_extracted: !!input.cook_card_id,
       planned_date: input.planned_date,
       meal_type: input.meal_type,
-      pantry_match_percent: pantryMatch.matchPercent,
-      missing_ingredients_count: pantryMatch.missingIngredients.length,
-      substitutions_applied: [
+      pantry_match_percent: pantryMatch?.matchPercent || null,
+      missing_ingredients_count: pantryMatch?.missingIngredients.length || 0,
+      substitutions_applied: pantryMatch ? [
         ...pantryMatch.strongSubstitutions,
         ...pantryMatch.weakSubstitutions,
-      ],
+      ] : [],
       status: 'planned',
       is_locked: false,
     })
@@ -251,6 +280,64 @@ export async function addMealToPlan(
 
   if (error) throw error;
   return data;
+}
+
+/**
+ * Add a text-only meal to plan (lightweight planning without extraction)
+ * This is a convenience wrapper for addMealToPlan with clearer semantics
+ */
+export async function addTextOnlyMealToPlan(
+  mealPlanId: string,
+  mealTitle: string,
+  plannedDate: string,
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack',
+  sourceUrl?: string
+): Promise<PlannedMeal> {
+  const { data, error } = await supabase
+    .from('planned_meals')
+    .insert({
+      meal_plan_id: mealPlanId,
+      meal_title: mealTitle,
+      source_url: sourceUrl || null,
+      is_extracted: false,
+      planned_date: plannedDate,
+      meal_type: mealType,
+      status: 'planned',
+      is_locked: false,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Link a text-only meal to a cook_card after extraction
+ */
+export async function linkMealToCookCard(
+  mealId: string,
+  cookCardId: string,
+  householdId: string
+): Promise<void> {
+  // Calculate pantry match for the newly linked cook_card
+  const pantryMatch = await calculatePantryMatch(cookCardId, householdId);
+
+  const { error } = await supabase
+    .from('planned_meals')
+    .update({
+      cook_card_id: cookCardId,
+      is_extracted: true,
+      pantry_match_percent: pantryMatch.matchPercent,
+      missing_ingredients_count: pantryMatch.missingIngredients.length,
+      substitutions_applied: [
+        ...pantryMatch.strongSubstitutions,
+        ...pantryMatch.weakSubstitutions,
+      ],
+    })
+    .eq('id', mealId);
+
+  if (error) throw error;
 }
 
 /**
@@ -308,6 +395,7 @@ export async function removeMealFromPlan(mealId: string): Promise<void> {
 
 /**
  * Mark a meal as cooked
+ * Note: Only adds to meal_history if meal has a cook_card_id (text-only meals are skipped)
  */
 export async function markMealAsCooked(mealId: string): Promise<void> {
   const { error } = await supabase
@@ -320,14 +408,15 @@ export async function markMealAsCooked(mealId: string): Promise<void> {
 
   if (error) throw error;
 
-  // Also update meal_history table for tracking
+  // Also update meal_history table for tracking (only for extracted meals)
   const { data: meal } = await supabase
     .from('planned_meals')
     .select('cook_card_id, meal_plan_id')
     .eq('id', mealId)
     .single();
 
-  if (meal) {
+  // Skip meal_history if no cook_card_id (text-only meal)
+  if (meal && meal.cook_card_id) {
     const { data: plan } = await supabase
       .from('meal_plans')
       .select('user_id, household_id')
@@ -383,6 +472,7 @@ export async function getMealsForDate(
 /**
  * Recalculate pantry match for all meals in a plan
  * (Useful after user adds new pantry items)
+ * Skips text-only meals (those without cook_card_id)
  */
 export async function recalculatePantryMatches(
   planId: string,
@@ -391,6 +481,9 @@ export async function recalculatePantryMatches(
   const meals = await getMealsForPlan(planId);
 
   for (const meal of meals) {
+    // Skip text-only meals (no cook_card_id)
+    if (!meal.cook_card_id) continue;
+
     const pantryMatch = await calculatePantryMatch(meal.cook_card_id, householdId);
 
     await supabase
@@ -409,9 +502,12 @@ export async function recalculatePantryMatches(
 
 /**
  * Get summary of meal plan
+ * Note: pantry match stats only include extracted meals (text-only meals don't have pantry match)
  */
 export async function getMealPlanSummary(planId: string): Promise<{
   totalMeals: number;
+  extractedMeals: number;
+  textOnlyMeals: number;
   cookedMeals: number;
   plannedMeals: number;
   skippedMeals: number;
@@ -420,12 +516,16 @@ export async function getMealPlanSummary(planId: string): Promise<{
 }> {
   const meals = await getMealsForPlan(planId);
 
+  const extractedMeals = meals.filter(m => m.is_extracted).length;
+  const textOnlyMeals = meals.filter(m => !m.is_extracted).length;
   const cookedMeals = meals.filter(m => m.status === 'cooked').length;
   const plannedMeals = meals.filter(m => m.status === 'planned').length;
   const skippedMeals = meals.filter(m => m.status === 'skipped').length;
 
-  const avgPantryMatch = meals.length > 0
-    ? meals.reduce((sum, m) => sum + (m.pantry_match_percent || 0), 0) / meals.length
+  // Calculate average pantry match only for extracted meals
+  const extractedMealsWithMatch = meals.filter(m => m.is_extracted && m.pantry_match_percent !== null);
+  const avgPantryMatch = extractedMealsWithMatch.length > 0
+    ? extractedMealsWithMatch.reduce((sum, m) => sum + (m.pantry_match_percent || 0), 0) / extractedMealsWithMatch.length
     : 0;
 
   const totalMissingIngredients = meals.reduce(
@@ -435,6 +535,8 @@ export async function getMealPlanSummary(planId: string): Promise<{
 
   return {
     totalMeals: meals.length,
+    extractedMeals,
+    textOnlyMeals,
     cookedMeals,
     plannedMeals,
     skippedMeals,

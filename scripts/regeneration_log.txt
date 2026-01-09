@@ -1,0 +1,372 @@
+🚀 REGENERATING 51 MISMATCHED RECIPE IMAGES
+==========================================
+
+📁 Output directory: /mnt/c/Users/chamc/OneDrive/Documents/GitHub/pantry_app_v1/scripts/recipe_images
+📊 Total to regenerate: 51
+💰 Estimated cost: $2.04
+
+
+[1/51]
+
+🎨 Generating: cacio_e_pepe
+📝 Prompt: Overhead food photography shot from directly above at 90-degree angle of Cacio e Pepe pasta, long st...
+♻️  Overwriting existing: cacio_e_pepe_97400d95-36fe-424c-8279-3e50d384b611.webp
+✅ Saved: cacio_e_pepe_97400d95-36fe-424c-8279-3e50d384b611.webp (171.3KB)
+
+[2/51]
+
+🎨 Generating: minestrone_soup
+📝 Prompt: Overhead food photography shot from directly above at 90-degree angle of Minestrone Soup, hearty Ita...
+♻️  Overwriting existing: minestrone_soup_1324dae9-f2b0-4523-8fcd-b60f59721ecd.webp
+✅ Saved: minestrone_soup_1324dae9-f2b0-4523-8fcd-b60f59721ecd.webp (180.7KB)
+
+[3/51]
+
+🎨 Generating: butter_chicken
+📝 Prompt: Overhead food photography shot from directly above of Butter Chicken, boneless chicken pieces comple...
+♻️  Overwriting existing: butter_chicken_fed91280-aa86-4e07-9a29-08ca970e7028.webp
+✅ Saved: butter_chicken_fed91280-aa86-4e07-9a29-08ca970e7028.webp (174.7KB)
+
+[4/51]
+
+🎨 Generating: chana_masala
+📝 Prompt: Overhead food photography shot from directly above of Chana Masala, chickpeas fully submerged in thi...
+♻️  Overwriting existing: chana_masala_8c14f1ab-54ae-4f70-b16a-4711ff72c689.webp
+✅ Saved: chana_masala_8c14f1ab-54ae-4f70-b16a-4711ff72c689.webp (170.5KB)
+
+[5/51]
+
+🎨 Generating: chicken_curry
+📝 Prompt: Overhead food photography shot from directly above of Chicken Curry, chicken pieces completely cover...
+♻️  Overwriting existing: chicken_curry_80d626cc-756c-4dc3-a747-0d03eb080fb5.webp
+✅ Saved: chicken_curry_80d626cc-756c-4dc3-a747-0d03eb080fb5.webp (189.1KB)
+
+[6/51]
+
+🎨 Generating: massaman_curry
+📝 Prompt: Overhead food photography shot from directly above of Massaman Curry, tender chunks of beef or chick...
+♻️  Overwriting existing: massaman_curry_70fe2593-8c35-464e-9e44-35626cf558df.webp
+✅ Saved: massaman_curry_70fe2593-8c35-464e-9e44-35626cf558df.webp (287.9KB)
+
+[7/51]
+
+🎨 Generating: palak_paneer
+📝 Prompt: Overhead food photography shot from directly above of Palak Paneer, white cubes of paneer cheese par...
+♻️  Overwriting existing: palak_paneer_348418b6-c269-427b-b5bc-f6644db394eb.webp
+✅ Saved: palak_paneer_348418b6-c269-427b-b5bc-f6644db394eb.webp (177.3KB)
+
+[8/51]
+
+🎨 Generating: rogan_josh
+📝 Prompt: Overhead food photography shot from directly above of Rogan Josh, tender lamb or mutton pieces compl...
+♻️  Overwriting existing: rogan_josh_a3b5df6d-e3ae-41e1-a281-4fa4f23386f8.webp
+✅ Saved: rogan_josh_a3b5df6d-e3ae-41e1-a281-4fa4f23386f8.webp (229.8KB)
+
+[9/51]
+
+🎨 Generating: vindaloo
+📝 Prompt: Overhead food photography shot from directly above of Vindaloo, tender pork or lamb pieces and potat...
+♻️  Overwriting existing: vindaloo_22320840-63a1-4cef-9e3e-518161daa9d2.webp
+✅ Saved: vindaloo_22320840-63a1-4cef-9e3e-518161daa9d2.webp (149.1KB)
+
+[10/51]
+
+🎨 Generating: dal_tadka
+📝 Prompt: Overhead food photography shot from directly above of Dal Tadka, yellow split lentils cooked into th...
+♻️  Overwriting existing: dal_tadka_eff8cebb-1387-4a8c-9fac-3c3382e5a703.webp
+✅ Saved: dal_tadka_eff8cebb-1387-4a8c-9fac-3c3382e5a703.webp (263.5KB)
+
+[11/51]
+
+🎨 Generating: vegetable_biryani
+📝 Prompt: Overhead food photography shot from directly above of Vegetable Biryani, fragrant basmati rice layer...
+♻️  Overwriting existing: vegetable_biryani_e83e17c9-233e-4ecd-b0a9-ee3ebef19067.webp
+✅ Saved: vegetable_biryani_e83e17c9-233e-4ecd-b0a9-ee3ebef19067.webp (175.2KB)
+
+[12/51]
+
+🎨 Generating: chicken_biryani
+📝 Prompt: Overhead food photography shot from directly above of Chicken Biryani, fragrant basmati rice layered...
+♻️  Overwriting existing: chicken_biryani_925b7fbf-8318-4190-a83f-7c5713d82d2b.webp
+✅ Saved: chicken_biryani_925b7fbf-8318-4190-a83f-7c5713d82d2b.webp (208.8KB)
+
+[13/51]
+
+🎨 Generating: chicken_fried_rice
+📝 Prompt: Overhead food photography shot from directly above of Chicken Fried Rice, golden-brown rice grains w...
+♻️  Overwriting existing: chicken_fried_rice_4858c016-5b0b-436f-a276-0d8d17b743e9.webp
+✅ Saved: chicken_fried_rice_4858c016-5b0b-436f-a276-0d8d17b743e9.webp (92.3KB)
+
+[14/51]
+
+🎨 Generating: fried_rice
+📝 Prompt: Overhead food photography shot from directly above of Fried Rice, golden-brown rice grains wok-fried...
+♻️  Overwriting existing: fried_rice_21a7cc10-d72a-4e49-9a28-ffdbac4b6e33.webp
+✅ Saved: fried_rice_21a7cc10-d72a-4e49-9a28-ffdbac4b6e33.webp (128.0KB)
+
+[15/51]
+
+🎨 Generating: kimchi_fried_rice
+📝 Prompt: Overhead food photography shot from directly above of Kimchi Fried Rice, rice grains wok-fried and t...
+♻️  Overwriting existing: kimchi_fried_rice_b227427d-c2ef-49e9-bbee-8d0eadde00f0.webp
+✅ Saved: kimchi_fried_rice_b227427d-c2ef-49e9-bbee-8d0eadde00f0.webp (146.6KB)
+
+[16/51]
+
+🎨 Generating: thai_fried_rice
+📝 Prompt: Overhead food photography shot from directly above of Thai Fried Rice, jasmine rice grains wok-fried...
+♻️  Overwriting existing: thai_fried_rice_97ec2999-6f16-41d3-bd34-f78459530b0e.webp
+✅ Saved: thai_fried_rice_97ec2999-6f16-41d3-bd34-f78459530b0e.webp (186.0KB)
+
+[17/51]
+
+🎨 Generating: vegetable_fried_rice
+📝 Prompt: Overhead food photography shot from directly above of Vegetable Fried Rice, golden-brown rice grains...
+♻️  Overwriting existing: vegetable_fried_rice_bd2171b7-45b5-40fb-8d7d-16e5a766e041.webp
+✅ Saved: vegetable_fried_rice_bd2171b7-45b5-40fb-8d7d-16e5a766e041.webp (161.6KB)
+
+[18/51]
+
+🎨 Generating: caesar_salad
+📝 Prompt: Overhead food photography shot from directly above of Caesar Salad, crisp romaine lettuce leaves tos...
+♻️  Overwriting existing: caesar_salad_e0ce5a84-73a6-4366-af54-f065febe004b.webp
+✅ Saved: caesar_salad_e0ce5a84-73a6-4366-af54-f065febe004b.webp (170.6KB)
+
+[19/51]
+
+🎨 Generating: chicken_caesar_salad
+📝 Prompt: Overhead food photography shot from directly above of Chicken Caesar Salad, crisp romaine lettuce le...
+♻️  Overwriting existing: chicken_caesar_salad_23b78c02-3c2b-489f-b157-62f49c71c7d4.webp
+✅ Saved: chicken_caesar_salad_23b78c02-3c2b-489f-b157-62f49c71c7d4.webp (242.2KB)
+
+[20/51]
+
+🎨 Generating: caprese_salad
+📝 Prompt: Overhead food photography shot from directly above of Caprese Salad, alternating slices of fresh whi...
+♻️  Overwriting existing: caprese_salad_b2bf1319-1846-46aa-835f-589c6fb4feea.webp
+✅ Saved: caprese_salad_b2bf1319-1846-46aa-835f-589c6fb4feea.webp (208.0KB)
+
+[21/51]
+
+🎨 Generating: greek_salad
+📝 Prompt: Overhead food photography shot from directly above of Greek Salad, chopped cucumbers, red tomatoes, ...
+♻️  Overwriting existing: greek_salad_a3a9dae4-0ec2-4e09-b42a-0e2cc9fb4406.webp
+✅ Saved: greek_salad_a3a9dae4-0ec2-4e09-b42a-0e2cc9fb4406.webp (207.1KB)
+
+[22/51]
+
+🎨 Generating: lasagna_bolognese
+📝 Prompt: Overhead food photography shot from directly above of Lasagna Bolognese slice, layered baked pasta d...
+♻️  Overwriting existing: lasagna_bolognese_6d4d35be-af08-471b-894b-a54035aff5ec.webp
+✅ Saved: lasagna_bolognese_6d4d35be-af08-471b-894b-a54035aff5ec.webp (153.3KB)
+
+[23/51]
+
+🎨 Generating: spaghetti_carbonara
+📝 Prompt: Overhead food photography shot from directly above of Spaghetti Carbonara, long spaghetti strands fu...
+♻️  Overwriting existing: spaghetti_carbonara_fbeb52bc-821e-400b-8c31-5b7953016439.webp
+✅ Saved: spaghetti_carbonara_fbeb52bc-821e-400b-8c31-5b7953016439.webp (148.0KB)
+
+[24/51]
+
+🎨 Generating: gnocchi_with_tomato_sauce
+📝 Prompt: Overhead food photography shot from directly above of Gnocchi with Tomato Sauce, soft potato gnocchi...
+♻️  Overwriting existing: gnocchi_with_tomato_sauce_eed73470-83d9-4120-b1ec-4aba50b577d1.webp
+✅ Saved: gnocchi_with_tomato_sauce_eed73470-83d9-4120-b1ec-4aba50b577d1.webp (261.3KB)
+
+[25/51]
+
+🎨 Generating: risotto_alla_milanese
+📝 Prompt: Overhead food photography shot from directly above of Risotto alla Milanese, creamy short-grain arbo...
+♻️  Overwriting existing: risotto_alla_milanese_2ecab346-87df-46a0-8ed9-d375bb97e481.webp
+✅ Saved: risotto_alla_milanese_2ecab346-87df-46a0-8ed9-d375bb97e481.webp (137.3KB)
+
+[26/51]
+
+🎨 Generating: pad_thai
+📝 Prompt: Overhead food photography shot from directly above of Pad Thai, flat rice noodles stir-fried with sh...
+♻️  Overwriting existing: pad_thai_9c4beaf1-9ad3-408a-9e50-a306c2322077.webp
+✅ Saved: pad_thai_9c4beaf1-9ad3-408a-9e50-a306c2322077.webp (137.4KB)
+
+[27/51]
+
+🎨 Generating: gimbap
+📝 Prompt: Overhead food photography shot from directly above of Gimbap Korean seaweed rice rolls, rice and fil...
+♻️  Overwriting existing: gimbap_452c8c19-08a5-4477-a728-edc0db57b8f5.webp
+✅ Saved: gimbap_452c8c19-08a5-4477-a728-edc0db57b8f5.webp (203.4KB)
+
+[28/51]
+
+🎨 Generating: egg_drop_soup
+📝 Prompt: Overhead food photography shot from directly above of Egg Drop Soup, clear golden chicken broth with...
+♻️  Overwriting existing: egg_drop_soup_fc2690b2-8c71-489c-8ba9-b05210f991f4.webp
+✅ Saved: egg_drop_soup_fc2690b2-8c71-489c-8ba9-b05210f991f4.webp (114.6KB)
+
+[29/51]
+
+🎨 Generating: ossobuco
+📝 Prompt: Overhead food photography shot from directly above of Ossobuco, braised veal shank cross-cut showing...
+♻️  Overwriting existing: ossobuco_0804e229-f3d7-4732-a346-2575e56ea1bb.webp
+✅ Saved: ossobuco_0804e229-f3d7-4732-a346-2575e56ea1bb.webp (225.6KB)
+
+[30/51]
+
+🎨 Generating: bibimbap
+📝 Prompt: Overhead food photography shot from directly above of Bibimbap, Korean rice bowl with white rice at ...
+♻️  Overwriting existing: bibimbap_c6a492ab-464d-4024-9fa2-41ac44869fd3.webp
+✅ Saved: bibimbap_c6a492ab-464d-4024-9fa2-41ac44869fd3.webp (236.8KB)
+
+[31/51]
+
+🎨 Generating: poke_bowl
+📝 Prompt: Overhead food photography shot from directly above of Poke Bowl, base of white or brown rice visible...
+♻️  Overwriting existing: poke_bowl_7fecb9a2-d710-4085-8cfa-9647a9b3a385.webp
+✅ Saved: poke_bowl_7fecb9a2-d710-4085-8cfa-9647a9b3a385.webp (217.1KB)
+
+[32/51]
+
+🎨 Generating: onigiri_rice_balls
+📝 Prompt: Overhead food photography shot from directly above of Onigiri Rice Balls, 2-3 triangle shaped Japane...
+♻️  Overwriting existing: onigiri_rice_balls_c97ff63e-7356-484d-8d6b-48fa06278797.webp
+✅ Saved: onigiri_rice_balls_c97ff63e-7356-484d-8d6b-48fa06278797.webp (108.1KB)
+
+[33/51]
+
+🎨 Generating: tteokbokki_spicy_rice_cakes
+📝 Prompt: Overhead food photography shot from directly above of Tteokbokki, Korean spicy rice cakes showing cy...
+♻️  Overwriting existing: tteokbokki_spicy_rice_cakes_d90a9bac-d59b-4ccc-8551-b4d4165081ea.webp
+✅ Saved: tteokbokki_spicy_rice_cakes_d90a9bac-d59b-4ccc-8551-b4d4165081ea.webp (135.4KB)
+
+[34/51]
+
+🎨 Generating: mango_sticky_rice
+📝 Prompt: Overhead food photography shot from directly above of Mango Sticky Rice, sweet coconut sticky rice (...
+♻️  Overwriting existing: mango_sticky_rice_93d39d5d-47e5-4bbe-a381-39a7baa3cbf5.webp
+✅ Saved: mango_sticky_rice_93d39d5d-47e5-4bbe-a381-39a7baa3cbf5.webp (71.4KB)
+
+[35/51]
+
+🎨 Generating: bruschetta
+📝 Prompt: Overhead food photography shot from directly above of Bruschetta, toasted golden-brown Italian bread...
+♻️  Overwriting existing: bruschetta_3d1a1f10-5996-4096-8ad1-ec296c0f93c4.webp
+✅ Saved: bruschetta_3d1a1f10-5996-4096-8ad1-ec296c0f93c4.webp (130.6KB)
+
+[36/51]
+
+🎨 Generating: focaccia
+📝 Prompt: Overhead food photography shot from directly above of Focaccia bread, thick fluffy Italian flatbread...
+♻️  Overwriting existing: focaccia_94973e5d-3f33-4dff-888d-6f0c44f878f7.webp
+✅ Saved: focaccia_94973e5d-3f33-4dff-888d-6f0c44f878f7.webp (193.7KB)
+
+[37/51]
+
+🎨 Generating: chips_and_salsa
+📝 Prompt: Overhead food photography shot from directly above of Chips and Salsa, pile of crispy triangular tor...
+♻️  Overwriting existing: chips_and_salsa_9f1a257b-c953-47e9-9d20-81c60590a7c9.webp
+✅ Saved: chips_and_salsa_9f1a257b-c953-47e9-9d20-81c60590a7c9.webp (162.0KB)
+
+[38/51]
+
+🎨 Generating: guacamole
+📝 Prompt: Overhead food photography shot from directly above of Guacamole, chunky bright green avocado dip sho...
+♻️  Overwriting existing: guacamole_31e7af47-16bf-47a5-940c-ebdc287c2808.webp
+✅ Saved: guacamole_31e7af47-16bf-47a5-940c-ebdc287c2808.webp (190.5KB)
+
+[39/51]
+
+🎨 Generating: tiramisu
+📝 Prompt: Overhead food photography shot from directly above of Tiramisu slice, Italian layered dessert showin...
+♻️  Overwriting existing: tiramisu_807cac3e-490b-48a1-9ea6-191eddb768e8.webp
+✅ Saved: tiramisu_807cac3e-490b-48a1-9ea6-191eddb768e8.webp (205.9KB)
+
+[40/51]
+
+🎨 Generating: panna_cotta
+📝 Prompt: Overhead food photography shot from directly above of Panna Cotta, smooth white Italian cream desser...
+♻️  Overwriting existing: panna_cotta_30ff5478-1196-4344-aa13-6f51a35683d7.webp
+✅ Saved: panna_cotta_30ff5478-1196-4344-aa13-6f51a35683d7.webp (82.4KB)
+
+[41/51]
+
+🎨 Generating: bingsu_shaved_ice
+📝 Prompt: Overhead food photography shot from directly above of Bingsu Korean Shaved Ice, mountain pile of ver...
+♻️  Overwriting existing: bingsu_shaved_ice_eac06bdd-4261-4792-aaae-ed9c4cb9c9e7.webp
+✅ Saved: bingsu_shaved_ice_eac06bdd-4261-4792-aaae-ed9c4cb9c9e7.webp (81.1KB)
+
+[42/51]
+
+🎨 Generating: chia_pudding
+📝 Prompt: Overhead food photography shot from directly above of Chia Pudding, creamy pudding showing smooth te...
+♻️  Overwriting existing: chia_pudding_799e4a69-8a1f-45ab-b47e-33116efb19b2.webp
+✅ Saved: chia_pudding_799e4a69-8a1f-45ab-b47e-33116efb19b2.webp (195.3KB)
+
+[43/51]
+
+🎨 Generating: overnight_oats
+📝 Prompt: Overhead food photography shot from directly above of Overnight Oats, creamy oatmeal mixture with vi...
+♻️  Overwriting existing: overnight_oats_bbd06b2b-e572-4f20-89cb-391b5c959473.webp
+✅ Saved: overnight_oats_bbd06b2b-e572-4f20-89cb-391b5c959473.webp (127.2KB)
+
+[44/51]
+
+🎨 Generating: greek_yogurt_parfait
+📝 Prompt: Overhead food photography shot from directly above of Greek Yogurt Parfait, served in clear glass sh...
+♻️  Overwriting existing: greek_yogurt_parfait_66afcb0b-1c0f-43e7-a5f6-8767a6cdc2cf.webp
+✅ Saved: greek_yogurt_parfait_66afcb0b-1c0f-43e7-a5f6-8767a6cdc2cf.webp (114.0KB)
+
+[45/51]
+
+🎨 Generating: chilaquiles_rojos
+📝 Prompt: Overhead food photography shot from directly above of Chilaquiles Rojos, fried tortilla chips simmer...
+♻️  Overwriting existing: chilaquiles_rojos_ab074ff3-5268-4894-97cc-ced83e2170cd.webp
+✅ Saved: chilaquiles_rojos_ab074ff3-5268-4894-97cc-ced83e2170cd.webp (149.5KB)
+
+[46/51]
+
+🎨 Generating: chicken_parmigiana
+📝 Prompt: Overhead food photography shot from directly above of Chicken Parmigiana, breaded chicken cutlet com...
+♻️  Overwriting existing: chicken_parmigiana_ce971d83-5d5e-4d06-9ad1-9647c87c3879.webp
+✅ Saved: chicken_parmigiana_ce971d83-5d5e-4d06-9ad1-9647c87c3879.webp (174.6KB)
+
+[47/51]
+
+🎨 Generating: stir_fry_vegetables
+📝 Prompt: Overhead food photography shot from directly above of Vegetable Stir Fry, colorful mixed vegetables ...
+♻️  Overwriting existing: stir_fry_vegetables_7cec8570-9673-41e5-833e-b3ae815fb40c.webp
+✅ Saved: stir_fry_vegetables_7cec8570-9673-41e5-833e-b3ae815fb40c.webp (173.5KB)
+
+[48/51]
+
+🎨 Generating: sweet_and_sour_pork
+📝 Prompt: Overhead food photography shot from directly above of Sweet and Sour Pork, battered and deep-fried p...
+♻️  Overwriting existing: sweet_and_sour_pork_35f6f587-6ec3-4e59-b74f-c2269ee8deef.webp
+✅ Saved: sweet_and_sour_pork_35f6f587-6ec3-4e59-b74f-c2269ee8deef.webp (172.1KB)
+
+[49/51]
+
+🎨 Generating: thai_basil_chicken
+📝 Prompt: Overhead food photography shot from directly above of Thai Basil Chicken Pad Krapow Gai, stir-fried ...
+♻️  Overwriting existing: thai_basil_chicken_ed6e9b1b-f5b3-4e81-8cdc-794d8e43c0cc.webp
+✅ Saved: thai_basil_chicken_ed6e9b1b-f5b3-4e81-8cdc-794d8e43c0cc.webp (140.9KB)
+
+[50/51]
+
+🎨 Generating: smoothie_bowl
+📝 Prompt: Overhead food photography shot from directly above of Smoothie Bowl, thick purple or pink smoothie b...
+♻️  Overwriting existing: smoothie_bowl_6f6a61fb-0af9-44ac-b8d4-260b5c43b759.webp
+✅ Saved: smoothie_bowl_6f6a61fb-0af9-44ac-b8d4-260b5c43b759.webp (181.5KB)
+
+[51/51]
+
+🎨 Generating: vegetable_stir_fry
+📝 Prompt: Overhead food photography shot from directly above of Vegetable Stir Fry, mixed colorful vegetables ...
+♻️  Overwriting existing: vegetable_stir_fry_6ae82b3b-1287-4e1b-9467-242e61bb37c2.webp
+✅ Saved: vegetable_stir_fry_6ae82b3b-1287-4e1b-9467-242e61bb37c2.webp (137.1KB)
+
+
+📊 REGENERATION COMPLETE
+=======================
+✅ Successful: 51/51
+❌ Failed: 0/51
+
+💰 Actual cost: $2.04
