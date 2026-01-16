@@ -1,20 +1,16 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   TouchableOpacity,
   Alert,
   Modal,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CookCard, PantryMatch, Ingredient } from '../types/CookCard';
-import { IngredientListItem } from '../components/cookcard/IngredientListItem';
-import { ConfidenceChip } from '../components/cookcard/ConfidenceChip';
 import { logIngressEvent } from '../services/telemetry';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
@@ -24,74 +20,55 @@ interface CookCardScreenProps {
   route?: {
     params?: {
       cookCard?: CookCard;
-      cookCardId?: string; // ID of user's saved cook_card
-      recipeDatabaseId?: string; // ID of recipe_database recipe
+      cookCardId?: string;
+      recipeDatabaseId?: string;
       mode?: 'normal' | 'needs_ingredients';
       sessionId?: string;
     };
   };
   cookCard?: CookCard;
-  mode?: 'normal' | 'needs_ingredients'; // L1-only extractions need manual ingredient confirmation
-  sessionId?: string; // For telemetry tracking
+  mode?: 'normal' | 'needs_ingredients';
+  sessionId?: string;
   onSave?: () => void;
   onCook?: () => void;
   onAddToShoppingList?: () => void;
 }
 
-/**
- * CookCardScreen Component
- *
- * Main screen for displaying a Cook Card with:
- * - Source attribution (creator, platform, link)
- * - Pantry match intelligence
- * - Ingredient list with Have/Need status
- * - Cost range (TODO: Task 3.2)
- * - Substitution toggle
- * - Confirmation flow for low-confidence extractions
- *
- * PRD Reference: COOKCARD_PRD_V1.md Section 4 (Core Product)
- */
 export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
   const navigation = useNavigation();
   const { householdId, user } = useAuth();
   const userId = user?.id;
 
-  // Extract route params
+  // Route params
   const cookCardId = props.route?.params?.cookCardId;
   const recipeDatabaseId = props.route?.params?.recipeDatabaseId;
   const mode = props.route?.params?.mode || props.mode || 'normal';
   const sessionId = props.route?.params?.sessionId || props.sessionId;
   const { onSave, onCook, onAddToShoppingList } = props;
 
-  // State for loaded cook card
+  // State
   const [cookCard, setCookCard] = useState<CookCard | null>(
     props.route?.params?.cookCard || props.cookCard || null
   );
   const [loading, setLoading] = useState(false);
   const [isFromDatabase, setIsFromDatabase] = useState(!!recipeDatabaseId);
+  const [pantryMatch, setPantryMatch] = useState<PantryMatch | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [showShoppingListModal, setShowShoppingListModal] = useState(false);
+  const [selectedOptionalIngredients, setSelectedOptionalIngredients] = useState<Set<string>>(new Set());
 
-  // Add close button to header (modal presentation)
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
-          style={{ paddingRight: 16 }}
-        >
-          <Ionicons name="close" size={28} color="#000" />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
+  // NEW: Serving scaler
+  const [servingMultiplier, setServingMultiplier] = useState(1);
+  const baseServings = cookCard?.servings || 4;
+  const currentServings = Math.round(baseServings * servingMultiplier);
 
-  // Load cook card data if IDs provided
+  // NEW: Completed steps tracking
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+
+  // Load cook card data
   useEffect(() => {
     const loadCookCard = async () => {
-      if (cookCard) return; // Already have cook card from props
+      if (cookCard) return;
 
       if (!cookCardId && !recipeDatabaseId) {
         console.error('[CookCard] No cook card, cookCardId, or recipeDatabaseId provided');
@@ -102,8 +79,6 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
 
       try {
         if (recipeDatabaseId) {
-          // Load from recipe_database
-          console.log('[CookCard] Loading recipe from database:', recipeDatabaseId.substring(0, 8));
           const { data: recipe, error } = await supabase
             .from('recipe_database')
             .select(`
@@ -117,20 +92,12 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
           if (error) throw error;
           if (!recipe) throw new Error('Recipe not found');
 
-          console.log('[CookCard] Loaded recipe:', {
-            id: recipe.id.substring(0, 8),
-            title: recipe.title,
-            ingredientCount: recipe.ingredients?.length || 0,
-            instructionCount: recipe.instructions?.length || 0
-          });
-
-          // Transform to CookCard format
           const transformedCookCard: CookCard = {
             id: recipe.id,
             version: '1.0',
             source: {
               url: recipe.source_url || '',
-              platform: (recipe.platform as Platform) || 'web',
+              platform: recipe.platform || 'web',
               creator: {
                 name: recipe.creator_name || 'Pantry App',
                 handle: recipe.creator_name || undefined,
@@ -155,9 +122,7 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
                       instruction: step.instruction_text,
                     })),
                 }
-              : {
-                  type: 'link_only',
-                },
+              : { type: 'link_only' },
             ingredients: (recipe.ingredients || []).map((ing: any, index: number) => ({
               name: ing.ingredient_name,
               normalized_name: ing.normalized_name || undefined,
@@ -166,7 +131,7 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
               unit: ing.unit || undefined,
               preparation: ing.preparation || undefined,
               confidence: 1.0,
-              provenance: 'creator_provided' as IngredientProvenance,
+              provenance: 'creator_provided',
               sort_order: ing.sort_order || index,
               is_optional: ing.is_optional || false,
             })),
@@ -184,7 +149,6 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
           setCookCard(transformedCookCard);
           setIsFromDatabase(true);
         } else if (cookCardId) {
-          // Load from cook_cards (user's saved recipes)
           const { data: card, error } = await supabase
             .from('cook_cards')
             .select('cook_card_data')
@@ -208,152 +172,95 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
     loadCookCard();
   }, [cookCardId, recipeDatabaseId, cookCard]);
 
-  const [pantryMatch, setPantryMatch] = useState<PantryMatch | null>(null);
-  const [saved, setSaved] = useState(false);
-  const [showShoppingListModal, setShowShoppingListModal] = useState(false);
-  const [selectedOptionalIngredients, setSelectedOptionalIngredients] = useState<Set<string>>(new Set());
-
   useEffect(() => {
     calculatePantryMatch();
   }, [cookCard]);
 
-  // Default save handler if none provided
-  const handleSave = async () => {
-    if (onSave) {
-      onSave();
-      return;
+  // Scale ingredient amount based on serving multiplier
+  const scaleAmount = (amount: number | string | undefined): string => {
+    if (!amount) return '';
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numAmount)) return String(amount);
+
+    const scaled = numAmount * servingMultiplier;
+    // Format nicely: remove trailing zeros, use fractions for common values
+    if (scaled === Math.floor(scaled)) {
+      return String(scaled);
     }
-
-    if (!cookCard) {
-      Alert.alert('Error', 'No recipe to save');
-      return;
-    }
-
-    // Default save behavior - save to database and log telemetry
-    try {
-      // Import services dynamically
-      const { saveCookCard } = await import('../services/cookCardService');
-      const { supabase } = await import('../lib/supabase');
-
-      // Get user info
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        Alert.alert('Error', 'You must be logged in to save recipes');
-        return;
-      }
-
-      // Get household ID (optional)
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('household_id')
-        .eq('id', user.id)
-        .single();
-
-      // Save to database
-      const result = await saveCookCard(
-        cookCard,
-        user.id,
-        profile?.household_id || undefined
-      );
-
-      if (result.alreadyExists) {
-        console.log('Cook Card already saved:', result.id);
-        Alert.alert(
-          'Already Saved',
-          "You've already saved this recipe!",
-          [{ text: 'OK' }]
-        );
-        // Don't change saved state - it was already saved
-        return;
-      }
-
-      // Only set saved if it's a new save
-      setSaved(true);
-      console.log('Cook Card saved:', result.id);
-
-      // Log telemetry
-      if (sessionId) {
-        logIngressEvent({
-          sessionId,
-          eventType: 'cook_card_saved',
-          ingressMethod: mode === 'needs_ingredients' ? 'paste_link' : 'share_extension_ios',
-          platform: cookCard.source.platform as any,
-          recipeUrl: cookCard.source.url,
-          metadata: {
-            extraction_method: cookCard.extraction?.method,
-            confidence: cookCard.extraction?.confidence,
-            cook_card_id: result.id,
-          },
-        });
-      }
-
-      // Show success message and navigate back
-      Alert.alert(
-        'Recipe Saved',
-        'This Cook Card has been saved to your collection.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Navigate back to recipes screen
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              }
-            },
-          },
-        ]
-      );
-    } catch (error) {
-      console.error('Failed to save Cook Card:', error);
-      setSaved(false);
-      Alert.alert(
-        'Save Failed',
-        'Could not save recipe. Please try again.',
-        [{ text: 'OK' }]
-      );
-    }
+    return scaled.toFixed(1).replace(/\.0$/, '');
   };
 
-  /**
-   * Handle add missing ingredients to shopping list
-   * Opens modal to let user select optional ingredients
-   */
+  // Get scaled ingredients
+  const scaledIngredients = useMemo(() => {
+    if (!cookCard?.ingredients) return [];
+    return cookCard.ingredients.map(ing => ({
+      ...ing,
+      scaledAmount: scaleAmount(ing.amount),
+    }));
+  }, [cookCard?.ingredients, servingMultiplier]);
+
+  const handleDelete = () => {
+    if (!cookCard?.id) {
+      Alert.alert('Error', 'Cannot delete this recipe');
+      return;
+    }
+
+    Alert.alert(
+      'Delete Recipe',
+      `Are you sure you want to delete "${cookCard.title}"? This cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const { error } = await supabase
+                .from('cook_cards')
+                .delete()
+                .eq('id', cookCard.id);
+
+              if (error) throw error;
+
+              Alert.alert('Deleted', 'Recipe has been deleted.', [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    if (navigation.canGoBack()) {
+                      navigation.goBack();
+                    }
+                  },
+                },
+              ]);
+            } catch (error) {
+              console.error('Failed to delete recipe:', error);
+              Alert.alert('Error', 'Failed to delete recipe. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleAddMissingToShoppingList = async () => {
     if (!pantryMatch || pantryMatch.need === 0) {
       Alert.alert('Nothing to Add', 'You have all the ingredients!');
       return;
     }
 
-    // Separate required and optional missing ingredients
     const requiredMissing = pantryMatch.missing_ingredients.filter(ing => !ing.is_optional);
     const optionalMissing = pantryMatch.missing_ingredients.filter(ing => ing.is_optional);
 
-    console.log('[CookCard] Shopping list breakdown:', {
-      totalMissing: pantryMatch.missing_ingredients.length,
-      requiredCount: requiredMissing.length,
-      optionalCount: optionalMissing.length,
-      optionals: optionalMissing.map(ing => ing.name),
-    });
-
-    // If no optional ingredients, add directly
     if (optionalMissing.length === 0) {
-      console.log('[CookCard] No optionals, adding directly');
       await confirmAddToShoppingList(requiredMissing.map(ing => ing.name));
       return;
     }
 
-    // Show modal for optional selection
-    console.log('[CookCard] Showing modal with optional ingredients');
-    setSelectedOptionalIngredients(new Set()); // Reset selection
+    setSelectedOptionalIngredients(new Set());
     setShowShoppingListModal(true);
   };
 
-  /**
-   * Actually add selected ingredients to shopping list
-   */
   const confirmAddToShoppingList = async (ingredientNames: string[]) => {
-
-    // Check if user is logged in
     if (!userId) {
       Alert.alert('Error', 'You must be logged in');
       return;
@@ -362,55 +269,39 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
     try {
       let activeHouseholdId = householdId;
 
-      // If no householdId from context, try to get or create one
       if (!activeHouseholdId) {
-        console.log('[CookCard] No householdId in context, attempting to create...');
         const { data: newHouseholdId, error } = await supabase.rpc('get_or_create_household');
-
         if (error || !newHouseholdId) {
-          console.error('[CookCard] Failed to get/create household:', error);
-          Alert.alert(
-            'Setup Required',
-            'Please complete your profile setup to use shopping lists. Go to Profile > Settings.'
-          );
+          Alert.alert('Setup Required', 'Please complete your profile setup.');
           return;
         }
-
         activeHouseholdId = newHouseholdId;
-        console.log('[CookCard] Created household:', activeHouseholdId);
       }
 
       const { addIngredientsToShoppingList } = await import('../services/shoppingListService');
 
-      // Map ingredient names to objects with optional flag
-      // Canonical matching will happen later when items are moved to inventory
       const ingredientObjects = ingredientNames.map(name => {
-        const matchingIngredient = cookCard.ingredients.find(ing => ing.name === name);
+        const matchingIngredient = cookCard?.ingredients.find(ing => ing.name === name);
         return matchingIngredient ? {
           name: matchingIngredient.name,
           is_optional: matchingIngredient.is_optional
-        } : name; // Fallback to just name if not found
+        } : name;
       });
 
-      // Add to shopping list (canonical matching happens at inventory time)
       const result = await addIngredientsToShoppingList(
         ingredientObjects,
         activeHouseholdId,
-        cookCard.id,
-        cookCard.title
+        cookCard?.id,
+        cookCard?.title
       );
 
-      // Show success with navigation hint
       if (result.added > 0) {
         const message = result.duplicates > 0
-          ? `Added ${result.added} item${result.added > 1 ? 's' : ''} to your shopping list (${result.duplicates} already in list).\n\nCheck the Shopping tab to see your list!`
-          : `Added ${result.added} item${result.added > 1 ? 's' : ''} to your shopping list!\n\nCheck the Shopping tab to see them.`;
-
-        Alert.alert('✅ Success', message, [
-          { text: 'OK', style: 'default' }
-        ]);
+          ? `Added ${result.added} item${result.added > 1 ? 's' : ''} (${result.duplicates} already in list)`
+          : `Added ${result.added} item${result.added > 1 ? 's' : ''}`;
+        Alert.alert('Added to Shopping List', message);
       } else {
-        Alert.alert('Already Added', 'All items are already in your shopping list.\n\nCheck the Shopping tab to see your list.');
+        Alert.alert('Already Added', 'All items are already in your shopping list.');
       }
     } catch (error) {
       console.error('Failed to add to shopping list:', error);
@@ -418,113 +309,79 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
     }
   };
 
-  /**
-   * Calculate pantry match percentage
-   */
   const calculatePantryMatch = async () => {
-    if (!userId || !householdId) {
-      // No user logged in, can't check pantry
-      return;
-    }
-
-    if (!cookCard) {
-      // CookCard not loaded yet
-      return;
-    }
+    if (!userId || !householdId || !cookCard) return;
 
     try {
-      // Fetch user's pantry items
       const { data: pantryItems, error } = await supabase
         .from('pantry_items')
         .select('canonical_item_id, name')
         .eq('household_id', householdId)
-        .eq('status', 'active') // Only active items
-        .gte('quantity', 0.01); // Only items with quantity > 0
+        .eq('status', 'active')
+        .gte('quantity', 0.01);
 
       if (error) {
         console.error('Error fetching pantry:', error);
         return;
       }
 
-      // Create a Set of canonical item IDs the user has
       const pantryCanonicalIds = new Set(
         pantryItems?.map(item => item.canonical_item_id).filter(Boolean) || []
       );
 
-      // Mark each ingredient as in_pantry or not
       const updatedIngredients = cookCard.ingredients.map(ing => ({
         ...ing,
         in_pantry: ing.canonical_item_id ? pantryCanonicalIds.has(ing.canonical_item_id) : false,
       }));
 
-      // Filter out optional ingredients
-      const requiredIngredients = updatedIngredients.filter((ing) => {
-        if (ing.is_optional) return false;
-        return true;
-      });
+      const requiredIngredients = updatedIngredients.filter(ing => !ing.is_optional);
+      const optionalIngredients = updatedIngredients.filter(ing => ing.is_optional);
 
-      // Also track optional ingredients separately for shopping list modal
-      const optionalIngredients = updatedIngredients.filter((ing) => ing.is_optional);
+      const available = requiredIngredients.filter(ing => ing.in_pantry);
+      const missing = requiredIngredients.filter(ing => !ing.in_pantry);
+      const missingOptionals = optionalIngredients.filter(ing => !ing.in_pantry);
 
-      const available = requiredIngredients.filter((ing) => ing.in_pantry);
-      const missing = requiredIngredients.filter((ing) => !ing.in_pantry);
-      const missingOptionals = optionalIngredients.filter((ing) => !ing.in_pantry);
-
-      // Combine all missing for shopping list (required + optional)
-      const allMissing = [...missing, ...missingOptionals];
-
-      const matchPercentage =
-        requiredIngredients.length > 0
-          ? (available.length / requiredIngredients.length) * 100
-          : 0;
-
-      console.log('[CookCard] Pantry match calculated:', {
-        total: requiredIngredients.length,
-        available: available.length,
-        missing: missing.length,
-        missingOptionals: missingOptionals.length,
-        percentage: Math.round(matchPercentage)
-      });
+      const matchPercentage = requiredIngredients.length > 0
+        ? (available.length / requiredIngredients.length) * 100
+        : 0;
 
       setPantryMatch({
         have: available.length,
         need: missing.length,
         match_percentage: Math.round(matchPercentage),
-        missing_ingredients: allMissing, // Include both required and optional
+        missing_ingredients: [...missing, ...missingOptionals],
         available_ingredients: available,
       });
 
-      // Update the cookCard ingredients with in_pantry flags (for display)
       cookCard.ingredients = updatedIngredients;
     } catch (error) {
       console.error('Error calculating pantry match:', error);
     }
   };
 
-
-  /**
-   * Check if Cook Card requires user confirmation
-   */
-  const requiresConfirmation = (): boolean => {
-    return (cookCard.extraction?.confidence ?? 1) < 0.8;
-  };
-
-  /**
-   * Format time estimate
-   */
   const formatTime = (minutes?: number): string => {
-    if (!minutes) return '';
-    if (minutes < 60) return `${minutes}min`;
+    if (!minutes) return '-';
+    if (minutes < 60) return `${minutes}m`;
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  };
+
+  const toggleStep = (stepNumber: number) => {
+    const newCompleted = new Set(completedSteps);
+    if (newCompleted.has(stepNumber)) {
+      newCompleted.delete(stepNumber);
+    } else {
+      newCompleted.add(stepNumber);
+    }
+    setCompletedSteps(newCompleted);
   };
 
   // Loading state
   if (loading) {
     return (
       <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#10B981" />
+        <ActivityIndicator size="large" color="#1F7A3B" />
         <Text style={styles.loadingText}>Loading recipe...</Text>
       </View>
     );
@@ -534,255 +391,215 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
   if (!cookCard) {
     return (
       <View style={[styles.container, styles.centerContent]}>
-        <Text style={styles.errorText}>Error: No recipe data provided</Text>
+        <Text style={styles.errorText}>No recipe data</Text>
         <TouchableOpacity
-          style={styles.secondaryButton}
+          style={styles.backButton}
           onPress={() => navigation.canGoBack() && navigation.goBack()}
         >
-          <Text style={styles.secondaryButtonText}>Go Back</Text>
+          <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
+  const getSourceBadge = () => {
+    if (cookCard.extraction?.method === 'user_manual') {
+      return { icon: '✏️', label: 'My Recipe' };
+    }
+    if (cookCard.source?.url?.includes('xiaohongshu.com') || cookCard.source?.url?.includes('xhslink.com')) {
+      return { icon: '📕', label: '小红书' };
+    }
+    switch (cookCard.source?.platform) {
+      case 'youtube': return { icon: '▶️', label: 'YouTube' };
+      case 'tiktok': return { icon: '🎵', label: 'TikTok' };
+      case 'instagram': return { icon: '📷', label: 'Instagram' };
+      default: return { icon: '🌐', label: 'Web' };
+    }
+  };
+
+  const sourceBadge = getSourceBadge();
+  const totalIngredients = cookCard.ingredients.filter(i => !i.is_optional).length;
+  const haveCount = pantryMatch?.have || 0;
+
   return (
-    <ScrollView style={styles.container}>
-      {/* Close Button */}
-      <TouchableOpacity
-        onPress={() => navigation.canGoBack() && navigation.goBack()}
-        style={styles.closeButton}
-      >
-        <Ionicons name="close" size={28} color="#000" />
-      </TouchableOpacity>
-
-      {/* L1-Only Banner (needs_ingredients mode) */}
-      {mode === 'needs_ingredients' && (
-        <View style={styles.amberBanner}>
-          <Text style={styles.amberBannerText}>
-            ⚠️ We found the recipe but couldn't extract ingredients automatically.
-            Add ingredients manually to complete this Cook Card.
-          </Text>
-        </View>
-      )}
-
-      {/* Confidence Banner (if <0.80) */}
-      {mode === 'normal' && requiresConfirmation() && (
-        <View style={styles.amberBanner}>
-          <Text style={styles.amberBannerText}>
-            ⚠️ We found {cookCard.ingredients.length} of ~
-            {Math.ceil(cookCard.ingredients.length / (cookCard.extraction?.confidence ?? 1))}{' '}
-            ingredients. Tap to confirm before planning.
-          </Text>
-        </View>
-      )}
-
-      {/* Header: Creator & Source */}
+    <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        {cookCard.source.creator.avatar_url && (
-          <Image
-            source={{ uri: cookCard.source.creator.avatar_url }}
-            style={styles.avatar}
-          />
-        )}
-        <View style={styles.creatorInfo}>
-          <Text style={styles.creatorName}>
-            {cookCard.source.creator.name || cookCard.source.creator.handle}
-            {cookCard.source.creator.verified && ' ✓'}
-          </Text>
-        </View>
+        <TouchableOpacity
+          onPress={() => navigation.canGoBack() && navigation.goBack()}
+          style={styles.closeButton}
+        >
+          <Ionicons name="close" size={28} color="#111111" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{sourceBadge.icon} {sourceBadge.label}</Text>
+        <TouchableOpacity
+          onPress={handleDelete}
+          style={styles.deleteButton}
+        >
+          <Ionicons name="trash-outline" size={22} color="#EF4444" />
+        </TouchableOpacity>
       </View>
 
-      {/* Recipe Image */}
-      {cookCard.image_url && (
-        <Image source={{ uri: cookCard.image_url }} style={styles.recipeImage} />
-      )}
-
-      {/* Title & Description */}
-      <View style={styles.recipeInfo}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Title */}
         <Text style={styles.title}>{cookCard.title}</Text>
-        {cookCard.description && (
-          <Text style={styles.description}>{cookCard.description}</Text>
-        )}
 
-        {/* Time Estimates */}
-        {(cookCard.prep_time_minutes ||
-          cookCard.cook_time_minutes ||
-          cookCard.servings) && (
-          <View style={styles.metadata}>
-            {cookCard.prep_time_minutes && (
-              <Text style={styles.metadataText}>
-                Prep: {formatTime(cookCard.prep_time_minutes)}
-              </Text>
-            )}
-            {cookCard.cook_time_minutes && (
-              <Text style={styles.metadataText}>
-                Cook: {formatTime(cookCard.cook_time_minutes)}
-              </Text>
-            )}
-            {cookCard.servings && (
-              <Text style={styles.metadataText}>
-                Serves: {cookCard.servings}
-              </Text>
-            )}
+        {/* Quick Stats Bar */}
+        <View style={styles.statsBar}>
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>Prep</Text>
+            <Text style={styles.statValue}>{formatTime(cookCard.prep_time_minutes)}</Text>
           </View>
-        )}
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>Cook</Text>
+            <Text style={styles.statValue}>{formatTime(cookCard.cook_time_minutes)}</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>Total</Text>
+            <Text style={styles.statValue}>{formatTime(cookCard.total_time_minutes)}</Text>
+          </View>
+          <View style={styles.statDivider} />
+          {/* Serving Scaler */}
+          <View style={styles.servingControl}>
+            <Text style={styles.statLabel}>Servings</Text>
+            <View style={styles.servingStepper}>
+              <TouchableOpacity
+                onPress={() => setServingMultiplier(Math.max(0.5, servingMultiplier - 0.5))}
+                style={styles.stepperButton}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Ionicons name="remove" size={14} color="#1F7A3B" />
+              </TouchableOpacity>
+              <Text style={styles.servingValue}>{currentServings}</Text>
+              <TouchableOpacity
+                onPress={() => setServingMultiplier(servingMultiplier + 0.5)}
+                style={styles.stepperButton}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Ionicons name="add" size={14} color="#1F7A3B" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
 
-        {/* Extraction Provenance Badge */}
-        {(cookCard.extraction?.sources?.length ?? 0) > 0 && (
-          <View style={styles.provenanceBadge}>
-            <Ionicons name="checkmark-circle" size={14} color="#10B981" />
-            <Text style={styles.provenanceText}>
-              Extracted from: {cookCard.extraction?.sources?.map((s: string) => s.replace(/_/g, ' ')).join(', ')}
+        {/* Pantry Match Indicator */}
+        {pantryMatch && totalIngredients > 0 && (
+          <View style={styles.pantryIndicator}>
+            <View style={styles.pantryProgress}>
+              <View
+                style={[
+                  styles.pantryProgressFill,
+                  { width: `${(haveCount / totalIngredients) * 100}%` }
+                ]}
+              />
+            </View>
+            <Text style={styles.pantryText}>
+              You have <Text style={styles.pantryBold}>{haveCount}/{totalIngredients}</Text> ingredients
             </Text>
           </View>
         )}
-      </View>
 
-      {/* Pantry Match Intelligence */}
-      {pantryMatch && (
-        <View style={styles.pantryMatch}>
-          <View style={styles.pantryMatchHeader}>
-            <Text style={styles.pantryMatchTitle}>Pantry Match</Text>
-            <View style={styles.matchPercentage}>
-              <Text style={styles.matchPercentageText}>
-                {pantryMatch.match_percentage}%
-              </Text>
-            </View>
+        {/* Ingredients Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>INGREDIENTS</Text>
+            {pantryMatch && pantryMatch.need > 0 && (
+              <TouchableOpacity
+                onPress={handleAddMissingToShoppingList}
+                style={styles.sectionAction}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Ionicons name="cart-outline" size={16} color="#1F7A3B" />
+                <Text style={styles.sectionActionText}>Add missing</Text>
+              </TouchableOpacity>
+            )}
           </View>
-          <Text style={styles.pantryMatchSubtitle}>
-            {pantryMatch.have} of {pantryMatch.have + pantryMatch.need} ingredients
-            in your pantry
-          </Text>
+
+          <View style={styles.ingredientsList}>
+            {scaledIngredients
+              .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+              .map((ingredient, index) => (
+                <View key={`${ingredient.name}-${index}`} style={styles.ingredientRow}>
+                  <Text style={styles.bullet}>•</Text>
+                  <Text style={styles.ingredientName} numberOfLines={1}>
+                    {ingredient.name}
+                    {ingredient.preparation ? <Text style={styles.ingredientPrep}>, {ingredient.preparation}</Text> : null}
+                    {ingredient.is_optional ? <Text style={styles.optionalLabel}> (optional)</Text> : null}
+                  </Text>
+                  {(ingredient.scaledAmount || ingredient.unit) && (
+                    <Text style={styles.ingredientQty}>
+                      {ingredient.scaledAmount}{ingredient.unit ? ` ${ingredient.unit}` : ''}
+                    </Text>
+                  )}
+                </View>
+              ))}
+          </View>
         </View>
-      )}
 
-      {/* Ingredients List */}
-      <View style={styles.ingredientsSection}>
-        <Text style={styles.sectionTitle}>Ingredients</Text>
+        {/* Instructions Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>INSTRUCTIONS</Text>
 
-        {/* Group ingredients by group (if any) */}
-        {cookCard.ingredients
-          .sort((a, b) => a.sort_order - b.sort_order)
-          .map((ingredient, index) => (
-            <IngredientListItem
-              key={`${ingredient.name}-${index}`}
-              ingredient={ingredient}
-              onPress={() => {
-                // TODO: Open ingredient editor
-                console.log('Edit ingredient:', ingredient.name);
-              }}
-            />
-          ))}
-      </View>
+          {(cookCard.instructions?.type === 'creator_provided' ||
+            cookCard.instructions?.type === 'user_notes' ||
+            cookCard.instructions?.type === 'steps') &&
+           cookCard.instructions?.steps &&
+           cookCard.instructions.steps.length > 0 ? (
+            <View style={styles.instructionsList}>
+              {cookCard.instructions.steps.map((step, index) => {
+                const stepNum = step.step_number || index + 1;
+                const isCompleted = completedSteps.has(stepNum);
 
-      {/* Instructions (Structured Steps) */}
-      {(cookCard.instructions.type === 'creator_provided' || cookCard.instructions.type === 'steps') && cookCard.instructions.steps && (
-        <View style={styles.instructionsSection}>
-          <Text style={styles.sectionTitle}>
-            Cooking Steps ({cookCard.instructions.steps.length})
-          </Text>
-          {cookCard.instructions.steps.map((step, index) => (
-            <View key={index} style={styles.instructionStep}>
-              <View style={styles.stepNumber}>
-                <Text style={styles.stepNumberText}>{step.step_number}</Text>
-              </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepInstruction}>{step.instruction}</Text>
-                {step.ingredients && step.ingredients.length > 0 && (
-                  <View style={styles.stepIngredients}>
-                    {step.ingredients.map((ing, i) => (
-                      <View key={i} style={styles.ingredientPill}>
-                        <Text style={styles.ingredientPillText}>{ing}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-                {step.tip && (
-                  <View style={styles.stepTip}>
-                    <Ionicons name="bulb-outline" size={14} color="#F59E0B" />
-                    <Text style={styles.stepTipText}>{step.tip}</Text>
-                  </View>
-                )}
-              </View>
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.instructionCard, isCompleted && styles.instructionCardCompleted]}
+                    onPress={() => toggleStep(stepNum)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.stepBadge, isCompleted && styles.stepBadgeCompleted]}>
+                      {isCompleted ? (
+                        <Ionicons name="checkmark" size={12} color="#fff" />
+                      ) : (
+                        <Text style={styles.stepBadgeText}>{stepNum}</Text>
+                      )}
+                    </View>
+                    <Text style={[styles.instructionText, isCompleted && styles.instructionTextCompleted]}>
+                      {step.instruction}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-          ))}
+          ) : (
+            <View style={styles.noInstructions}>
+              <Text style={styles.noInstructionsText}>
+                {cookCard.source?.url && !cookCard.source.url.startsWith('manual://')
+                  ? 'View the original source for full instructions'
+                  : 'No instructions added yet'}
+              </Text>
+              {cookCard.source?.url && !cookCard.source.url.startsWith('manual://') && (
+                <TouchableOpacity
+                  style={styles.viewSourceButton}
+                  onPress={() => Alert.alert('Source', cookCard.source.url)}
+                >
+                  <Ionicons name="open-outline" size={18} color="#1F7A3B" />
+                  <Text style={styles.viewSourceText}>View Original</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
         </View>
-      )}
 
-      {/* Instructions (Link to Source) */}
-      {cookCard.instructions.type === 'link_only' && (
-        <View style={styles.instructionsSection}>
-          <Text style={styles.sectionTitle}>Instructions</Text>
-          <Text style={styles.linkOnlyMessage}>
-            Full cooking instructions are not available for this recipe.
-          </Text>
-        </View>
-      )}
-
-      {/* Action Buttons */}
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={[styles.primaryButton, saved && styles.buttonDisabled]}
-          onPress={handleSave}
-          disabled={saved}
-        >
-          <Text style={styles.primaryButtonText}>
-            {saved ? 'Recipe Saved ✓' : 'Save Recipe'}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Show "Add Ingredients" CTA if no ingredients, otherwise show shopping list button */}
-        {cookCard.ingredients.length === 0 || mode === 'needs_ingredients' ? (
-          <TouchableOpacity
-            style={styles.addIngredientsButton}
-            onPress={() => {
-              Alert.alert(
-                'Add Ingredients',
-                'Ingredient parsing coming soon! For now, you can save this recipe and view it on the original platform.',
-                [{ text: 'OK' }]
-              );
-            }}
-          >
-            <Text style={styles.addIngredientsButtonText}>+ Add Ingredients</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[
-              styles.secondaryButton,
-              requiresConfirmation() && styles.buttonDisabled,
-            ]}
-            onPress={onAddToShoppingList || handleAddMissingToShoppingList}
-            disabled={requiresConfirmation()}
-          >
-            <Text style={styles.secondaryButtonText}>Add to Shopping List</Text>
-          </TouchableOpacity>
-        )}
-
-        {onCook && (
-          <TouchableOpacity style={styles.secondaryButton} onPress={onCook}>
-            <Text style={styles.secondaryButtonText}>Start Cooking</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Extraction Metadata (Debug) */}
-      <View style={styles.debugSection}>
-        <Text style={styles.debugTitle}>Extraction Info</Text>
-        <Text style={styles.debugText}>
-          Method: {cookCard.extraction?.method ?? 'N/A'}
-        </Text>
-        <Text style={styles.debugText}>
-          Confidence: {Math.round((cookCard.extraction?.confidence ?? 1) * 100)}%
-        </Text>
-        <Text style={styles.debugText}>
-          Version: {cookCard.extraction?.version ?? 'N/A'}
-        </Text>
-        {(cookCard.extraction?.cost_cents ?? 0) > 0 && (
-          <Text style={styles.debugText}>
-            Cost: ${((cookCard.extraction?.cost_cents ?? 0) / 100).toFixed(3)}
-          </Text>
-        )}
-      </View>
+        {/* Bottom spacing */}
+        <View style={{ height: 40 }} />
+      </ScrollView>
 
       {/* Shopping List Selection Modal */}
       <Modal
@@ -794,30 +611,27 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Add to Shopping List</Text>
-            <Text style={styles.modalSubtitle}>Select ingredients to add</Text>
 
-            <ScrollView style={styles.ingredientScrollView}>
-              {/* Required Ingredients */}
+            <ScrollView style={styles.modalScroll}>
               {pantryMatch && pantryMatch.missing_ingredients.filter(ing => !ing.is_optional).length > 0 && (
                 <>
-                  <Text style={styles.ingredientSectionTitle}>Required</Text>
+                  <Text style={styles.modalSectionTitle}>Required</Text>
                   {pantryMatch.missing_ingredients.filter(ing => !ing.is_optional).map((ingredient) => (
-                    <View key={ingredient.name} style={styles.ingredientCheckboxRow}>
-                      <Ionicons name="checkmark-circle" size={20} color="#10B981" />
-                      <Text style={styles.ingredientCheckboxLabel}>{ingredient.name}</Text>
+                    <View key={ingredient.name} style={styles.modalIngredientRow}>
+                      <Ionicons name="checkmark-circle" size={20} color="#1F7A3B" />
+                      <Text style={styles.modalIngredientText}>{ingredient.name}</Text>
                     </View>
                   ))}
                 </>
               )}
 
-              {/* Optional Ingredients */}
               {pantryMatch && pantryMatch.missing_ingredients.filter(ing => ing.is_optional).length > 0 && (
                 <>
-                  <Text style={styles.ingredientSectionTitle}>Optional (select if desired)</Text>
+                  <Text style={styles.modalSectionTitle}>Optional</Text>
                   {pantryMatch.missing_ingredients.filter(ing => ing.is_optional).map((ingredient) => (
                     <TouchableOpacity
                       key={ingredient.name}
-                      style={styles.ingredientCheckboxRow}
+                      style={styles.modalIngredientRow}
                       onPress={() => {
                         const newSelected = new Set(selectedOptionalIngredients);
                         if (newSelected.has(ingredient.name)) {
@@ -831,16 +645,15 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
                       <Ionicons
                         name={selectedOptionalIngredients.has(ingredient.name) ? 'checkbox' : 'square-outline'}
                         size={20}
-                        color={selectedOptionalIngredients.has(ingredient.name) ? '#10B981' : '#9CA3AF'}
+                        color={selectedOptionalIngredients.has(ingredient.name) ? '#1F7A3B' : '#9CA3AF'}
                       />
-                      <Text style={styles.ingredientCheckboxLabel}>{ingredient.name}</Text>
+                      <Text style={styles.modalIngredientText}>{ingredient.name}</Text>
                     </TouchableOpacity>
                   ))}
                 </>
               )}
             </ScrollView>
 
-            {/* Action Buttons */}
             <View style={styles.modalActions}>
               <TouchableOpacity
                 style={styles.modalCancelButton}
@@ -848,40 +661,34 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
-                style={styles.modalSubmitButton}
+                style={styles.modalAddButton}
                 onPress={async () => {
                   if (!pantryMatch) return;
-
-                  // Combine required and selected optional ingredients
                   const requiredNames = pantryMatch.missing_ingredients
                     .filter(ing => !ing.is_optional)
                     .map(ing => ing.name);
-                  const selectedOptionalNames = Array.from(selectedOptionalIngredients);
-                  const allIngredients = [...requiredNames, ...selectedOptionalNames];
-
+                  const allIngredients = [...requiredNames, ...Array.from(selectedOptionalIngredients)];
                   setShowShoppingListModal(false);
                   await confirmAddToShoppingList(allIngredients);
                 }}
               >
-                <Text style={styles.modalSubmitText}>Add {
-                  (pantryMatch?.missing_ingredients.filter(ing => !ing.is_optional).length || 0) +
-                  selectedOptionalIngredients.size
-                } items</Text>
+                <Text style={styles.modalAddText}>
+                  Add {(pantryMatch?.missing_ingredients.filter(ing => !ing.is_optional).length || 0) + selectedOptionalIngredients.size} items
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAFBFC',
   },
   centerContent: {
     justifyContent: 'center',
@@ -897,429 +704,367 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#EF4444',
     marginBottom: 20,
-    textAlign: 'center',
   },
-  closeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 1000,
+  backButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     backgroundColor: '#F3F4F6',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 8,
   },
-  amberBanner: {
-    backgroundColor: '#FEF3C7',
-    padding: 16,
-    borderBottomWidth: 2,
-    borderBottomColor: '#F59E0B',
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
   },
-  amberBannerText: {
-    color: '#92400E',
-    fontSize: 14,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
+
+  // Header - matches ManualRecipeEntryScreen
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 12,
-  },
-  creatorInfo: {
-    flex: 1,
-  },
-  creatorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  sourceLink: {
-    fontSize: 14,
-    color: '#3B82F6',
-    marginTop: 2,
-  },
-  recipeImage: {
-    width: '100%',
-    height: 240,
-    backgroundColor: '#F3F4F6',
-  },
-  recipeInfo: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  metadata: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  metadataText: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  provenanceBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#F0FDF4',
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  provenanceText: {
-    fontSize: 12,
-    color: '#065F46',
-    fontWeight: '500',
-    textTransform: 'capitalize',
-  },
-  pantryMatch: {
-    backgroundColor: '#F9FAFB',
-    padding: 16,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  pantryMatchHeader: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
-  pantryMatchTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  matchPercentage: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  matchPercentageText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  pantryMatchSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 12,
-  },
-  toggleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  toggleSwitch: {
+  closeButton: {
     width: 44,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#D1D5DB',
-    padding: 2,
-    marginRight: 8,
-  },
-  toggleSwitchActive: {
-    backgroundColor: '#10B981',
-  },
-  toggleKnob: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
-  },
-  toggleKnobActive: {
-    transform: [{ translateX: 20 }],
-  },
-  toggleLabel: {
-    fontSize: 14,
-    color: '#374151',
-  },
-  ingredientsSection: {
-    padding: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 12,
-  },
-  instructionsSection: {
-    padding: 16,
-  },
-  instructionStep: {
-    flexDirection: 'row',
-    marginBottom: 20,
-    gap: 12,
-  },
-  stepNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#10B981',
-    alignItems: 'center',
+    height: 44,
     justifyContent: 'center',
-    flexShrink: 0,
+    alignItems: 'center',
+    marginLeft: -8,
   },
-  stepNumberText: {
-    color: '#FFFFFF',
+  headerTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#111111',
   },
-  stepContent: {
+  deleteButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: -8,
+  },
+
+  // Scroll content
+  scrollView: {
     flex: 1,
   },
-  stepInstruction: {
-    fontSize: 16,
-    color: '#111827',
-    lineHeight: 24,
-    marginBottom: 8,
+  scrollContent: {
+    padding: 20,
   },
-  stepIngredients: {
+
+  // Title
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#111111',
+    marginBottom: 20,
+    lineHeight: 34,
+  },
+
+  // Quick Stats Bar
+  statsBar: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginBottom: 8,
-  },
-  ingredientPill: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    alignItems: 'center',
+    backgroundColor: '#fff',
     borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
-  ingredientPillText: {
-    fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  stepTip: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 6,
-    backgroundColor: '#FEF3C7',
-    padding: 10,
-    borderRadius: 6,
-    borderLeftWidth: 3,
-    borderLeftColor: '#F59E0B',
-  },
-  stepTipText: {
-    flex: 1,
-    fontSize: 13,
-    color: '#92400E',
-    lineHeight: 18,
-  },
-  linkButton: {
-    backgroundColor: '#3B82F6',
-    padding: 16,
-    borderRadius: 8,
+  statItem: {
     alignItems: 'center',
-    marginTop: 16,
+    flex: 1,
   },
-  linkButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+  statLabel: {
+    fontSize: 11,
     fontWeight: '600',
+    color: '#9CA3AF',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
-  linkOnlyMessage: {
+  statValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111111',
+  },
+  statDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: '#E5E7EB',
+  },
+  servingControl: {
+    alignItems: 'center',
+    flex: 1.2,
+  },
+  servingStepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  stepperButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#E8F5EC',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  servingValue: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111111',
+    minWidth: 20,
+    textAlign: 'center',
+  },
+
+  // Pantry Indicator
+  pantryIndicator: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  pantryProgress: {
+    height: 8,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 4,
+    marginBottom: 10,
+    overflow: 'hidden',
+  },
+  pantryProgressFill: {
+    height: '100%',
+    backgroundColor: '#1F7A3B',
+    borderRadius: 4,
+  },
+  pantryText: {
     fontSize: 14,
     color: '#6B7280',
     textAlign: 'center',
-    paddingVertical: 20,
   },
-  actions: {
-    padding: 16,
-    gap: 12,
+  pantryBold: {
+    fontWeight: '700',
+    color: '#111111',
   },
-  primaryButton: {
-    backgroundColor: '#10B981',
-    padding: 16,
-    borderRadius: 8,
+
+  // Section
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    backgroundColor: '#F3F4F6',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: '#374151',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  addIngredientsButton: {
-    backgroundColor: '#3B82F6',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#2563EB',
-    borderStyle: 'dashed',
-  },
-  addIngredientsButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  debugSection: {
-    padding: 16,
-    backgroundColor: '#F9FAFB',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-  },
-  debugTitle: {
-    fontSize: 12,
-    fontWeight: '600',
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
     color: '#6B7280',
-    marginBottom: 4,
+    letterSpacing: 1,
+    marginBottom: 12,
   },
-  debugText: {
-    fontSize: 11,
-    color: '#9CA3AF',
-    marginBottom: 2,
-  },
-  markCookedButton: {
-    backgroundColor: '#10B981',
-    paddingVertical: 14,
-    borderRadius: 8,
+  sectionAction: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    gap: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
-  markCookedButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+  sectionActionText: {
+    fontSize: 13,
     fontWeight: '600',
+    color: '#1F7A3B',
   },
+
+  // Ingredients List
+  ingredientsList: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  ingredientRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 5,
+  },
+  bullet: {
+    fontSize: 14,
+    color: '#1F7A3B',
+    marginRight: 10,
+  },
+  ingredientName: {
+    flex: 1,
+    fontSize: 15,
+    color: '#111111',
+  },
+  ingredientPrep: {
+    color: '#6B7280',
+  },
+  ingredientQty: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginLeft: 12,
+    marginRight: 4,
+  },
+  optionalLabel: {
+    color: '#9CA3AF',
+    fontStyle: 'italic',
+  },
+
+  // Instructions List
+  instructionsList: {
+    gap: 10,
+  },
+  instructionCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  instructionCardCompleted: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#BBF7D0',
+  },
+  stepBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#1F7A3B',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    marginTop: 2,
+  },
+  stepBadgeCompleted: {
+    backgroundColor: '#16A34A',
+  },
+  stepBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  instructionText: {
+    flex: 1,
+    fontSize: 15,
+    color: '#111111',
+    lineHeight: 22,
+  },
+  instructionTextCompleted: {
+    color: '#6B7280',
+  },
+  noInstructions: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+  },
+  noInstructionsText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  viewSourceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: '#E8F5EC',
+    borderRadius: 8,
+  },
+  viewSourceText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1F7A3B',
+  },
+
+  // Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     padding: 24,
-    width: '85%',
-    maxWidth: 400,
+    maxHeight: '70%',
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
+    color: '#111111',
+    marginBottom: 16,
     textAlign: 'center',
   },
-  modalSubtitle: {
-    fontSize: 16,
+  modalScroll: {
+    maxHeight: 300,
+  },
+  modalSectionTitle: {
+    fontSize: 12,
+    fontWeight: '600',
     color: '#6B7280',
-    marginBottom: 20,
-    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 16,
+    marginBottom: 8,
   },
-  starContainer: {
+  modalIngredientRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
+    alignItems: 'center',
+    paddingVertical: 12,
+    gap: 12,
   },
-  starButton: {
-    padding: 8,
-  },
-  starText: {
-    fontSize: 36,
-  },
-  notesInput: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    padding: 12,
+  modalIngredientText: {
     fontSize: 16,
-    color: '#111827',
-    marginBottom: 20,
-    minHeight: 80,
-    textAlignVertical: 'top',
+    color: '#111111',
+    flex: 1,
   },
   modalActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 20,
   },
   modalCancelButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
     backgroundColor: '#F3F4F6',
-    marginRight: 8,
     alignItems: 'center',
   },
   modalCancelText: {
-    color: '#6B7280',
     fontSize: 16,
     fontWeight: '600',
+    color: '#6B7280',
   },
-  modalSubmitButton: {
+  modalAddButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#2563EB',
-    marginLeft: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
+    backgroundColor: '#1F7A3B',
     alignItems: 'center',
   },
-  modalSubmitText: {
+  modalAddText: {
+    fontSize: 16,
+    fontWeight: '600',
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  ingredientScrollView: {
-    maxHeight: 300,
-    marginBottom: 20,
-  },
-  ingredientSectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-    marginTop: 12,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  ingredientCheckboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-  },
-  ingredientCheckboxLabel: {
-    fontSize: 16,
-    color: '#111827',
-    marginLeft: 12,
-    flex: 1,
   },
 });

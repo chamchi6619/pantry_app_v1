@@ -30,7 +30,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { validateRecipeURL, detectPlatform } from '../utils/urlUtils';
-import { extractCookCard } from '../services/cookCardService';
+import { extractCookCard, saveCookCard } from '../services/cookCardService';
 import {
   ingestTraditionalRecipe,
   loadTraditionalRecipeAsCookCard,
@@ -206,6 +206,14 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
         confidence = result.extraction?.confidence || 0.99;
 
         console.log('[PasteLink] Social recipe extracted:', cookCard.title);
+
+        // Save the cook card to the database (social media extractions don't auto-save)
+        if (!cookCard.id) {
+          console.log('[PasteLink] Saving social media recipe to database...');
+          const saveResult = await saveCookCard(cookCard, user.id);
+          cookCard.id = saveResult.id;
+          console.log('[PasteLink] Recipe saved with ID:', saveResult.id);
+        }
       }
 
       // Log extraction_completed event

@@ -1,15 +1,21 @@
+/**
+ * AppNavigator - V1 Navigation Structure
+ *
+ * Tabs: Pantry, Shopping, Scan, Recipes, Profile
+ * V1 Scope: Simplified navigation without Explore/MealPlanning
+ */
+
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet, Platform, Dimensions, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Pressable, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../core/constants/theme';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthScreen } from '../features/auth/screens/AuthScreen';
 import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
 import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleShoppingListScreen';
-import { ExploreRecipesScreenSupabase } from '../features/recipes/screens/ExploreRecipesScreenSupabase';
 import { ScannerScreen } from '../features/scanner/screens/ScannerScreen';
 import { FixQueueScreen } from '../features/receipt/screens/FixQueueScreen';
 import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
@@ -19,12 +25,8 @@ import { PurchaseHistoryScreen } from '../features/receipt/screens/PurchaseHisto
 import PasteLinkScreen from '../screens/PasteLinkScreen';
 import { CookCardScreen } from '../screens/CookCardScreen';
 import { ShareHandlerScreen } from '../screens/ShareHandlerScreen';
-import { SavedRecipesScreen } from '../screens/SavedRecipesScreen';
-import BrowsePlatformsScreen from '../screens/BrowsePlatformsScreen';
-import MealPlanningScreen from '../features/meal-planning/screens/MealPlanningScreen';
-import RecipesTabbedScreen from '../features/queue/screens/RecipesTabbedScreen';
 import RecipesHeroScreen from '../features/queue/screens/RecipesHeroScreen';
-import { RecipeListScreen } from '../features/queue/screens/RecipeListScreen';
+import ManualRecipeEntryScreen from '../features/recipes/screens/ManualRecipeEntryScreen';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -65,7 +67,7 @@ const CustomTabButton: React.FC<{ children: React.ReactNode; onPress?: () => voi
   </Pressable>
 );
 
-// Recipe Stack Navigator
+// Recipe Stack Navigator - V1: My Recipes only
 const RecipeStack = () => (
   <Stack.Navigator
     screenOptions={{
@@ -73,17 +75,11 @@ const RecipeStack = () => (
     }}
   >
     <Stack.Screen name="RecipeList" component={RecipesHeroScreen} />
-    <Stack.Screen name="RecipeListScreen" component={RecipeListScreen} />
-    <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} />
-    <Stack.Screen name="Recipes" component={RecipesTabbedScreen} />
-    <Stack.Screen name="MealPlanning" component={MealPlanningScreen} />
-    <Stack.Screen name="BrowsePlatforms" component={BrowsePlatformsScreen} />
-    <Stack.Screen name="ExploreVersions" component={ExploreRecipesScreenSupabase} />
   </Stack.Navigator>
 );
 
-// Receipt Stack Navigator
-const ReceiptStack = () => (
+// Scan Stack Navigator (renamed from Receipt)
+const ScanStack = () => (
   <Stack.Navigator
     screenOptions={{
       headerShown: false,
@@ -142,7 +138,7 @@ const ProfileStack = () => (
   </Stack.Navigator>
 );
 
-// Bottom Tab Navigator
+// Bottom Tab Navigator - V1 Labels
 const TabNavigator = () => {
   const insets = useSafeAreaInsets();
 
@@ -164,11 +160,11 @@ const TabNavigator = () => {
       }}
     >
       <Tab.Screen
-        name="Inventory"
+        name="Pantry"
         component={InventoryScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon="📦" label="Inventory" />
+            <TabIcon focused={focused} icon="📦" label="Pantry" />
           ),
           tabBarButton: (props) => (
             <CustomTabButton {...props} />
@@ -188,11 +184,11 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Receipt"
-        component={ReceiptStack}
+        name="Scan"
+        component={ScanStack}
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon="🧾" label="Receipt" />
+            <TabIcon focused={focused} icon="🧾" label="Scan" />
           ),
           tabBarButton: (props) => (
             <CustomTabButton {...props} />
@@ -251,7 +247,6 @@ export const AppNavigator: React.FC = () => {
   }
 
   // User must have both a session AND a profile to access the app
-  // Profile is 1:1 with auth user, household is optional
   const hasValidSession = session && hasProfile;
 
   return (
@@ -264,7 +259,7 @@ export const AppNavigator: React.FC = () => {
         {hasValidSession ? (
           <>
             <Stack.Screen name="Main" component={TabNavigator} />
-            {/* Cook Card modal screens */}
+            {/* Modal screens */}
             <Stack.Screen
               name="PasteLink"
               component={PasteLinkScreen}
@@ -273,6 +268,11 @@ export const AppNavigator: React.FC = () => {
             <Stack.Screen
               name="CookCard"
               component={CookCardScreen}
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="ManualRecipeEntry"
+              component={ManualRecipeEntryScreen}
               options={{ presentation: 'modal' }}
             />
             <Stack.Screen
@@ -300,25 +300,6 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
     fontSize: 16,
     color: theme.colors.textSecondary,
-  },
-  placeholderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-  },
-  placeholderText: {
-    fontSize: 48,
-    marginBottom: theme.spacing.md,
-  },
-  placeholderTitle: {
-    ...theme.typography.h2,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
-  },
-  placeholderSubtitle: {
-    ...theme.typography.body,
-    color: theme.colors.textLight,
   },
   tabIconContainer: {
     alignItems: 'center',
