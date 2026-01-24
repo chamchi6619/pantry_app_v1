@@ -62,8 +62,8 @@ async def diagnose_gemini() -> Dict:
 
                 # Fallback: Try known model names
                 known_models = [
-                    'gemini-2.0-flash',        # Stable 2.0 Flash (recommended)
-                    'gemini-2.0-flash-exp',    # Experimental 2.0
+                    'gemini-2.5-flash',        # Primary model (migrated from 2.0)
+                    'gemini-2.5-flash-lite',   # Lite version
                     'gemini-1.5-flash',
                     'gemini-1.5-flash-latest',
                     'gemini-1.5-flash-8b',
@@ -261,7 +261,7 @@ TAX                 0.80
 TOTAL              12.27"""
 
     # Try with the first working model from known list
-    models_to_try = ['gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
+    models_to_try = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
 
     for model_name in models_to_try:
         try:

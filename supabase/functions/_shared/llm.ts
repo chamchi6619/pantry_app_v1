@@ -409,10 +409,10 @@ async function fetchWithRetry(
 }
 
 /**
- * Extract ingredients using Gemini 2.0 Flash (STABLE)
+ * Extract ingredients using Gemini 2.5 Flash
  *
  * Safety mechanisms:
- * - Uses stable model (gemini-2.0-flash)
+ * - Uses stable model (gemini-2.5-flash)
  * - 30s timeout per request
  * - Max 2 retries with exponential backoff
  * - Input size enforcement (16000 chars max)
@@ -434,8 +434,8 @@ export async function extractIngredientsWithGemini(
     throw new Error('GEMINI_API_KEY environment variable not set');
   }
 
-  // Use STABLE model (not experimental)
-  const model = 'gemini-2.0-flash';
+  // Use Gemini 2.5 Flash (migrated from 2.0 - Jan 2025)
+  const model = 'gemini-2.5-flash';
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   // Build prompt
@@ -619,8 +619,8 @@ export async function extractFromVideoVision(
     };
   }
 
-  // Use Gemini 2.0 Flash for vision (proven more reliable, 79% cost savings)
-  const model = 'gemini-2.0-flash';
+  // Use Gemini 2.5 Flash for vision (migrated from 2.0 - Jan 2025)
+  const model = 'gemini-2.5-flash';
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   // Determine media resolution

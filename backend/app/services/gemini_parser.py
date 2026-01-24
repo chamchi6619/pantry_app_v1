@@ -68,11 +68,10 @@ class GeminiReceiptParser:
 
         try:
             genai.configure(api_key=self.api_key)
-            # Use gemini-2.0-flash (stable) as primary model
-            # $0.10/1M input tokens, $0.40/1M output tokens - optimal for receipts
+            # Use gemini-2.5-flash as primary model (migrated from 2.0 - Jan 2025)
             model_names = [
-                'gemini-2.0-flash',      # Stable 2.0 Flash - recommended
-                'gemini-2.0-flash-exp',  # Experimental 2.0 (if stable not available)
+                'gemini-2.5-flash',      # Primary model
+                'gemini-2.5-flash-lite', # Lite version
                 'gemini-1.5-flash',      # Fallback to 1.5 Flash
                 'gemini-1.5-flash-latest',
                 'gemini-pro'

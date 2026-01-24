@@ -161,7 +161,7 @@ Deno.serve(async (req) => {
     // 5. Call Gemini AI
     const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY") || "");
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-exp",
+      model: "gemini-2.5-flash",
     });
 
     const prompt = `
@@ -274,7 +274,7 @@ Return ONLY valid JSON, no additional text.
         meals: aiResponse.meals,
         rationale: aiResponse.overall_rationale,
         generation_time_ms: generationTimeMs,
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
       }),
       {
         status: 200,

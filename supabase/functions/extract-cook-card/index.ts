@@ -846,7 +846,7 @@ Deno.serve(async (req) => {
               }
 
               cookCard.extraction.method = "video_vision";
-              cookCard.extraction.version = "L4-gemini-2.0-flash-vision-v89-natural";
+              cookCard.extraction.version = "L4-gemini-2.5-flash-vision-v90";
               cookCard.extraction.evidence_source = "video_vision";
 
               visionExtractedEarly = true;
@@ -1152,7 +1152,7 @@ Deno.serve(async (req) => {
           }
 
           cookCard.extraction.method = commentUsed ? "llm_assisted_comment" : "llm_assisted";
-          cookCard.extraction.version = "L3-gemini-2.0-flash-evidence";
+          cookCard.extraction.version = "L3-gemini-2.5-flash-evidence";
           cookCard.extraction.evidence_source = evidenceSource;
 
           console.log(`✅ L3: Final ${cookCard.ingredients.length} ingredients after validation`);
@@ -1348,7 +1348,7 @@ ${instructionSteps.join('\n')}
                 };
 
                 cookCard.extraction.method = "blog_gemini_cleaned";
-                cookCard.extraction.version = "L3.2-blog-gemini-2.0-flash";
+                cookCard.extraction.version = "L3.2-blog-gemini-2.5-flash";
                 cookCard.extraction.evidence_source = "creator_blog";
                 cookCard.extraction.cost_cents = extractionCost;
                 cookCard.extraction.confidence = 0.90; // Blog recipes are high quality
@@ -1690,7 +1690,7 @@ ${instructionSteps.join('\n')}
                 }
 
                 cookCard.extraction.method = "llm_assisted";
-                cookCard.extraction.version = "L3-gemini-2.0-flash-evidence";
+                cookCard.extraction.version = "L3-gemini-2.5-flash-evidence";
                 cookCard.extraction.evidence_source = "description";
 
                 console.log(`✅ L3: Final ${cookCard.ingredients.length} ingredients from Xiaohongshu photo post`);
@@ -1925,7 +1925,7 @@ ${instructionSteps.join('\n')}
                   }
 
                   cookCard.extraction.method = "llm_assisted_comment";
-                  cookCard.extraction.version = "L3-gemini-2.0-flash-evidence";
+                  cookCard.extraction.version = "L3-gemini-2.5-flash-evidence";
                   cookCard.extraction.evidence_source = "youtube_comment";
 
                   console.log(`✅ L2→L3: Final ${cookCard.ingredients.length} ingredients from long video comment`);
@@ -2321,7 +2321,7 @@ ${instructionSteps.join('\n')}
           });
 
           cookCard.extraction.method = "video_vision";
-          cookCard.extraction.version = "L4-gemini-2.0-flash-vision-v89-natural";
+          cookCard.extraction.version = "L4-gemini-2.5-flash-vision-v90";
         }
       }
 
@@ -2406,7 +2406,7 @@ ${instructionSteps.join('\n')}
 
       // Multi-source tracking (if used)
       vision_used: ['video_vision', 'vision_transcript_hybrid', 'multi_source_hybrid'].includes(cookCard.extraction.method),
-      vision_model: ['video_vision', 'vision_transcript_hybrid', 'multi_source_hybrid'].includes(cookCard.extraction.method) ? 'gemini-2.0-flash' : null,
+      vision_model: ['video_vision', 'vision_transcript_hybrid', 'multi_source_hybrid'].includes(cookCard.extraction.method) ? 'gemini-2.5-flash' : null,
       vision_duration_seconds: ['video_vision', 'vision_transcript_hybrid', 'multi_source_hybrid'].includes(cookCard.extraction.method) ? duration_seconds : null,
       asr_used: cookCard.extraction.method === 'multi_source_hybrid',
       asr_cost_cents: asrCost || 0,

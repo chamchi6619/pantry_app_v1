@@ -1,8 +1,9 @@
 # Gemini 2.0 → 2.5 Flash Migration Plan
 
 **Created:** 2025-01-24
+**Completed:** 2025-01-24
 **Deadline:** March 31, 2026
-**Status:** PLANNED
+**Status:** ✅ COMPLETE
 
 ---
 
@@ -236,9 +237,31 @@ If issues occur after migration:
 | Milestone | Target Date | Status |
 |-----------|-------------|--------|
 | Migration plan created | Jan 24, 2025 | ✅ Done |
-| Staging test complete | TBD | Pending |
-| Production rollout start | TBD | Pending |
-| Migration complete | Before Mar 31, 2026 | Pending |
+| Code migration complete | Jan 24, 2025 | ✅ Done |
+| Edge Functions deployment | TBD | Pending |
+| Production verification | TBD | Pending |
+
+## Files Changed (Jan 24, 2025)
+
+All code files have been updated. The following changes were made:
+
+### Production Edge Functions
+- `supabase/functions/_shared/llm.ts` - Lines 438, 623: `gemini-2.0-flash` → `gemini-2.5-flash`
+- `supabase/functions/clean-ingredients/index.ts` - Line 162: `gemini-2.0-flash-exp` → `gemini-2.5-flash`
+- `supabase/functions/clean-canonical-items/index.ts` - Line 96: `gemini-2.0-flash-exp` → `gemini-2.5-flash`
+- `supabase/functions/generate-meal-plan/index.ts` - Lines 164, 277: `gemini-2.0-flash-exp` → `gemini-2.5-flash`
+- `supabase/functions/extract-cook-card/index.ts` - Version labels and vision_model updated
+
+### Backend Functions
+- `backend/supabase/functions/parse-receipt-gemini/index.ts` - API endpoint and method labels updated
+- `backend/app/services/gemini_parser.py` - Model fallback list updated
+- `backend/app/api/gemini_test.py` - Test model lists updated
+
+### Test Scripts
+- `scripts/test_vision_models.js` - Updated to compare 2.5 vs 2.5-lite
+- `scripts/test_gemini_quality.js` - Updated to compare 2.5 vs 2.5-lite
+
+**Next Step:** Deploy Edge Functions to Supabase to activate the changes.
 
 ---
 

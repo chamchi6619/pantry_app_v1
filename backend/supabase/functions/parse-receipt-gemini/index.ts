@@ -190,7 +190,7 @@ ${ocr_text}`;
     let geminiResponse;
     try {
       geminiResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -272,7 +272,7 @@ ${ocr_text}`;
         tax_amount_cents: 0,
         subtotal_cents: Math.round(itemsTotal * 100),
         status: 'pending',
-        parse_method: 'gemini-2.0-flash-normalized',
+        parse_method: 'gemini-2.5-flash-normalized',
         confidence: confidence,
         raw_text: ocr_text.substring(0, 10000)
       })
@@ -346,7 +346,7 @@ ${ocr_text}`;
       receipt_id: receipt.id,
       receipt,
       items: queueItems,
-      method: 'gemini-2.0-flash-normalized',
+      method: 'gemini-2.5-flash-normalized',
       confidence: confidence,
       store: storeName,
       gemini_cost: cost
