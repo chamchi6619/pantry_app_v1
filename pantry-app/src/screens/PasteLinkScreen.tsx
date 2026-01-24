@@ -30,12 +30,13 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { validateRecipeURL, detectPlatform } from '../utils/urlUtils';
-import { extractCookCard, saveCookCard } from '../services/cookCardService';
+import { extractCookCard } from '../services/cookCardService';
 import {
   ingestTraditionalRecipe,
   loadTraditionalRecipeAsCookCard,
   isTraditionalRecipeUrl,
 } from '../services/traditionalRecipeService';
+import { saveRecipeWithMatching, updateRecipeWithCanonicalMatching } from '../services/recipeService';
 import { logIngressEvent } from '../services/telemetry';
 import { supabase } from '../lib/supabase';
 
@@ -185,6 +186,10 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
         extractionMethod = 'schema_org';
         confidence = 0.95;
 
+        // Add canonical matching to existing ingredients (for pantry matching)
+        console.log('[PasteLink] Adding canonical matching to traditional recipe...');
+        await updateRecipeWithCanonicalMatching(result.cook_card.id);
+
         console.log('[PasteLink] Traditional recipe extracted:', cookCard.title);
       } else {
         // Social media extraction (yt-dlp + Gemini)
@@ -207,10 +212,10 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
 
         console.log('[PasteLink] Social recipe extracted:', cookCard.title);
 
-        // Save the cook card to the database (social media extractions don't auto-save)
+        // Save the cook card with canonical matching (for pantry matching)
         if (!cookCard.id) {
-          console.log('[PasteLink] Saving social media recipe to database...');
-          const saveResult = await saveCookCard(cookCard, user.id);
+          console.log('[PasteLink] Saving social media recipe with canonical matching...');
+          const saveResult = await saveRecipeWithMatching(cookCard, user.id);
           cookCard.id = saveResult.id;
           console.log('[PasteLink] Recipe saved with ID:', saveResult.id);
         }

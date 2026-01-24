@@ -238,8 +238,8 @@ export const useInventorySupabaseStore = create<InventoryState>()(
             body: {
               household_id: householdId,
               name: item.name,  // ✅ Send user's original text (not canonical name)
-              quantity: item.quantity,
-              unit: item.unit,
+              quantity: item.quantity ?? 1,  // Default to 1 if not specified
+              unit: item.unit || 'piece',    // Default to 'piece' if not specified
               location: item.location,
               category: item.category,
               notes: item.notes,
@@ -256,8 +256,13 @@ export const useInventorySupabaseStore = create<InventoryState>()(
 
           // Log canonical matching result
           if (response.canonical_match) {
-            console.log(`✓ Item matched to canonical: ${response.canonical_match.canonical_name}`);
+            console.log(`✓ Item matched to canonical: "${response.canonical_match.name}" (ID: ${response.canonical_match.canonical_item_id})`);
+          } else {
+            console.log(`⚠️ No canonical match found for "${item.name}"`);
           }
+
+          // Log the saved item's canonical_item_id
+          console.log(`📦 Saved pantry item: ${data.id}, canonical_item_id: ${data.canonical_item_id || 'NONE'}`);
 
           // Update with real ID from Supabase
           const syncedItem: InventoryItem = {

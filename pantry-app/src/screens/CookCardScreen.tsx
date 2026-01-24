@@ -172,9 +172,16 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
     loadCookCard();
   }, [cookCardId, recipeDatabaseId, cookCard]);
 
+  // Track if we've calculated pantry match for this cook card
+  const [pantryMatchCalculated, setPantryMatchCalculated] = useState(false);
+
   useEffect(() => {
-    calculatePantryMatch();
-  }, [cookCard]);
+    // Only calculate once per cook card load, not on every update
+    if (cookCard && !pantryMatchCalculated) {
+      calculatePantryMatch();
+      setPantryMatchCalculated(true);
+    }
+  }, [cookCard, pantryMatchCalculated]);
 
   // Scale ingredient amount based on serving multiplier
   const scaleAmount = (amount: number | string | undefined): string => {
@@ -313,6 +320,19 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
     if (!userId || !householdId || !cookCard) return;
 
     try {
+      // First, let's see ALL pantry items to debug
+      const { data: allPantryItems, error: debugError } = await supabase
+        .from('pantry_items')
+        .select('id, name, canonical_item_id, status, quantity')
+        .eq('household_id', householdId)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      console.log('[PantryMatch] DEBUG - Recent pantry items (all statuses):');
+      allPantryItems?.forEach(item => {
+        console.log(`  - "${item.name}" | status: ${item.status} | qty: ${item.quantity} | canonical: ${item.canonical_item_id || 'NONE'}`);
+      });
+
       const { data: pantryItems, error } = await supabase
         .from('pantry_items')
         .select('canonical_item_id, name')
@@ -325,9 +345,23 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
         return;
       }
 
+      // Debug: Log pantry items with canonical IDs
+      const pantryWithCanonical = pantryItems?.filter(item => item.canonical_item_id) || [];
+      console.log(`[PantryMatch] Found ${pantryItems?.length || 0} pantry items, ${pantryWithCanonical.length} with canonical IDs`);
+      pantryWithCanonical.forEach(item => {
+        console.log(`  - Pantry: "${item.name}" → canonical: ${item.canonical_item_id}`);
+      });
+
       const pantryCanonicalIds = new Set(
         pantryItems?.map(item => item.canonical_item_id).filter(Boolean) || []
       );
+
+      // Debug: Log recipe ingredients with canonical IDs
+      const ingredientsWithCanonical = cookCard.ingredients.filter(ing => ing.canonical_item_id);
+      console.log(`[PantryMatch] Recipe has ${cookCard.ingredients.length} ingredients, ${ingredientsWithCanonical.length} with canonical IDs`);
+      cookCard.ingredients.forEach(ing => {
+        console.log(`  - Recipe: "${ing.name}" → canonical: ${ing.canonical_item_id || 'NONE'}`);
+      });
 
       const updatedIngredients = cookCard.ingredients.map(ing => ({
         ...ing,
@@ -353,7 +387,8 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
         available_ingredients: available,
       });
 
-      cookCard.ingredients = updatedIngredients;
+      // Update cookCard state to trigger re-render with in_pantry flags
+      setCookCard(prev => prev ? { ...prev, ingredients: updatedIngredients } : prev);
     } catch (error) {
       console.error('Error calculating pantry match:', error);
     }
@@ -526,8 +561,15 @@ export const CookCardScreen: React.FC<CookCardScreenProps> = (props) => {
               .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
               .map((ingredient, index) => (
                 <View key={`${ingredient.name}-${index}`} style={styles.ingredientRow}>
-                  <Text style={styles.bullet}>•</Text>
-                  <Text style={styles.ingredientName} numberOfLines={1}>
+                  {ingredient.in_pantry ? (
+                    <Ionicons name="checkmark-circle" size={18} color="#1F7A3B" style={styles.ingredientIcon} />
+                  ) : (
+                    <Ionicons name="ellipse-outline" size={18} color="#9CA3AF" style={styles.ingredientIcon} />
+                  )}
+                  <Text style={[
+                    styles.ingredientName,
+                    ingredient.in_pantry && styles.ingredientInPantry
+                  ]} numberOfLines={1}>
                     {ingredient.name}
                     {ingredient.preparation ? <Text style={styles.ingredientPrep}>, {ingredient.preparation}</Text> : null}
                     {ingredient.is_optional ? <Text style={styles.optionalLabel}> (optional)</Text> : null}
@@ -898,6 +940,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 5,
   },
+  ingredientIcon: {
+    marginRight: 10,
+    width: 18,
+  },
   bullet: {
     fontSize: 14,
     color: '#1F7A3B',
@@ -907,6 +953,9 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: '#111111',
+  },
+  ingredientInPantry: {
+    color: '#1F7A3B',
   },
   ingredientPrep: {
     color: '#6B7280',

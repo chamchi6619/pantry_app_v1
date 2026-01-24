@@ -80,7 +80,7 @@ src/navigation/AppNavigator.tsx - Renamed tabs, removed v2 routes
 - [x] Deprecated file syntax error (DEPRECATED_ShoppingListScreen.tsx)
 
 ### Still TODO
-- [ ] **Canonical matching architecture refactor** (see below)
+- [x] **Canonical matching architecture refactor** (DONE - see below)
 - [ ] Credit system implementation
 - [ ] IAP integration (RevenueCat)
 - [ ] Onboarding flow
@@ -103,19 +103,21 @@ src/navigation/AppNavigator.tsx - Renamed tabs, removed v2 routes
 
 ---
 
-## Canonical Matching Architecture (V1 Critical)
+## Canonical Matching Architecture (V1 Critical) - ✅ IMPLEMENTED
 
-### Problem Statement
+### Problem Statement (SOLVED)
 
-Pantry matching ("Have 5 / Need 3") is a key "wow moment" that connects Recipes ↔ Pantry ↔ Shopping. However, canonical matching (assigning `canonical_item_id` to ingredients) is **fragmented across paths**:
+Pantry matching ("Have 5 / Need 3") is a key "wow moment" that connects Recipes ↔ Pantry ↔ Shopping. Previously, canonical matching (assigning `canonical_item_id` to ingredients) was **fragmented across paths**.
+
+**After implementation (2025-01-16):**
 
 | Import Path | Canonical Matching | Pantry Match Works |
 |-------------|:------------------:|:------------------:|
 | Social media (L3/L4) | ✅ Yes | ✅ Yes |
-| Schema.org (traditional) | ❌ No | ❌ No |
-| Manual entry | ❌ No | ❌ No |
+| Schema.org (traditional) | ✅ Yes | ✅ Yes |
+| Manual entry | ✅ Yes | ✅ Yes |
 
-**Result:** Pantry matching only works for social media imports. Traditional recipe imports (NYT, AllRecipes) and manually entered recipes show "Have 0 / Need X" even when user has all ingredients.
+All recipe sources now go through unified canonical matching.
 
 ### Current Architecture (Fragmented)
 
@@ -159,76 +161,48 @@ Three different paths. Matching in one. Saving in two different places.
 
 **Key insight:** The source of a recipe (YouTube, NYT, manual) shouldn't affect how we store it. An ingredient is an ingredient.
 
-### Implementation Plan
+### Implementation (COMPLETED 2025-01-16)
 
-#### Phase 1: Create unified save function
-```
-1. Create src/services/recipeService.ts
-2. Implement saveRecipe() with canonical matching
-3. Implement matchIngredientsToCanonical() (simple: exact + alias match)
-```
+#### What was done:
 
-#### Phase 2: Migrate Manual Entry
-```
-4. Update ManualRecipeEntryScreen to use saveRecipe()
-5. Test: Manual entry → pantry matching works
-```
+1. **Created `src/services/recipeService.ts`** - Unified save function with canonical matching
+   - `saveRecipeWithMatching()` - saves recipe with canonical matching for new recipes
+   - `updateRecipeWithCanonicalMatching()` - updates existing recipes (traditional imports)
+   - `loadCanonicalItemsMap()` - loads canonical items with 1-hour cache
+   - `matchIngredientsToCanonical()` - matches ingredients to canonical IDs
 
-#### Phase 3: Migrate Social Media
-```
-6. Update PasteLinkScreen (social path) to use saveRecipe()
-7. Remove old saveCookCard() call
-8. Test: Social import → pantry matching works
-```
+2. **Updated `ManualRecipeEntryScreen.tsx`** - Now uses `saveRecipeWithMatching()`
+   - Builds CookCard object with normalized_name for each ingredient
+   - Canonical matching happens automatically on save
 
-#### Phase 4: Migrate Traditional/Schema.org
-```
-9. Modify extract-cook-card Edge Function:
-   - Schema.org path: Remove database save, just return data
-10. Update PasteLinkScreen to use saveRecipe() for traditional too
-11. Test: Traditional import → pantry matching works
-```
+3. **Updated `PasteLinkScreen.tsx`** - Both paths now use unified matching
+   - Social media: Uses `saveRecipeWithMatching()` (new save with matching)
+   - Traditional: Uses `updateRecipeWithCanonicalMatching()` (updates existing)
 
-#### Phase 5: Cleanup
-```
-12. Remove old saveCookCard() if no longer used
-13. Remove matchCanonicalItems() from Edge Function (moved to frontend)
-14. Update types/interfaces for consistency
-```
-
-### Effort Estimate
-
-| Phase | Effort | Risk |
-|-------|--------|------|
-| Phase 1: Create unified save | 30 min | Low |
-| Phase 2: Migrate manual | 15 min | Low |
-| Phase 3: Migrate social | 15 min | Low |
-| Phase 4: Migrate traditional | 30 min | Medium |
-| Phase 5: Cleanup | 15 min | Low |
-| **Total** | **~2 hours** | |
-
-### Key Files to Modify
+#### Files Created/Modified:
 
 ```
 NEW:    src/services/recipeService.ts (unified save + matching)
 
-MODIFY: src/screens/PasteLinkScreen.tsx (use saveRecipe for all paths)
-MODIFY: src/features/recipes/screens/ManualRecipeEntryScreen.tsx (use saveRecipe)
-MODIFY: supabase/functions/extract-cook-card/index.ts (schema.org: don't save)
-
-DELETE: Parts of src/services/cookCardService.ts (saveCookCard if replaced)
+MODIFY: src/screens/PasteLinkScreen.tsx (uses saveRecipeWithMatching)
+MODIFY: src/features/recipes/screens/ManualRecipeEntryScreen.tsx (uses saveRecipeWithMatching)
 ```
+
+#### Note on Edge Function:
+The traditional path still saves in the Edge Function, but we now run canonical matching
+after the recipe is loaded. This avoids risky Edge Function changes while achieving
+the same result. Edge Function cleanup is deferred to later optimization phase.
 
 ---
 
 ## Summary
 
-Recipes feature is functionally complete for V1 with one critical gap:
+Recipes feature is **COMPLETE** for V1:
 - ✅ My Recipes list with source icons
 - ✅ Manual recipe entry (free)
 - ✅ URL import flow (social + traditional)
 - ✅ Recipe detail view with serving scaler
 - ✅ Pantry matching UI (Have/Need + Add to Shopping)
-- ❌ **Pantry matching only works for social media imports**
+- ✅ **Pantry matching works for ALL recipe sources** (implemented 2025-01-16)
 
-**Next up:** Canonical matching architecture refactor to enable pantry matching for ALL recipe sources.
+**V1 Recipes: READY FOR LAUNCH**

@@ -28,7 +28,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../../core/constants/theme';
 import { useAuth } from '../../../contexts/AuthContext';
-import { supabase } from '../../../lib/supabase';
+import { saveRecipeWithMatching } from '../../../services/recipeService';
+import { CookCard } from '../../../types/CookCard';
 
 interface IngredientInput {
   name: string;
@@ -181,64 +182,59 @@ export default function ManualRecipeEntryScreen() {
       const totalMins = prepMins + cookMins || null;
 
       // Build instructions JSON for structured steps
-      const instructionsJson = filteredInstructions.length > 0
+      const instructionsSteps = filteredInstructions.length > 0
         ? filteredInstructions.map((text, index) => ({
             step_number: index + 1,
             instruction: text,
           }))
-        : null;
+        : undefined;
 
       // Generate unique source_url for manual entries (UNIQUE constraint)
       const manualSourceUrl = sourceUrl.trim() || `manual://${user.id}/${Date.now()}`;
 
-      // Save to cook_cards table
-      const { data: cookCard, error: cardError } = await supabase
-        .from('cook_cards')
-        .insert({
-          user_id: user.id,
-          title: title.trim(),
-          source_url: manualSourceUrl,
-          description: notes.trim() || null,
-          platform: 'web',  // Closest match for manual entries
-          extraction_method: 'user_manual',  // Must match DB constraint
-          extraction_confidence: 1.0,
-          is_archived: false,
-          prep_time_minutes: prepMins || null,
-          cook_time_minutes: cookMins || null,
-          total_time_minutes: totalMins,
-          servings: parseInt(servings) || null,
-          instructions_type: filteredInstructions.length > 0 ? 'user_notes' : 'link_only',
-          instructions_json: instructionsJson,
-        })
-        .select()
-        .single();
-
-      if (cardError) throw cardError;
-
-      // Save ingredients if provided
-      if (filteredIngredients.length > 0 && cookCard) {
-        const ingredientRecords = filteredIngredients.map((ing, index) => {
+      // Build CookCard object for unified save
+      const cookCardData: CookCard = {
+        version: '1.0',
+        title: title.trim(),
+        description: notes.trim() || undefined,
+        prep_time_minutes: prepMins || undefined,
+        cook_time_minutes: cookMins || undefined,
+        total_time_minutes: totalMins || undefined,
+        servings: parseInt(servings) || undefined,
+        source: {
+          url: manualSourceUrl,
+          platform: 'web',
+          creator: {},
+        },
+        instructions: {
+          type: filteredInstructions.length > 0 ? 'user_notes' : 'link_only',
+          text: filteredInstructions.join('\n') || undefined,
+          steps: instructionsSteps,
+        },
+        extraction: {
+          method: 'user_manual',
+          confidence: 1.0,
+          version: '1.0',
+          timestamp: new Date().toISOString(),
+          cost_cents: 0,
+        },
+        // Build ingredients with normalized_name for canonical matching
+        ingredients: filteredIngredients.map((ing, index) => {
           const { amount, unit } = parseQuantity(ing.qty);
           return {
-            cook_card_id: cookCard.id,
-            ingredient_name: ing.name.trim(),
+            name: ing.name.trim(),
             normalized_name: ing.name.trim().toLowerCase(),
-            amount: amount,      // DB column name
-            unit: unit,          // DB column name
+            amount: amount || undefined,
+            unit: unit || undefined,
             sort_order: index,
             confidence: 1.0,
-            provenance: 'user_edited',  // Must match DB constraint
+            provenance: 'user_edited',
           };
-        });
+        }),
+      };
 
-        const { error: ingredientsError } = await supabase
-          .from('cook_card_ingredients')
-          .insert(ingredientRecords);
-
-        if (ingredientsError) {
-          console.error('Error saving ingredients:', ingredientsError);
-        }
-      }
+      // Use unified save with canonical matching
+      await saveRecipeWithMatching(cookCardData, user.id);
 
       Alert.alert(
         'Recipe Saved',

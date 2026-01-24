@@ -503,9 +503,10 @@ export const InventoryScreen: React.FC = () => {
   const handleSaveItem = (itemData: any) => {
     console.log('Received item data:', itemData);
     // Map modal data structure to inventory item structure
+    const parsedQuantity = isNaN(itemData.quantity) || itemData.quantity === null ? 1 : itemData.quantity;
     const mappedData = {
       name: toTitleCase(itemData.name),
-      quantity: isNaN(itemData.quantity) || itemData.quantity === null ? 0 : itemData.quantity,
+      quantity: parsedQuantity,
       unit: itemData.unit,
       // Ensure location is lowercase for store
       location: itemData.location.toLowerCase() as 'fridge' | 'freezer' | 'pantry',
@@ -520,6 +521,32 @@ export const InventoryScreen: React.FC = () => {
     };
 
     console.log('Mapped data with expirationDate:', mappedData.expirationDate);
+
+    // If editing an existing item and quantity is 0 or less, prompt to delete
+    if (editingItem && parsedQuantity <= 0) {
+      Alert.alert(
+        'Remove Item?',
+        `"${mappedData.name}" quantity will be 0. Remove from inventory?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: () => {
+              deleteItem(editingItem.id);
+              setShowModal(false);
+              setEditingItem(null);
+            }
+          }
+        ]
+      );
+      return;
+    }
+
+    // For new items with 0 quantity, default to 1 (shouldn't add empty items)
+    if (!editingItem && parsedQuantity <= 0) {
+      mappedData.quantity = 1;
+    }
 
     if (editingItem) {
       updateItem(editingItem.id, mappedData);
