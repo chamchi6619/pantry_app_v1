@@ -90,6 +90,7 @@ export default function RecipesHeroScreen() {
   // Reload recipes when screen comes into focus
   useFocusEffect(
     useCallback(() => {
+      console.log('[RecipesHero] Screen focused - reloading recipes');
       loadSavedRecipes(!hasLoadedOnce); // Only show loading spinner on first load
     }, [userId, householdId, hasLoadedOnce])
   );
@@ -99,6 +100,8 @@ export default function RecipesHeroScreen() {
       setLoading(false);
       return;
     }
+
+    console.log('[RecipesHero] Loading saved recipes...');
 
     // Only show loading spinner on first load, not on subsequent refreshes
     if (showLoadingSpinner) {
@@ -142,6 +145,7 @@ export default function RecipesHeroScreen() {
         })
       );
 
+      console.log(`[RecipesHero] Loaded ${recipesWithCounts.length} recipes`);
       setSavedRecipes(recipesWithCounts);
     } catch (error) {
       console.error('[RecipesHero] Error loading saved recipes:', error);
