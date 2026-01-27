@@ -235,12 +235,23 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
         },
       });
 
-      // Navigate to CookCardScreen
-      navigation.navigate('CookCard', {
-        cookCard,
-        mode: confidence < 0.8 ? 'needs_confirmation' : 'normal',
-        sessionId,
-      });
+      // Show success alert and navigate to CookCardScreen
+      Alert.alert(
+        'Recipe Saved!',
+        `"${cookCard.title}" has been added to your recipes.`,
+        [
+          {
+            text: 'View Recipe',
+            onPress: () => {
+              navigation.navigate('CookCard', {
+                cookCard,
+                mode: confidence < 0.8 ? 'needs_confirmation' : 'normal',
+                sessionId,
+              });
+            },
+          },
+        ]
+      );
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to extract recipe';
       setError(errorMessage);
