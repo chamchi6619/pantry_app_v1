@@ -17,17 +17,19 @@
  */
 
 /**
- * Gemini 2.0 Flash Pricing (Paid Tier)
+ * Gemini 2.5 Flash Pricing (Paid Tier)
  *
- * Official pricing from ai.google.dev/gemini-api/docs/pricing
- * - Input: $0.10 per 1M tokens
- * - Output: $0.40 per 1M tokens
+ * Official pricing from ai.google.dev/gemini-api/docs/pricing (Jan 2026)
+ * - Input (text/image/video): $0.30 per 1M tokens
+ * - Input (audio): $1.00 per 1M tokens
+ * - Output (including thinking tokens): $2.50 per 1M tokens
  *
+ * Note: Same pricing as GEMINI_VISION_PRICING for 2.5 Flash
  * Free tier: $0.00 for both input/output
  */
 const GEMINI_PRICING = {
-  INPUT_PER_1M_TOKENS: 0.10,  // $0.10 per 1M tokens
-  OUTPUT_PER_1M_TOKENS: 0.40, // $0.40 per 1M tokens
+  INPUT_PER_1M_TOKENS: 0.30,  // $0.30 per 1M tokens (Gemini 2.5 Flash)
+  OUTPUT_PER_1M_TOKENS: 2.50, // $2.50 per 1M tokens (Gemini 2.5 Flash)
 };
 
 /**

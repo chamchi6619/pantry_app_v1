@@ -771,6 +771,12 @@ Deno.serve(async (req) => {
     let sectionResult: any = null;
     let transcript = ""; // For L2.5 transcript
 
+    // Redundancy prevention flags (Phase 2 optimization - Jan 2026)
+    let cachedComments: any[] | null = null; // Cache comments from L2 for reuse in L3.2/Step 6
+    let transcriptIncludedInL3 = false; // Skip L3.5 if L3 already processed transcript
+    let visionAttemptedIn4A = false; // Skip Step 6 Vision if Step 4A already tried
+    let l3RanOnDescription = false; // Skip Step 6 Xiaohongshu L3 if Step 5 already ran
+
     // ============================================================
     // STEP 4A: VISION-FIRST EXTRACTION (NEW PATH!)
     // ============================================================
@@ -809,6 +815,9 @@ Deno.serve(async (req) => {
               visionResult = await extractFromVideoVision(fileUri, title, duration_seconds, false, false); // Extract BOTH
               extractionCost += visionResult.cost_cents;
             }
+
+            // Mark that Vision was attempted in Step 4A (prevent redundant retry in Step 6)
+            visionAttemptedIn4A = true;
 
             // Check if Vision succeeded with sufficient ingredients
             if (visionResult.success && visionResult.ingredients.length >= 3) {
@@ -936,7 +945,11 @@ Deno.serve(async (req) => {
         try {
           const commentResult = await fetchCommentsFromURL(url, 20);
 
+          // Cache comments for reuse in L3.2 blog URL check and Step 6 fallback
           if (commentResult.success && commentResult.comments.length > 0) {
+            cachedComments = commentResult.comments;
+            console.log(`   💾 Cached ${cachedComments.length} comments for potential reuse`);
+
             // Debug: Log first 3 comments to see if pinned comment is present
             console.log(`   📋 First 3 fetched comments:`);
             commentResult.comments.slice(0, 3).forEach((c, i) => {
@@ -1011,6 +1024,7 @@ Deno.serve(async (req) => {
               // Combine description + transcript
               sourceText = description + '\n\nTranscript:\n' + transcript;
               evidenceSource = 'description+transcript';
+              transcriptIncludedInL3 = true; // Mark that L3 will process transcript (skip L3.5 later)
               console.log(`   ✅ L2.5: Transcript added (total: ${sourceText.length} chars)`);
 
               await logEvent(supabase, {
@@ -1096,6 +1110,8 @@ Deno.serve(async (req) => {
 
         // Call Gemini
         const llmResult = await extractWithLLM(url, platform, cookCard, sourceText);
+        l3RanOnDescription = true; // Mark that L3 ran (prevent redundant retry in Step 6)
+
         if (llmResult.success && llmResult.ingredients.length > 0) {
           console.log(`   📦 L3 returned ${llmResult.ingredients.length} ingredients (raw)`);
           extractionCost += llmResult.cost;
@@ -1255,16 +1271,20 @@ Deno.serve(async (req) => {
 
       // Fallback: Check YouTube comments if no URL in description
       // (Many creators post recipe links in pinned comments after uploading)
+      // OPTIMIZATION: Use cached comments from L2 if available (avoid duplicate API call)
       if (!blogUrl && platform === 'youtube') {
         try {
-          const commentsForBlog = await fetchCommentsFromURL(url, 5); // Just check first 5
-          if (commentsForBlog.success && commentsForBlog.comments.length > 0) {
-            for (const comment of commentsForBlog.comments) {
-              blogUrl = extractRecipeUrl(comment.text);
-              if (blogUrl) {
-                console.log(`   🔗 Found recipe URL in comment by ${comment.author}`);
-                break;
-              }
+          // Use cached comments from L2 if available, otherwise fetch fresh
+          const commentsToCheck = cachedComments || (await fetchCommentsFromURL(url, 5)).comments || [];
+          if (cachedComments) {
+            console.log(`   💾 Using ${cachedComments.length} cached comments for blog URL check`);
+          }
+
+          for (const comment of commentsToCheck.slice(0, 5)) { // Only check first 5
+            blogUrl = extractRecipeUrl(comment.text);
+            if (blogUrl) {
+              console.log(`   🔗 Found recipe URL in comment by ${comment.author}`);
+              break;
             }
           }
         } catch (commentFetchError) {
@@ -1451,7 +1471,12 @@ ${instructionSteps.join('\n')}
     // For YouTube videos, extract instructions from FREE YouTube transcript API
     // This is more accurate and cheaper than Vision API for spoken instructions
     // Only runs if instructions are still missing after L3
+    // OPTIMIZATION: Skip if L3 already processed the transcript (redundancy fix)
     if (platform === 'youtube' && (!cookCard.instructions?.steps || cookCard.instructions.steps.length === 0)) {
+      // Skip if L3 already processed transcript (L2.5 combined it into sourceText)
+      if (transcriptIncludedInL3) {
+        console.log('⏭️  L3.5: Skipping - transcript already processed in L3 (redundancy prevention)');
+      } else {
       console.log('🎬 L3.5: YouTube transcript instruction extraction...');
 
       // Fetch transcript if not already fetched in L2.5
@@ -1497,6 +1522,7 @@ ${instructionSteps.join('\n')}
       } else {
         console.log('   ℹ️  L3.5: No transcript available (video may lack captions or be non-English)');
       }
+      } // Close transcriptIncludedInL3 else block
     }
 
     // ============================================================
@@ -1626,7 +1652,7 @@ ${instructionSteps.join('\n')}
     // - Transcript: FREE audio/captions from YouTube
     // - ASR L5: Whisper transcription (conditional, Pro tier only)
     // - File API: Download video + upload for Instagram/TikTok/Xiaohongshu/Facebook
-    // Skip if Vision already ran in Step 4A
+    // Skip Vision if already attempted in Step 4A (redundancy optimization)
     if (!visionExtractedEarly && (!cookCard || cookCard.ingredients.length === 0)) {
       console.log('🎥 Step 6: Multi-Platform Vision Extraction (text methods failed)...');
 
@@ -1643,7 +1669,11 @@ ${instructionSteps.join('\n')}
 
         // For Xiaohongshu photo posts with description, try L3 extraction one more time
         // (may have been skipped due to quality gate or length check)
+        // OPTIMIZATION: Skip if L3 already ran on this description (redundancy prevention)
         if (platform === 'xiaohongshu' && description.length >= 100) {
+          if (l3RanOnDescription) {
+            console.log(`⏭️  Xiaohongshu L3 skipped: L3 already ran on description (redundancy prevention)`);
+          } else {
           console.log(`📝 Xiaohongshu photo post with description - attempting L3 extraction...`);
 
           try {
@@ -1760,6 +1790,7 @@ ${instructionSteps.join('\n')}
           } catch (l3Error) {
             console.error('   ❌ L3 extraction error:', l3Error);
           }
+          } // Close l3RanOnDescription else block
         }
 
         await logEvent(supabase, {
@@ -1861,17 +1892,26 @@ ${instructionSteps.join('\n')}
             console.log(`   This may indicate the comment doesn't contain a parseable recipe`);
           } else {
             // No comment harvested yet - proceed with harvest
-            console.log(`   🔍 No comment harvested yet in Step 4, fetching now...`);
+            // OPTIMIZATION: Use cached comments from L2 if available
+            console.log(`   🔍 Checking for comments (cached or fresh)...`);
 
           try {
-            const commentResult = await fetchCommentsFromURL(url, 20);
+            // Use cached comments from L2 if available, otherwise fetch fresh
+            let commentsToProcess = cachedComments;
+            if (!commentsToProcess) {
+              const commentResult = await fetchCommentsFromURL(url, 20);
+              commentsToProcess = (commentResult.success && commentResult.comments.length > 0) ? commentResult.comments : [];
+              console.log(`   📋 Fetched ${commentsToProcess.length} fresh comments`);
+            } else {
+              console.log(`   💾 Using ${commentsToProcess.length} cached comments from L2`);
+            }
 
-            if (commentResult.success && commentResult.comments.length > 0) {
-              console.log(`   📋 Fetched ${commentResult.comments.length} comments`);
+            if (commentsToProcess.length > 0) {
+              console.log(`   📋 Processing ${commentsToProcess.length} comments`);
 
               // Filter to likely ingredient candidates
-              const candidates = filterToIngredientCandidates(commentResult.comments);
-              console.log(`   Found ${candidates.length}/${commentResult.comments.length} comment candidates`);
+              const candidates = filterToIngredientCandidates(commentsToProcess);
+              console.log(`   Found ${candidates.length}/${commentsToProcess.length} comment candidates`);
 
               // Find best ingredient comment (lowered threshold to 20 for testing)
               const bestComment = findBestIngredientComment(candidates, 20);
@@ -2085,6 +2125,34 @@ ${instructionSteps.join('\n')}
 
       console.log(`⚠️  L4 budget checks DISABLED for testing`);
 
+      // OPTIMIZATION: Skip Vision if Step 4A already attempted (prevent redundant API call)
+      if (visionAttemptedIn4A) {
+        console.log(`⏭️  Step 6 Vision skipped: Already attempted in Step 4A (redundancy prevention)`);
+        console.log(`   Step 4A Vision found insufficient ingredients. Text extraction also failed.`);
+        console.log(`   Returning fallback instead of re-running same Vision call.`);
+
+        await logEvent(supabase, {
+          user_id,
+          household_id,
+          event_type: "l4_vision_skipped",
+          reason: "already_attempted_in_step_4a",
+          platform,
+        });
+
+        return new Response(
+          JSON.stringify({
+            error: "Could not extract sufficient ingredients from this video",
+            fallback: "cook_card_lite",
+            cook_card: cookCard,
+            extraction_attempts: {
+              vision_4a: true,
+              text_l3: l3RanOnDescription,
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
       // Reserve L4 budget BEFORE calling API (optimistic lock to prevent race condition)
       console.log(`🤖 Calling L4 Vision for ${duration_seconds}s video (platform: ${platform})...`);
       await reserveL4Budget(supabase, user_id, videoDurationMinutes);
@@ -2181,7 +2249,8 @@ ${instructionSteps.join('\n')}
         console.log('📝 Extracting ingredients from existing transcript...');
         const transcriptExtraction = await extractIngredientsWithGemini(title, transcript, platform);
         transcriptIngredients = transcriptExtraction.ingredients;
-        console.log(`   ✅ Transcript: ${transcriptIngredients.length} ingredients`);
+        extractionCost += transcriptExtraction.cost_cents; // Track transcript extraction cost
+        console.log(`   ✅ Transcript: ${transcriptIngredients.length} ingredients (cost: ${transcriptExtraction.cost_cents}¢)`);
       }
 
       // Decide if ASR L5 is needed
