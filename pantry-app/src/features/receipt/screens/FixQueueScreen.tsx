@@ -155,23 +155,21 @@ export function FixQueueScreen() {
           await inventoryStore.initialize(currentHousehold.id);
         }
 
-        // Add high confidence items to inventory with their individual locations
+        // Add all user-confirmed items to inventory with their individual locations
         for (const item of editedItems) {
-          if (item.confidence >= 0.8) {
-            try {
-              await inventoryStore.addItem({
-                name: item.parsed_name,
-                quantity: item.quantity,
-                unit: item.unit,
-                category: item.categories || 'Other',
-                location: item.selectedLocation || getSmartLocation(item.categories),
-                notes: `Added from receipt on ${new Date().toLocaleDateString()}`,
-                canonicalItemId: item.canonical_item_id,  // ✅ Pass canonical ID from receipt processing
-              });
-              addedToInventory++;
-            } catch (err) {
-              console.error('Failed to add item to inventory:', err);
-            }
+          try {
+            await inventoryStore.addItem({
+              name: item.parsed_name,
+              quantity: item.quantity,
+              unit: item.unit,
+              category: item.categories || 'Other',
+              location: item.selectedLocation || getSmartLocation(item.categories),
+              notes: `Added from receipt on ${new Date().toLocaleDateString()}`,
+              canonicalItemId: item.canonical_item_id,
+            });
+            addedToInventory++;
+          } catch (err) {
+            console.error('Failed to add item to inventory:', err);
           }
         }
       }

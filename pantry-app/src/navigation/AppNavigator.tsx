@@ -22,6 +22,7 @@ import { ProfileScreen } from '../features/profile/screens/ProfileScreen';
 import { PrivacyPolicyScreen } from '../features/profile/screens/PrivacyPolicyScreen';
 import { TermsOfServiceScreen } from '../features/profile/screens/TermsOfServiceScreen';
 import { PurchaseHistoryScreen } from '../features/receipt/screens/PurchaseHistoryScreen';
+import { ReceiptDetailScreen } from '../features/receipt/screens/ReceiptDetailScreen';
 import PasteLinkScreen from '../screens/PasteLinkScreen';
 import { CookCardScreen } from '../screens/CookCardScreen';
 import { ShareHandlerScreen } from '../screens/ShareHandlerScreen';
@@ -105,6 +106,7 @@ const ProfileStack = () => (
   >
     <Stack.Screen name="ProfileMain" component={ProfileScreen} />
     <Stack.Screen name="PurchaseHistory" component={PurchaseHistoryScreen} />
+    <Stack.Screen name="ReceiptDetail" component={ReceiptDetailScreen} />
     <Stack.Screen
       name="PrivacyPolicy"
       component={PrivacyPolicyScreen}

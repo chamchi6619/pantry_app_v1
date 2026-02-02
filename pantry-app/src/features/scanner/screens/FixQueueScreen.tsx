@@ -1,17 +1,27 @@
+/**
+ * @deprecated This is a MOCK/PROTOTYPE screen with hardcoded data.
+ * DO NOT USE IN PRODUCTION.
+ *
+ * The real FixQueueScreen is at: src/features/receipt/screens/FixQueueScreen.tsx
+ * This file is kept for reference only and is not connected to any navigation.
+ */
+
 import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TextInput,
   Pressable,
   Switch,
+  Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../../core/constants/theme';
 import { Button } from '../../../core/components/ui/Button';
 
+/** @deprecated Mock interface - not used in production */
 interface FixQueueItem {
   id: string;
   rawText: string;
@@ -161,7 +171,12 @@ const FixQueueCard: React.FC<{
   );
 };
 
-export const FixQueueScreen: React.FC<{ navigation?: any }> = ({ navigation }) => {
+/**
+ * @deprecated MOCK SCREEN - Do not use in production
+ * Real implementation: src/features/receipt/screens/FixQueueScreen.tsx
+ */
+export const FixQueueScreenMock: React.FC<{ navigation?: any }> = ({ navigation }) => {
+  // MOCK DATA - This screen is deprecated
   const [items, setItems] = useState<FixQueueItem[]>([
     {
       id: '1',
