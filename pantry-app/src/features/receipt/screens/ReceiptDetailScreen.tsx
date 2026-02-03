@@ -213,7 +213,7 @@ export function ReceiptDetailScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Navigation Header */}
       <View style={styles.navHeader}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,121 +6,201 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  SafeAreaView,
   RefreshControl,
   TextInput,
+  Modal,
+  Pressable,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useHousehold } from '../../../hooks/useHousehold';
 import { supabase } from '../../../lib/supabase';
 import { theme } from '../../../core/constants/theme';
 
-interface PurchaseItem {
-  id: string;
-  product_name: string;
-  brand?: string;
-  store_name?: string;
-  purchase_date: string;
-  quantity: number;
-  unit?: string;
-  total_price_cents: number;
-  category?: string;
-  was_on_sale?: boolean;
-}
+// Helper functions for month navigation
+const getMonthStart = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+};
 
-interface ReceiptSummary {
+const getMonthEnd = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+};
+
+const getPreviousMonth = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth() - 1, 1);
+};
+
+const getNextMonth = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 1);
+};
+
+const formatMonthYear = (date: Date): string => {
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+};
+
+const isSameMonth = (date1: Date, date2: Date): boolean => {
+  return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth();
+};
+
+const isDateInMonth = (dateString: string, monthStart: Date): boolean => {
+  const date = new Date(dateString);
+  const monthEnd = getMonthEnd(monthStart);
+  return date >= monthStart && date <= monthEnd;
+};
+
+const isDateInYear = (dateString: string, year: number): boolean => {
+  const date = new Date(dateString);
+  return date.getFullYear() === year;
+};
+
+const isFutureMonth = (year: number, month: number): boolean => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  return year > currentYear || (year === currentYear && month > currentMonth);
+};
+
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+interface ReceiptWithItems {
   id: string;
   store_name: string;
   receipt_date: string;
   total_amount_cents: number;
   item_count: number;
   status: string;
+  item_names: string[]; // For search functionality
 }
 
 export function PurchaseHistoryScreen() {
   const navigation = useNavigation();
   const { currentHousehold } = useHousehold();
 
-  const [purchases, setPurchases] = useState<PurchaseItem[]>([]);
-  const [receipts, setReceipts] = useState<ReceiptSummary[]>([]);
+  const [receipts, setReceipts] = useState<ReceiptWithItems[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTab, setSelectedTab] = useState<'items' | 'receipts'>('items');
-  const [stats, setStats] = useState({
-    totalSpent: 0,
-    totalItems: 0,
-    totalReceipts: 0,
-    avgItemPrice: 0,
-  });
+  const [selectedMonth, setSelectedMonth] = useState<Date>(getMonthStart(new Date()));
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
+
+  // Check if we can navigate to next month (can't go beyond current month)
+  const canGoNext = !isSameMonth(selectedMonth, new Date());
+
+  // Filter receipts by selected month
+  const monthFilteredReceipts = useMemo(() => {
+    return receipts.filter(receipt => isDateInMonth(receipt.receipt_date, selectedMonth));
+  }, [receipts, selectedMonth]);
+
+  // Calculate stats based on filtered receipts
+  const stats = useMemo(() => {
+    if (monthFilteredReceipts.length === 0) {
+      return { totalSpent: 0, totalItems: 0, totalTrips: 0, avgPerTrip: 0 };
+    }
+    const totalSpent = monthFilteredReceipts.reduce(
+      (sum, receipt) => sum + (receipt.total_amount_cents || 0),
+      0
+    );
+    const totalItems = monthFilteredReceipts.reduce(
+      (sum, receipt) => sum + (receipt.item_count || 0),
+      0
+    );
+    return {
+      totalSpent,
+      totalItems,
+      totalTrips: monthFilteredReceipts.length,
+      avgPerTrip: Math.round(totalSpent / monthFilteredReceipts.length),
+    };
+  }, [monthFilteredReceipts]);
+
+  // Calculate monthly totals for calendar year grid
+  const yearlyTotals = useMemo(() => {
+    const totals: { [month: number]: number } = {};
+    for (let i = 0; i < 12; i++) {
+      totals[i] = 0;
+    }
+    receipts.forEach(receipt => {
+      if (isDateInYear(receipt.receipt_date, calendarYear)) {
+        const month = new Date(receipt.receipt_date).getMonth();
+        totals[month] += receipt.total_amount_cents || 0;
+      }
+    });
+    return totals;
+  }, [receipts, calendarYear]);
+
+  const handleCalendarMonthSelect = (month: number) => {
+    if (!isFutureMonth(calendarYear, month)) {
+      setSelectedMonth(new Date(calendarYear, month, 1));
+      setShowCalendar(false);
+    }
+  };
+
+  const handlePreviousYear = () => {
+    setCalendarYear(calendarYear - 1);
+  };
+
+  const handleNextYear = () => {
+    if (calendarYear < new Date().getFullYear()) {
+      setCalendarYear(calendarYear + 1);
+    }
+  };
+
+  const handlePreviousMonth = () => {
+    setSelectedMonth(getPreviousMonth(selectedMonth));
+  };
+
+  const handleNextMonth = () => {
+    if (canGoNext) {
+      setSelectedMonth(getNextMonth(selectedMonth));
+    }
+  };
 
   useEffect(() => {
     if (currentHousehold?.id) {
-      loadPurchaseHistory();
+      loadReceipts();
     }
-  }, [currentHousehold?.id, selectedTab]);
+  }, [currentHousehold?.id]);
 
-  const loadPurchaseHistory = async () => {
+  const loadReceipts = async () => {
     if (!currentHousehold?.id) return;
 
     try {
       setLoading(true);
 
-      if (selectedTab === 'items') {
-        // Load purchase items
-        const { data: items, error } = await supabase
-          .from('purchase_history')
-          .select('*')
-          .eq('household_id', currentHousehold.id)
-          .order('purchase_date', { ascending: false })
-          .limit(100);
+      // Load receipts with their item names for search (last 6 months)
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-        if (error) throw error;
+      const { data: receiptData, error } = await supabase
+        .from('receipts')
+        .select(`
+          id,
+          store_name,
+          receipt_date,
+          total_amount_cents,
+          status,
+          receipt_fix_queue(parsed_name)
+        `)
+        .eq('household_id', currentHousehold.id)
+        .gte('receipt_date', sixMonthsAgo.toISOString())
+        .order('receipt_date', { ascending: false });
 
-        setPurchases(items || []);
+      if (error) throw error;
 
-        // Calculate stats
-        if (items && items.length > 0) {
-          const total = items.reduce((sum, item) => sum + (item.total_price_cents || 0), 0);
-          setStats({
-            totalSpent: total,
-            totalItems: items.length,
-            totalReceipts: new Set(items.map(i => i.receipt_id)).size,
-            avgItemPrice: Math.round(total / items.length),
-          });
-        }
-      } else {
-        // Load receipts
-        const { data: receiptData, error } = await supabase
-          .from('receipts')
-          .select(`
-            id,
-            store_name,
-            receipt_date,
-            total_amount_cents,
-            status,
-            receipt_items(count)
-          `)
-          .eq('household_id', currentHousehold.id)
-          .order('receipt_date', { ascending: false })
-          .limit(50);
+      const formattedReceipts: ReceiptWithItems[] = (receiptData || []).map(r => ({
+        id: r.id,
+        store_name: r.store_name || 'Unknown Store',
+        receipt_date: r.receipt_date,
+        total_amount_cents: r.total_amount_cents || 0,
+        item_count: r.receipt_fix_queue?.length || 0,
+        status: r.status,
+        item_names: (r.receipt_fix_queue || []).map((item: any) => item.parsed_name?.toLowerCase() || ''),
+      }));
 
-        if (error) throw error;
-
-        const formattedReceipts = receiptData?.map(r => ({
-          id: r.id,
-          store_name: r.store_name,
-          receipt_date: r.receipt_date,
-          total_amount_cents: r.total_amount_cents,
-          item_count: r.receipt_items?.[0]?.count || 0,
-          status: r.status,
-        })) || [];
-
-        setReceipts(formattedReceipts);
-      }
+      setReceipts(formattedReceipts);
     } catch (error) {
-      console.error('Failed to load purchase history:', error);
+      console.error('Failed to load receipts:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -129,7 +209,7 @@ export function PurchaseHistoryScreen() {
 
   const onRefresh = () => {
     setRefreshing(true);
-    loadPurchaseHistory();
+    loadReceipts();
   };
 
   const formatPrice = (cents: number) => {
@@ -145,52 +225,18 @@ export function PurchaseHistoryScreen() {
     });
   };
 
-  const filteredPurchases = purchases.filter(item =>
-    item.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.store_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.category?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Search by store name OR item names within receipts
+  const filteredReceipts = useMemo(() => {
+    if (!searchQuery) return monthFilteredReceipts;
 
-  const filteredReceipts = receipts.filter(receipt =>
-    receipt.store_name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    const query = searchQuery.toLowerCase();
+    return monthFilteredReceipts.filter(receipt =>
+      receipt.store_name.toLowerCase().includes(query) ||
+      receipt.item_names.some(itemName => itemName.includes(query))
+    );
+  }, [monthFilteredReceipts, searchQuery]);
 
-  const renderPurchaseItem = ({ item }: { item: PurchaseItem }) => (
-    <TouchableOpacity style={styles.purchaseCard}>
-      <View style={styles.purchaseHeader}>
-        <View style={styles.purchaseInfo}>
-          <Text style={styles.productName}>{item.product_name}</Text>
-          {item.brand && <Text style={styles.brand}>{item.brand}</Text>}
-          <View style={styles.purchaseMeta}>
-            <Text style={styles.storeName}>{item.store_name || 'Unknown Store'}</Text>
-            <Text style={styles.separator}>•</Text>
-            <Text style={styles.purchaseDate}>{formatDate(item.purchase_date)}</Text>
-          </View>
-        </View>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>{formatPrice(item.total_price_cents)}</Text>
-          {item.was_on_sale && (
-            <View style={styles.saleBadge}>
-              <Text style={styles.saleText}>SALE</Text>
-            </View>
-          )}
-        </View>
-      </View>
-      <View style={styles.purchaseDetails}>
-        <Text style={styles.quantity}>
-          {item.quantity} {item.unit || 'item'}
-          {item.quantity > 1 ? 's' : ''}
-        </Text>
-        {item.category && (
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{item.category}</Text>
-          </View>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderReceiptItem = ({ item }: { item: ReceiptSummary }) => (
+  const renderReceiptItem = ({ item }: { item: ReceiptWithItems }) => (
     <TouchableOpacity
       style={styles.receiptCard}
       onPress={() => navigation.navigate('ReceiptDetail', { receiptId: item.id })}
@@ -206,53 +252,77 @@ export function PurchaseHistoryScreen() {
           <Text style={styles.itemCount}>{item.item_count} items</Text>
         </View>
       </View>
-      <View style={[styles.statusBadge, styles[`status_${item.status}`]]}>
-        <Text style={styles.statusText}>{item.status}</Text>
-      </View>
+      {item.status !== 'completed' && (
+        <View style={[styles.statusBadge, styles[`status_${item.status}`] || styles.status_pending]}>
+          <Text style={styles.statusText}>{item.status}</Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 
   const renderHeader = () => (
     <View style={styles.header}>
+      {/* Month Selector */}
+      <View style={styles.monthSelector}>
+        <TouchableOpacity
+          style={styles.monthArrow}
+          onPress={handlePreviousMonth}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="chevron-back" size={24} color={theme.colors.primary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.monthDisplay}
+          onPress={() => {
+            setCalendarYear(selectedMonth.getFullYear());
+            setShowCalendar(true);
+          }}
+          activeOpacity={0.7}
+        >
+          <View style={styles.monthTextRow}>
+            <Text style={styles.monthText}>{formatMonthYear(selectedMonth)}</Text>
+            <Ionicons name="calendar-outline" size={18} color={theme.colors.primary} style={styles.calendarIcon} />
+          </View>
+          <Text style={styles.monthTotal}>{formatPrice(stats.totalSpent)}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.monthArrow, !canGoNext && styles.monthArrowDisabled]}
+          onPress={handleNextMonth}
+          disabled={!canGoNext}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name="chevron-forward"
+            size={24}
+            color={canGoNext ? theme.colors.primary : theme.colors.border}
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Stats Row */}
       <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>{formatPrice(stats.totalSpent)}</Text>
-          <Text style={styles.statLabel}>Total Spent</Text>
-        </View>
         <View style={styles.statCard}>
           <Text style={styles.statValue}>{stats.totalItems}</Text>
           <Text style={styles.statLabel}>Items</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>{formatPrice(stats.avgItemPrice)}</Text>
-          <Text style={styles.statLabel}>Avg Price</Text>
+          <Text style={styles.statValue}>{stats.totalTrips}</Text>
+          <Text style={styles.statLabel}>Trips</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{formatPrice(stats.avgPerTrip)}</Text>
+          <Text style={styles.statLabel}>Avg/Trip</Text>
         </View>
       </View>
 
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, selectedTab === 'items' && styles.activeTab]}
-          onPress={() => setSelectedTab('items')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'items' && styles.activeTabText]}>
-            Items
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, selectedTab === 'receipts' && styles.activeTab]}
-          onPress={() => setSelectedTab('receipts')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'receipts' && styles.activeTabText]}>
-            Receipts
-          </Text>
-        </TouchableOpacity>
-      </View>
-
+      {/* Search - searches both store names and items */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#6B7280" />
         <TextInput
           style={styles.searchInput}
-          placeholder={`Search ${selectedTab}...`}
+          placeholder="Search stores or items..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholderTextColor="#9CA3AF"
@@ -268,40 +338,126 @@ export function PurchaseHistoryScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading purchase history...</Text>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>Loading receipts...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const data = selectedTab === 'items' ? filteredPurchases : filteredReceipts;
-  const renderItem = selectedTab === 'items' ? renderPurchaseItem : renderReceiptItem;
+  const renderCalendarModal = () => (
+    <Modal
+      visible={showCalendar}
+      transparent
+      animationType="fade"
+      onRequestClose={() => setShowCalendar(false)}
+    >
+      <Pressable style={styles.modalOverlay} onPress={() => setShowCalendar(false)}>
+        <Pressable style={styles.calendarContainer} onPress={(e) => e.stopPropagation()}>
+          {/* Year Header */}
+          <View style={styles.yearHeader}>
+            <TouchableOpacity
+              style={styles.yearArrow}
+              onPress={handlePreviousYear}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="chevron-back" size={24} color={theme.colors.primary} />
+            </TouchableOpacity>
+            <Text style={styles.yearText}>{calendarYear}</Text>
+            <TouchableOpacity
+              style={[styles.yearArrow, calendarYear >= new Date().getFullYear() && styles.yearArrowDisabled]}
+              onPress={handleNextYear}
+              disabled={calendarYear >= new Date().getFullYear()}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons
+                name="chevron-forward"
+                size={24}
+                color={calendarYear >= new Date().getFullYear() ? theme.colors.border : theme.colors.primary}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Month Grid */}
+          <View style={styles.monthGrid}>
+            {[0, 1, 2, 3].map((row) => (
+              <View key={row} style={styles.monthRow}>
+                {[0, 1, 2].map((col) => {
+                  const month = row * 3 + col;
+                  const isFuture = isFutureMonth(calendarYear, month);
+                  const isSelected = selectedMonth.getFullYear() === calendarYear && selectedMonth.getMonth() === month;
+                  const total = yearlyTotals[month];
+
+                  return (
+                    <TouchableOpacity
+                      key={month}
+                      style={[
+                        styles.monthCell,
+                        isSelected && styles.monthCellSelected,
+                        isFuture && styles.monthCellDisabled,
+                      ]}
+                      onPress={() => handleCalendarMonthSelect(month)}
+                      disabled={isFuture}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[
+                        styles.monthCellName,
+                        isSelected && styles.monthCellNameSelected,
+                        isFuture && styles.monthCellNameDisabled,
+                      ]}>
+                        {MONTH_NAMES[month]}
+                      </Text>
+                      <Text style={[
+                        styles.monthCellTotal,
+                        isSelected && styles.monthCellTotalSelected,
+                        isFuture && styles.monthCellTotalDisabled,
+                        total === 0 && !isFuture && styles.monthCellTotalZero,
+                      ]}>
+                        {isFuture ? '—' : `$${(total / 100).toFixed(0)}`}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ))}
+          </View>
+
+          {/* Close Button */}
+          <TouchableOpacity style={styles.closeButton} onPress={() => setShowCalendar(false)}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {renderCalendarModal()}
       <FlatList
-        data={data}
+        data={filteredReceipts}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+        renderItem={renderReceiptItem}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="cart-outline" size={64} color="#D1D5DB" />
-            <Text style={styles.emptyTitle}>No Purchase History</Text>
+            <Ionicons name="receipt-outline" size={64} color="#D1D5DB" />
+            <Text style={styles.emptyTitle}>
+              {searchQuery ? 'No Results' : 'No Receipts'}
+            </Text>
             <Text style={styles.emptyText}>
-              {selectedTab === 'items'
-                ? 'Purchase items will appear here after processing receipts'
-                : 'Processed receipts will appear here'}
+              {searchQuery
+                ? `No receipts found matching "${searchQuery}"`
+                : 'Scanned receipts will appear here'}
             </Text>
           </View>
         }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        contentContainerStyle={data.length === 0 ? styles.emptyList : undefined}
+        contentContainerStyle={filteredReceipts.length === 0 ? styles.emptyList : undefined}
       />
     </SafeAreaView>
   );
@@ -319,7 +475,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: theme.spacing.md,
-    ...theme.typography.bodySmall,
+    fontSize: 14,
     color: theme.colors.textSecondary,
   },
   header: {
@@ -328,48 +484,61 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
-  statsContainer: {
+  monthSelector: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
+  },
+  monthArrow: {
+    padding: theme.spacing.sm,
+  },
+  monthArrowDisabled: {
+    opacity: 0.3,
+  },
+  monthDisplay: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  monthTextRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  calendarIcon: {
+    marginLeft: 6,
+  },
+  monthText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  monthTotal: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: theme.colors.primary,
+    marginTop: 4,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.xs,
+    paddingBottom: theme.spacing.md,
   },
   statCard: {
     flex: 1,
     alignItems: 'center',
   },
   statValue: {
-    ...theme.typography.h3,
+    fontSize: 18,
     fontWeight: '700',
-    color: theme.colors.primary,
+    color: theme.colors.text,
   },
   statLabel: {
-    ...theme.typography.caption,
+    fontSize: 12,
     color: theme.colors.textSecondary,
-    marginTop: theme.spacing.xs,
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: theme.spacing.sm,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  activeTab: {
-    borderBottomColor: theme.colors.primary,
-  },
-  tabText: {
-    ...theme.typography.bodySmall,
-    fontWeight: '500',
-    color: theme.colors.textSecondary,
-  },
-  activeTabText: {
-    color: theme.colors.primary,
+    marginTop: 2,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -377,104 +546,26 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.md,
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.borderLight,
-    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.borderLight || '#F3F4F6',
+    borderRadius: 8,
   },
   searchInput: {
     flex: 1,
     marginLeft: theme.spacing.sm,
-    ...theme.typography.bodySmall,
+    fontSize: 14,
     color: theme.colors.text,
-  },
-  purchaseCard: {
-    backgroundColor: theme.colors.surface,
-    marginHorizontal: theme.spacing.md,
-    marginVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
-    ...theme.shadows.sm,
-  },
-  purchaseHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  purchaseInfo: {
-    flex: 1,
-  },
-  productName: {
-    ...theme.typography.body,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-  brand: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-    marginTop: 2,
-  },
-  purchaseMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: theme.spacing.xs,
-  },
-  storeName: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-  },
-  separator: {
-    marginHorizontal: theme.spacing.xs + 2,
-    color: theme.colors.border,
-  },
-  purchaseDate: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-  },
-  priceContainer: {
-    alignItems: 'flex-end',
-  },
-  price: {
-    ...theme.typography.h3,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  saleBadge: {
-    backgroundColor: theme.colors.error + '20',
-    borderRadius: theme.borderRadius.xs,
-    paddingHorizontal: theme.spacing.xs + 2,
-    paddingVertical: 2,
-    marginTop: theme.spacing.xs,
-  },
-  saleText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: theme.colors.error,
-  },
-  purchaseDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: theme.spacing.sm + 4,
-  },
-  quantity: {
-    ...theme.typography.bodySmall,
-    color: theme.colors.textSecondary,
-  },
-  categoryBadge: {
-    backgroundColor: theme.colors.primary + '15',
-    borderRadius: theme.borderRadius.lg,
-    paddingHorizontal: theme.spacing.sm + 2,
-    paddingVertical: theme.spacing.xs,
-    marginLeft: theme.spacing.sm,
-  },
-  categoryText: {
-    ...theme.typography.caption,
-    color: theme.colors.primary,
   },
   receiptCard: {
     backgroundColor: theme.colors.surface,
     marginHorizontal: theme.spacing.md,
     marginVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.lg,
+    borderRadius: 12,
     padding: theme.spacing.md,
-    ...theme.shadows.sm,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   receiptHeader: {
     flexDirection: 'row',
@@ -482,10 +573,15 @@ const styles = StyleSheet.create({
   },
   receiptInfo: {
     flex: 1,
-    marginLeft: theme.spacing.sm + 4,
+    marginLeft: 12,
+  },
+  storeName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text,
   },
   receiptDate: {
-    ...theme.typography.caption,
+    fontSize: 13,
     color: theme.colors.textSecondary,
     marginTop: 2,
   },
@@ -493,56 +589,147 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   receiptTotal: {
-    ...theme.typography.h3,
+    fontSize: 18,
     fontWeight: '700',
     color: theme.colors.text,
   },
   itemCount: {
-    ...theme.typography.caption,
+    fontSize: 12,
     color: theme.colors.textSecondary,
     marginTop: 2,
   },
   statusBadge: {
     alignSelf: 'flex-start',
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: theme.borderRadius.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
     marginTop: theme.spacing.sm,
   },
   status_completed: {
-    backgroundColor: theme.colors.success + '30',
+    backgroundColor: '#D1FAE5',
   },
   status_pending: {
     backgroundColor: '#FEF3C7',
   },
   status_failed: {
-    backgroundColor: theme.colors.error + '20',
+    backgroundColor: '#FEE2E2',
   },
   statusText: {
     fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
+    color: '#666',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: theme.spacing.xl * 2,
+    paddingVertical: 64,
   },
   emptyTitle: {
-    ...theme.typography.h3,
+    fontSize: 18,
     fontWeight: '600',
     color: theme.colors.text,
     marginTop: theme.spacing.md,
   },
   emptyText: {
-    ...theme.typography.bodySmall,
+    fontSize: 14,
     color: theme.colors.textSecondary,
     marginTop: theme.spacing.sm,
     textAlign: 'center',
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: 32,
   },
   emptyList: {
     flexGrow: 1,
+  },
+  // Calendar Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calendarContainer: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: theme.spacing.lg,
+    marginHorizontal: theme.spacing.lg,
+    width: '90%',
+    maxWidth: 360,
+  },
+  yearHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing.lg,
+  },
+  yearArrow: {
+    padding: theme.spacing.sm,
+  },
+  yearArrowDisabled: {
+    opacity: 0.3,
+  },
+  yearText: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  monthGrid: {
+    marginBottom: theme.spacing.md,
+  },
+  monthRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing.sm,
+  },
+  monthCell: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: theme.spacing.md,
+    marginHorizontal: 4,
+    borderRadius: 12,
+    backgroundColor: theme.colors.background,
+  },
+  monthCellSelected: {
+    backgroundColor: theme.colors.primary,
+  },
+  monthCellDisabled: {
+    backgroundColor: theme.colors.border + '40',
+  },
+  monthCellName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+    marginBottom: 4,
+  },
+  monthCellNameSelected: {
+    color: '#fff',
+  },
+  monthCellNameDisabled: {
+    color: theme.colors.textSecondary,
+  },
+  monthCellTotal: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: theme.colors.textSecondary,
+  },
+  monthCellTotalSelected: {
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  monthCellTotalDisabled: {
+    color: theme.colors.border,
+  },
+  monthCellTotalZero: {
+    color: theme.colors.border,
+  },
+  closeButton: {
+    alignItems: 'center',
+    paddingVertical: theme.spacing.md,
+    marginTop: theme.spacing.sm,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.primary,
   },
 });
