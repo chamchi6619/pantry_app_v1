@@ -24,11 +24,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Clipboard,
-  Alert,
   AppState,
+  Clipboard,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { theme } from '../core/constants/theme';
 import { validateRecipeURL, detectPlatform } from '../utils/urlUtils';
 import { extractCookCard } from '../services/cookCardService';
 import {
@@ -76,6 +78,7 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
   const navigation = useNavigation();
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Extracting recipe...');
   const [error, setError] = useState<string | null>(null);
   const sessionId = route?.params?.sessionId || generateSessionId();
   const lastClipboardCheck = useRef<number>(0);
@@ -148,6 +151,20 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
       const platform = isTraditional ? 'traditional' : detectPlatform(url.trim());
 
       console.log('[PasteLink] URL type:', isTraditional ? 'traditional' : 'social', '| Platform:', platform);
+
+      // Set platform-specific loading message
+      if (isTraditional) {
+        setLoadingMessage('Extracting recipe...');
+      } else {
+        const platformNames: { [key: string]: string } = {
+          instagram: 'Instagram',
+          tiktok: 'TikTok',
+          youtube: 'YouTube',
+          xiaohongshu: 'Xiaohongshu',
+        };
+        const displayName = platformNames[platform || ''] || 'video';
+        setLoadingMessage(`Extracting from ${displayName}...`);
+      }
 
       // Log url_pasted event
       logIngressEvent({
@@ -260,40 +277,76 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
       console.error('[PasteLink] Extraction failed:', err);
     } finally {
       setLoading(false);
+      setLoadingMessage('Extracting recipe...');
+    }
+  };
+
+  const handlePasteFromClipboard = async () => {
+    try {
+      const clipboardContent = await Clipboard.getString();
+      if (clipboardContent) {
+        setUrl(clipboardContent);
+        setError(null);
+      }
+    } catch (err) {
+      console.warn('Failed to paste from clipboard:', err);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {/* Header with close button */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => navigation.goBack()}
+          disabled={loading}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="close" size={28} color={theme.colors.text} />
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.content}>
         <Text style={styles.title}>Paste Recipe Link</Text>
         <Text style={styles.subtitle}>
-          Paste a link from social media OR traditional recipe websites
+          Import from social media or recipe websites
         </Text>
 
-        <TextInput
-          style={styles.input}
-          value={url}
-          onChangeText={(text) => {
-            setUrl(text);
-            setError(null);
-          }}
-          placeholder="https://www.instagram.com/p/... or cooking.nytimes.com/..."
-          placeholderTextColor="#999"
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-          returnKeyType="go"
-          onSubmitEditing={handleExtract}
-          editable={!loading}
-        />
+        {/* Input with paste button */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={url}
+            onChangeText={(text) => {
+              setUrl(text);
+              setError(null);
+            }}
+            placeholder="Paste recipe URL here..."
+            placeholderTextColor={theme.colors.textSecondary}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
+            returnKeyType="go"
+            onSubmitEditing={handleExtract}
+            editable={!loading}
+          />
+          <TouchableOpacity
+            style={styles.pasteButton}
+            onPress={handlePasteFromClipboard}
+            disabled={loading}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="clipboard-outline" size={22} color={theme.colors.primary} />
+          </TouchableOpacity>
+        </View>
 
         {error && (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{error}</Text>
             {error.includes('look like a recipe link') && (
               <Text style={styles.errorHint}>
-                Tip: Open the recipe in the app, tap Share → Copy Link, then paste here
+                Tip: Open the recipe in the app, tap Share, then Copy Link
               </Text>
             )}
           </View>
@@ -305,7 +358,10 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color="#fff" size="small" />
+              <Text style={styles.loadingText}>{loadingMessage}</Text>
+            </View>
           ) : (
             <Text style={styles.buttonText}>Extract Recipe</Text>
           )}
@@ -321,16 +377,19 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
 
         {/* Help text for supported platforms */}
         <View style={styles.helpContainer}>
-          <Text style={styles.helpTitle}>Social Media:</Text>
-          <Text style={styles.helpText}>✅ Instagram, TikTok, YouTube, Xiaohongshu</Text>
-          <Text style={styles.helpSubtext}>$0.01-0.02 per recipe</Text>
-
-          <Text style={[styles.helpTitle, { marginTop: 12 }]}>Recipe Websites:</Text>
-          <Text style={styles.helpText}>✅ NYT Cooking, Bon Appétit, AllRecipes, and 1000+ more</Text>
-          <Text style={styles.helpSubtext}>FREE - no AI cost!</Text>
+          <View style={styles.helpRow}>
+            <Ionicons name="logo-instagram" size={18} color={theme.colors.textSecondary} />
+            <Ionicons name="logo-tiktok" size={18} color={theme.colors.textSecondary} style={styles.helpIcon} />
+            <Ionicons name="logo-youtube" size={18} color={theme.colors.textSecondary} style={styles.helpIcon} />
+            <Text style={styles.helpText}>Instagram, TikTok, YouTube</Text>
+          </View>
+          <View style={styles.helpRow}>
+            <Ionicons name="globe-outline" size={18} color={theme.colors.textSecondary} />
+            <Text style={styles.helpText}>NYT Cooking, AllRecipes, and 1000+ more</Text>
+          </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -341,92 +400,121 @@ function generateSessionId(): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+  },
+  closeButton: {
+    padding: theme.spacing.sm,
   },
   content: {
     flex: 1,
-    padding: 24,
-    justifyContent: 'center',
+    padding: theme.spacing.lg,
+    paddingTop: '20%',
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#000',
+    fontWeight: '700',
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.text,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.xl,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    marginBottom: theme.spacing.md,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 16,
+    flex: 1,
+    padding: theme.spacing.md,
     fontSize: 16,
-    marginBottom: 16,
-    backgroundColor: '#f9f9f9',
+    color: theme.colors.text,
+  },
+  pasteButton: {
+    padding: theme.spacing.md,
+    borderLeftWidth: 1,
+    borderLeftColor: theme.colors.border,
   },
   errorContainer: {
-    backgroundColor: '#fee',
+    backgroundColor: '#FEE2E2',
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   errorText: {
-    color: '#c33',
+    color: '#DC2626',
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
   },
   errorHint: {
-    color: '#c33',
+    color: '#DC2626',
     fontSize: 12,
   },
   button: {
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    padding: 16,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12,
+    padding: theme.spacing.md,
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
+    opacity: 0.7,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '500',
+    marginLeft: theme.spacing.sm,
+  },
   cancelButton: {
-    padding: 16,
+    padding: theme.spacing.md,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#007AFF',
+    color: theme.colors.textSecondary,
     fontSize: 16,
+    fontWeight: '500',
   },
   helpContainer: {
-    marginTop: 32,
-    padding: 16,
-    backgroundColor: '#f0f8ff',
-    borderRadius: 8,
+    marginTop: theme.spacing.xl,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 12,
+    gap: theme.spacing.sm,
   },
-  helpTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+  helpRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  helpIcon: {
+    marginLeft: theme.spacing.sm,
   },
   helpText: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  helpSubtext: {
-    fontSize: 12,
-    color: '#999',
-    fontStyle: 'italic',
+    color: theme.colors.textSecondary,
+    marginLeft: theme.spacing.sm,
+    flex: 1,
   },
 });
