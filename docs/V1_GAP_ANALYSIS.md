@@ -1,6 +1,6 @@
 # Pantry Pal V1 - Gap Analysis
 
-**Date:** 2025-01-16 (Updated)
+**Date:** 2025-02-06 (Updated)
 **Status:** IN PROGRESS
 
 ---
@@ -32,6 +32,29 @@
 - [x] Removed redundant floating + button (header button only)
 - [x] Search placeholder clarified ("Search by title")
 
+### PurchaseHistoryScreen - Simplified (2025-02-06)
+
+**Changes Made:**
+- [x] Removed Items tab, kept Receipts only
+- [x] Added item search within receipts (searches store names + item names)
+- [x] Added monthly navigation with swipeable arrows
+- [x] Added year grid calendar modal (tap month header to open)
+- [x] Shows monthly spending totals in calendar grid
+- [x] Fixed notch overlap (SafeAreaView with top edge)
+- [x] Stats: Items, Trips, Avg/Trip based on filtered receipts
+
+### PasteLinkScreen - Polished (2025-02-06)
+
+**Changes Made:**
+- [x] Added SafeAreaView with top/bottom edges for notch safety
+- [x] Use theme colors instead of hardcoded values
+- [x] Added close X button at top right
+- [x] Added paste button next to input field
+- [x] Platform-specific loading messages ("Extracting from Instagram...")
+- [x] Removed pricing info from help section (not user-facing)
+- [x] Simplified help section with platform icons
+- [x] Content positioned at 20% from top
+
 ### CookCardScreen - Redesigned
 
 **Changes Made:**
@@ -56,6 +79,9 @@
 src/features/queue/screens/RecipesHeroScreen.tsx - My Recipes list, source icons
 src/features/recipes/screens/ManualRecipeEntryScreen.tsx - Free manual entry
 src/screens/CookCardScreen.tsx - Complete redesign
+src/screens/PasteLinkScreen.tsx - Polished UI (2025-02-06)
+src/features/receipt/screens/PurchaseHistoryScreen.tsx - Receipts-only + calendar (2025-02-06)
+src/features/receipt/screens/ReceiptDetailScreen.tsx - Notch fix (2025-02-06)
 src/navigation/AppNavigator.tsx - Renamed tabs, removed v2 routes
 ```
 
