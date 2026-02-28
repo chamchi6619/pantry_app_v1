@@ -6,11 +6,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, StyleSheet, Dimensions, Pressable, ActivityIndicator, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { theme } from '../core/constants/theme';
 import { useAuth } from '../contexts/AuthContext';
 import { useUsage } from '../hooks/useUsage';
@@ -182,9 +182,7 @@ const AdBanner: React.FC<{ activeTab: string }> = ({ activeTab }) => {
 };
 
 // Bottom Tab Navigator - V1 Labels
-const TabNavigatorInner = () => {
-  const insets = useSafeAreaInsets();
-
+const TabNavigatorInner: React.FC<{ onTabChange?: (tab: string) => void }> = ({ onTabChange }) => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -192,14 +190,20 @@ const TabNavigatorInner = () => {
           backgroundColor: theme.colors.background,
           borderTopWidth: 1,
           borderTopColor: theme.colors.border,
-          paddingBottom: Math.max(insets.bottom, 8),
-          paddingTop: 8,
-          height: Math.max(insets.bottom, 20) + 60,
+          paddingBottom: 2,
+          paddingTop: 4,
+          height: 56,
         },
         tabBarShowLabel: false,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.textLight,
         headerShown: false
+      }}
+      screenListeners={{
+        state: (e: any) => {
+          const state = e.data?.state;
+          if (state) onTabChange?.(state.routes[state.index].name);
+        },
       }}
     >
       <Tab.Screen
@@ -267,12 +271,12 @@ const TabNavigatorInner = () => {
 };
 
 // TabNavigator with AdBanner below the tab bar
-const TabNavigator: React.FC<{ route?: any }> = ({ route }) => {
-  const activeTab = getFocusedRouteNameFromRoute(route ?? {}) ?? 'Pantry';
+const TabNavigator = () => {
+  const [activeTab, setActiveTab] = useState('Pantry');
 
   return (
-    <View style={{ flex: 1 }}>
-      <TabNavigatorInner />
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <TabNavigatorInner onTabChange={setActiveTab} />
       <AdBanner activeTab={activeTab} />
     </View>
   );
