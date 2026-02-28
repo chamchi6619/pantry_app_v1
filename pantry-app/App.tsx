@@ -3,8 +3,6 @@ import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
-import mobileAds from 'react-native-google-mobile-ads';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { initAnalytics, trackEvent } from './src/services/analyticsService';
@@ -17,11 +15,18 @@ export default function App() {
     configurePurchases();
 
     // ATT prompt (iOS only) then initialize mobile ads
+    // Dynamic imports: these are native modules unavailable in Expo Go
     (async () => {
-      if (Platform.OS === 'ios') {
-        await requestTrackingPermissionsAsync();
+      try {
+        if (Platform.OS === 'ios') {
+          const { requestTrackingPermissionsAsync } = await import('expo-tracking-transparency');
+          await requestTrackingPermissionsAsync();
+        }
+        const { default: mobileAds } = await import('react-native-google-mobile-ads');
+        await mobileAds().initialize();
+      } catch {
+        console.log('AdMob init skipped (native module unavailable)');
       }
-      await mobileAds().initialize();
     })();
   }, []);
 

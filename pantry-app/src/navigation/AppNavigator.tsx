@@ -5,13 +5,12 @@
  * V1 Scope: Simplified navigation without Explore/MealPlanning
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, StyleSheet, Dimensions, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { theme } from '../core/constants/theme';
 import { useAuth } from '../contexts/AuthContext';
 import { useUsage } from '../hooks/useUsage';
@@ -144,26 +143,37 @@ const ProfileStack = () => (
 );
 
 // Production ad unit IDs — replace with real IDs before release
-const AD_UNIT_ID = __DEV__
-  ? TestIds.ADAPTIVE_BANNER
-  : Platform.select({
-      ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
-      android: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
-    }) ?? TestIds.ADAPTIVE_BANNER;
+const PROD_AD_UNIT_ID = Platform.select({
+  ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
+  android: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
+}) ?? '';
 
 // AdBanner - shown below tab bar for free-tier users on allowed tabs
+// Uses dynamic import so the app still bundles without native google-mobile-ads module
 const AdBanner: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   const { usage } = useUsage();
   const [adFailed, setAdFailed] = useState(false);
+  const [adModule, setAdModule] = useState<any>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    import('react-native-google-mobile-ads')
+      .then((mod) => { if (mounted) setAdModule(mod); })
+      .catch(() => { /* native module unavailable (Expo Go) */ });
+    return () => { mounted = false; };
+  }, []);
 
   if (!FEATURE_FLAGS.ENABLE_ADS) return null;
   if (usage.tier !== 'free') return null;
   if (FEATURE_FLAGS.ADS_HIDDEN_TABS.includes(activeTab)) return null;
-  if (adFailed) return null;
+  if (adFailed || !adModule) return null;
+
+  const { BannerAd, BannerAdSize, TestIds } = adModule;
+  const unitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : PROD_AD_UNIT_ID;
 
   return (
     <BannerAd
-      unitId={AD_UNIT_ID}
+      unitId={unitId}
       size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
       requestOptions={{ requestNonPersonalizedAdsOnly: false }}
       onAdFailedToLoad={() => setAdFailed(true)}
