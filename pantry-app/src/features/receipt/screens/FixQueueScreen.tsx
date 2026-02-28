@@ -17,6 +17,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useHousehold } from '../../../hooks/useHousehold';
 import { useInventorySupabaseStore } from '../../../stores/inventorySupabaseStore';
 import { useReceiptStore } from '../../../stores/receiptStore';
+import { trackEvent } from '../../../services/analyticsService';
 
 // Smart location defaults based on category
 function getSmartLocation(category?: string): 'fridge' | 'freezer' | 'pantry' {
@@ -173,6 +174,8 @@ export function FixQueueScreen() {
           }
         }
       }
+
+      trackEvent('scan_items_confirmed', { item_count: editedItems.length, added_to_inventory: addedToInventory });
 
       // Calculate stats for success message
       const totalItems = editedItems.length;

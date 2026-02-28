@@ -1,23 +1,23 @@
 /**
  * Budget Check Utilities
  *
- * Purpose: Enforce LLM extraction limits per user tier
+ * Purpose: Enforce operation limits per user tier
  *
  * Tiers:
- * - Free: 5 LLM calls/month
- * - Pro: 1000 LLM calls/month
- * - Pro Plus: 5000 LLM calls/month
+ * - Free: 5 scans/month, 3 imports/month
+ * - Premium: 50 scans/month, 30 imports/month
  *
- * Rate limiting: 50 LLM calls/hour (all tiers)
+ * Rate limiting: 50 calls/hour (all tiers)
  */
 
-/**
- * User tier limits
- */
+export type OperationType = 'scan' | 'import';
+
 const TIER_LIMITS = {
-  free: 5,
-  pro: 1000,
-  pro_plus: 5000,
+  free: { scans: 5, imports: 3 },
+  premium: { scans: 50, imports: 30 },
+  lifetime: { scans: 50, imports: 30 },
+  pro: { scans: 50, imports: 30 },
+  pro_plus: { scans: 50, imports: 30 },
 };
 
 const HOURLY_RATE_LIMIT = 50;
@@ -32,18 +32,16 @@ export interface BudgetCheckResult {
   monthly_limit: number;
   hourly_count?: number;
   tier: string;
+  operation?: OperationType;
 }
 
 /**
- * Check if user is within extraction budget
- *
- * @param supabase - Supabase client
- * @param userId - User ID
- * @returns Budget check result
+ * Check if user is within extraction budget for a specific operation type
  */
 export async function checkExtractionBudget(
   supabase: any,
-  userId: string
+  userId: string,
+  operation: OperationType = 'scan'
 ): Promise<BudgetCheckResult> {
   try {
     // Get or create user limits
@@ -56,13 +54,18 @@ export async function checkExtractionBudget(
     // Create default limits if not exists
     if (error || !limits) {
       console.log(`📝 Creating default limits for user ${userId}`);
+      const tierLimits = TIER_LIMITS.free;
       const { data: newLimits, error: insertError } = await supabase
         .from('user_extraction_limits')
         .insert({
           user_id: userId,
           tier: 'free',
-          monthly_limit: TIER_LIMITS.free,
+          monthly_limit: tierLimits.scans,
           current_month_count: 0,
+          scan_month_count: 0,
+          import_month_count: 0,
+          scan_monthly_limit: tierLimits.scans,
+          import_monthly_limit: tierLimits.imports,
           hourly_limit: HOURLY_RATE_LIMIT,
           current_hour_count: 0,
         })
@@ -77,36 +80,47 @@ export async function checkExtractionBudget(
       limits = newLimits;
     }
 
-    // Check monthly limit
-    if (limits.current_month_count >= limits.monthly_limit) {
+    // Determine which counter and limit to check
+    const currentCount = operation === 'import'
+      ? (limits.import_month_count ?? 0)
+      : (limits.scan_month_count ?? 0);
+    const monthlyLimit = operation === 'import'
+      ? (limits.import_monthly_limit ?? TIER_LIMITS.free.imports)
+      : (limits.scan_monthly_limit ?? TIER_LIMITS.free.scans);
+
+    // Check operation-specific limit
+    if (currentCount >= monthlyLimit) {
+      const opLabel = operation === 'import' ? 'imports' : 'scans';
       return {
         allowed: false,
-        reason: `Monthly limit reached (${limits.monthly_limit}/${limits.monthly_limit}). Upgrade to Pro for 1000/month.`,
-        current_count: limits.current_month_count,
-        monthly_limit: limits.monthly_limit,
+        reason: `Monthly ${opLabel} limit reached (${currentCount}/${monthlyLimit}). Upgrade to Premium for more.`,
+        current_count: currentCount,
+        monthly_limit: monthlyLimit,
         tier: limits.tier,
+        operation,
       };
     }
 
     // Check hourly rate limit
-    if (limits.current_hour_count >= limits.hourly_limit) {
+    if ((limits.current_hour_count ?? 0) >= (limits.hourly_limit ?? HOURLY_RATE_LIMIT)) {
       return {
         allowed: false,
-        reason: `Hourly rate limit reached (${limits.hourly_limit}/hour). Please try again in a few minutes.`,
-        current_count: limits.current_month_count,
-        monthly_limit: limits.monthly_limit,
+        reason: `Hourly rate limit reached. Please try again in a few minutes.`,
+        current_count: currentCount,
+        monthly_limit: monthlyLimit,
         hourly_count: limits.current_hour_count,
         tier: limits.tier,
+        operation,
       };
     }
 
-    // Budget OK
     return {
       allowed: true,
-      current_count: limits.current_month_count,
-      monthly_limit: limits.monthly_limit,
+      current_count: currentCount,
+      monthly_limit: monthlyLimit,
       hourly_count: limits.current_hour_count,
       tier: limits.tier,
+      operation,
     };
   } catch (err) {
     console.error('Budget check error:', err);
@@ -115,23 +129,21 @@ export async function checkExtractionBudget(
 }
 
 /**
- * Increment extraction count (call after successful extraction)
- *
- * @param supabase - Supabase client
- * @param userId - User ID
+ * Increment extraction count for a specific operation type
  */
 export async function incrementExtractionCount(
   supabase: any,
-  userId: string
+  userId: string,
+  operation: OperationType = 'scan'
 ): Promise<void> {
   try {
-    // Increment both monthly and hourly counts
     const { error } = await supabase.rpc('increment_extraction_counts', {
       p_user_id: userId,
+      p_operation: operation,
     });
 
     if (error) {
-      // Fallback: manual update
+      console.error('RPC increment failed, using fallback:', error);
       const { data: limits } = await supabase
         .from('user_extraction_limits')
         .select('*')
@@ -139,30 +151,32 @@ export async function incrementExtractionCount(
         .single();
 
       if (limits) {
+        const update: any = {
+          current_month_count: (limits.current_month_count ?? 0) + 1,
+          current_hour_count: (limits.current_hour_count ?? 0) + 1,
+          updated_at: new Date().toISOString(),
+        };
+        if (operation === 'import') {
+          update.import_month_count = (limits.import_month_count ?? 0) + 1;
+        } else {
+          update.scan_month_count = (limits.scan_month_count ?? 0) + 1;
+        }
+
         await supabase
           .from('user_extraction_limits')
-          .update({
-            current_month_count: limits.current_month_count + 1,
-            current_hour_count: limits.current_hour_count + 1,
-            updated_at: new Date().toISOString(),
-          })
+          .update(update)
           .eq('user_id', userId);
       }
     }
 
-    console.log(`📊 Incremented extraction count for user ${userId}`);
+    console.log(`📊 Incremented ${operation} count for user ${userId}`);
   } catch (err) {
     console.error('Failed to increment extraction count:', err);
-    // Non-blocking: Continue even if increment fails
   }
 }
 
 /**
  * Get user tier info (for display in UI)
- *
- * @param supabase - Supabase client
- * @param userId - User ID
- * @returns Tier info
  */
 export async function getUserTierInfo(supabase: any, userId: string) {
   const { data: limits } = await supabase
@@ -174,52 +188,46 @@ export async function getUserTierInfo(supabase: any, userId: string) {
   if (!limits) {
     return {
       tier: 'free',
-      monthly_limit: TIER_LIMITS.free,
-      current_count: 0,
-      remaining: TIER_LIMITS.free,
-      percentage_used: 0,
+      scan_count: 0,
+      scan_limit: TIER_LIMITS.free.scans,
+      import_count: 0,
+      import_limit: TIER_LIMITS.free.imports,
+      scans_remaining: TIER_LIMITS.free.scans,
+      imports_remaining: TIER_LIMITS.free.imports,
     };
   }
 
-  const remaining = Math.max(0, limits.monthly_limit - limits.current_month_count);
-  const percentageUsed = Math.min(
-    100,
-    Math.round((limits.current_month_count / limits.monthly_limit) * 100)
-  );
-
   return {
     tier: limits.tier,
-    monthly_limit: limits.monthly_limit,
-    current_count: limits.current_month_count,
-    remaining,
-    percentage_used: percentageUsed,
-    hourly_count: limits.current_hour_count,
-    hourly_limit: limits.hourly_limit,
+    scan_count: limits.scan_month_count ?? 0,
+    scan_limit: limits.scan_monthly_limit ?? TIER_LIMITS.free.scans,
+    import_count: limits.import_month_count ?? 0,
+    import_limit: limits.import_monthly_limit ?? TIER_LIMITS.free.imports,
+    scans_remaining: Math.max(0, (limits.scan_monthly_limit ?? 5) - (limits.scan_month_count ?? 0)),
+    imports_remaining: Math.max(0, (limits.import_monthly_limit ?? 3) - (limits.import_month_count ?? 0)),
   };
 }
 
 /**
- * Upgrade user tier (admin function)
- *
- * @param supabase - Supabase client
- * @param userId - User ID
- * @param newTier - New tier ('pro' or 'pro_plus')
+ * Upgrade user tier
  */
 export async function upgradeUserTier(
   supabase: any,
   userId: string,
-  newTier: 'pro' | 'pro_plus'
+  newTier: 'premium' | 'lifetime' | 'pro' | 'pro_plus'
 ): Promise<void> {
-  const newLimit = TIER_LIMITS[newTier];
+  const tierLimits = TIER_LIMITS[newTier];
 
   await supabase
     .from('user_extraction_limits')
     .upsert({
       user_id: userId,
       tier: newTier,
-      monthly_limit: newLimit,
+      monthly_limit: tierLimits.scans,
+      scan_monthly_limit: tierLimits.scans,
+      import_monthly_limit: tierLimits.imports,
       updated_at: new Date().toISOString(),
     });
 
-  console.log(`⬆️  Upgraded user ${userId} to ${newTier} (limit: ${newLimit}/mo)`);
+  console.log(`⬆️  Upgraded user ${userId} to ${newTier} (scans: ${tierLimits.scans}/mo, imports: ${tierLimits.imports}/mo)`);
 }

@@ -6,6 +6,7 @@
  */
 
 import { CookCard, ExtractionResponse } from '../types/CookCard';
+import { trackEvent } from './analyticsService';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -52,9 +53,14 @@ export async function extractCookCard(
     }
 
     const data: ExtractionResponse = await response.json();
+    trackEvent('recipe_import_completed', {
+      platform: data.cook_card?.source?.platform,
+      ingredient_count: data.cook_card?.ingredients?.length ?? 0,
+    });
     return data;
   } catch (error) {
     console.error('Extract Cook Card error:', error);
+    trackEvent('recipe_import_failed', { error: (error as Error).message });
     throw error;
   }
 }

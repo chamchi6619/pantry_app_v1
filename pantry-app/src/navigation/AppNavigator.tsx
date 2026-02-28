@@ -5,14 +5,17 @@
  * V1 Scope: Simplified navigation without Explore/MealPlanning
  */
 
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet, Dimensions, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { theme } from '../core/constants/theme';
 import { useAuth } from '../contexts/AuthContext';
+import { useUsage } from '../hooks/useUsage';
+import { FEATURE_FLAGS } from '../config/featureFlags';
 import { AuthScreen } from '../features/auth/screens/AuthScreen';
 import { InventoryScreen } from '../features/inventory/screens/InventoryScreen';
 import { SimpleShoppingListScreen } from '../features/shopping/screens/SimpleShoppingListScreen';
@@ -140,8 +143,36 @@ const ProfileStack = () => (
   </Stack.Navigator>
 );
 
+// Production ad unit IDs — replace with real IDs before release
+const AD_UNIT_ID = __DEV__
+  ? TestIds.ADAPTIVE_BANNER
+  : Platform.select({
+      ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
+      android: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
+    }) ?? TestIds.ADAPTIVE_BANNER;
+
+// AdBanner - shown below tab bar for free-tier users on allowed tabs
+const AdBanner: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  const { usage } = useUsage();
+  const [adFailed, setAdFailed] = useState(false);
+
+  if (!FEATURE_FLAGS.ENABLE_ADS) return null;
+  if (usage.tier !== 'free') return null;
+  if (FEATURE_FLAGS.ADS_HIDDEN_TABS.includes(activeTab)) return null;
+  if (adFailed) return null;
+
+  return (
+    <BannerAd
+      unitId={AD_UNIT_ID}
+      size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+      requestOptions={{ requestNonPersonalizedAdsOnly: false }}
+      onAdFailedToLoad={() => setAdFailed(true)}
+    />
+  );
+};
+
 // Bottom Tab Navigator - V1 Labels
-const TabNavigator = () => {
+const TabNavigatorInner = () => {
   const insets = useSafeAreaInsets();
 
   return (
@@ -222,6 +253,18 @@ const TabNavigator = () => {
         }}
       />
     </Tab.Navigator>
+  );
+};
+
+// TabNavigator with AdBanner below the tab bar
+const TabNavigator: React.FC<{ route?: any }> = ({ route }) => {
+  const activeTab = getFocusedRouteNameFromRoute(route ?? {}) ?? 'Pantry';
+
+  return (
+    <View style={{ flex: 1 }}>
+      <TabNavigatorInner />
+      <AdBanner activeTab={activeTab} />
+    </View>
   );
 };
 

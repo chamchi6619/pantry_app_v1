@@ -1,9 +1,6 @@
-import { Camera, useCameraDevice, useFrameProcessor } from 'react-native-vision-camera';
-import { useRunOnJS } from 'react-native-worklets-core';
-import { scanOCR } from 'react-native-vision-camera-v3-text-recognition';
-
-// Native OCR Service using react-native-vision-camera
-// This requires a development build with native modules
+// Native OCR Service - receipt parsing helpers
+// Frame processor removed (vision camera v3 incompatible with RN 0.81)
+// On-device OCR now handled by deviceOcrService.ts using @react-native-ml-kit/text-recognition
 
 interface OCRResult {
   text: string;
@@ -45,39 +42,6 @@ interface ParsedReceipt {
 }
 
 class NativeOCRService {
-  // Process OCR results from frame processor
-  processOCRFrame(frame: any): OCRResult | null {
-    'worklet';
-    try {
-      const data = scanOCR(frame);
-
-      if (!data || !data.resultText) {
-        return null;
-      }
-
-      // Convert native OCR data to our format
-      const blocks: TextBlock[] = (data.blocks || []).map((block: any) => ({
-        text: block.text || '',
-        boundingBox: block.frame ? {
-          x: block.frame.x,
-          y: block.frame.y,
-          width: block.frame.width,
-          height: block.frame.height,
-        } : undefined,
-        confidence: block.confidence || 0.5,
-      }));
-
-      return {
-        text: data.resultText,
-        blocks,
-        confidence: data.confidence || 0.85,
-      };
-    } catch (error) {
-      console.error('OCR frame processing error:', error);
-      return null;
-    }
-  }
-
   // Parse OCR text into structured receipt data
   parseReceipt(ocrResult: OCRResult): ParsedReceipt {
     const lines = ocrResult.text.split('\n');
@@ -232,10 +196,6 @@ class NativeOCRService {
 
   // Determine if item needs review
   private needsReview(name: string, price: number): boolean {
-    // Flag for review if:
-    // - Name is too short
-    // - Price seems unusual
-    // - Contains unusual characters
     return (
       name.length < 3 ||
       price <= 0 ||
@@ -270,7 +230,6 @@ class NativeOCRService {
 
   // Process accumulated text from multiple frames
   processAccumulatedText(texts: string[]): string {
-    // Combine and deduplicate text from multiple frames
     const allLines = texts.flatMap(text => text.split('\n'));
     const uniqueLines = [...new Set(allLines)];
     return uniqueLines.join('\n');

@@ -20,12 +20,14 @@ export default {
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: false,
-      bundleIdentifier: 'com.pantrypal.app',
+      bundleIdentifier: 'com.taeyoungpark.pantrypal',
       infoPlist: {
         NSCameraUsageDescription:
           'This app uses the camera to scan receipts and automatically add items to your pantry inventory.',
         NSPhotoLibraryUsageDescription:
           'This app needs access to photo library to save scanned receipts.',
+        NSUserTrackingUsageDescription:
+          'This allows us to show you more relevant ads and improve your experience.',
         CFBundleURLTypes: [
           {
             CFBundleURLSchemes: ['pantryapp']
@@ -41,7 +43,7 @@ export default {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#FFFFFF',
       },
-      package: 'com.pantrypal.app',
+      package: 'com.taeyoungpark.pantrypal',
       permissions: ['CAMERA'],
     },
     web: {
@@ -50,12 +52,24 @@ export default {
     plugins: [
       'expo-dev-client',
       [
-        'react-native-vision-camera',
+        'expo-build-properties',
         {
-          cameraPermissionText: 'Pantry Pal needs access to your camera to scan receipts.',
-          enableMicrophonePermission: false,
+          ios: {
+            deploymentTarget: '16.0',
+          },
+          android: {
+            minSdkVersion: 24,
+          },
         },
       ],
+      [
+        'react-native-google-mobile-ads',
+        {
+          androidAppId: 'ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY',
+          iosAppId: 'ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY',
+        },
+      ],
+      'expo-tracking-transparency',
     ],
   },
 };

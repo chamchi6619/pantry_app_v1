@@ -104,7 +104,10 @@ async function processBatch(
         generationConfig: {
           temperature: 0.1,
           responseMimeType: 'application/json',
-        }
+        },
+        thinkingConfig: {
+          thinkingBudget: 0,
+        },
       })
     }
   );

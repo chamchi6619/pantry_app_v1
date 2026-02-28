@@ -19,6 +19,9 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useMonthlySpending } from '../../../hooks/useMonthlySpending';
 import { useUserPreferences } from '../../../hooks/useUserPreferences';
 import { supabase } from '../../../lib/supabase';
+import { useUsage } from '../../../hooks/useUsage';
+import RevenueCatUI from 'react-native-purchases-ui';
+import { presentPaywall } from '../../../services/purchaseService';
 
 interface RecentReceipt {
   id: string;
@@ -37,6 +40,7 @@ export const ProfileScreen: React.FC = () => {
   const { signOut, user, householdId } = useAuth();
   const { data: spending } = useMonthlySpending();
   const { preferences, profile, loading: prefsLoading, updatePreferences, updateProfile } = useUserPreferences();
+  const { usage, refreshUsage } = useUsage();
 
   const [recentReceipts, setRecentReceipts] = useState<RecentReceipt[]>([]);
   const [loading, setLoading] = useState(true);
@@ -247,6 +251,22 @@ export const ProfileScreen: React.FC = () => {
           </View>
         </View>
 
+        {/* Usage */}
+        <View style={styles.statsOverview}>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>Scans</Text>
+            <Text style={styles.statValue}>{usage.scan_count}/{usage.scan_limit}</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>Imports</Text>
+            <Text style={styles.statValue}>{usage.import_count}/{usage.import_limit}</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>Plan</Text>
+            <Text style={[styles.statValue, { textTransform: 'capitalize' }]}>{usage.tier}</Text>
+          </View>
+        </View>
+
         {/* Recent Purchases */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -365,12 +385,44 @@ export const ProfileScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
 
+          {usage.tier === 'free' && (
+            <Pressable
+              style={[styles.accountItem, styles.upgradeItem]}
+              onPress={async () => {
+                await presentPaywall();
+                refreshUsage();
+              }}
+            >
+              <Ionicons name="star" size={20} color="#10B981" />
+              <Text style={[styles.accountText, styles.upgradeText]}>Upgrade to Pro</Text>
+              <Ionicons name="chevron-forward" size={20} color="#10B981" />
+            </Pressable>
+          )}
+
           <Pressable
             style={styles.accountItem}
             onPress={() => Linking.openURL('mailto:support@pantryapp.com?subject=Support Request')}
           >
             <Ionicons name="help-circle-outline" size={20} color="#6B7280" />
             <Text style={styles.accountText}>Help & Support</Text>
+            <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+          </Pressable>
+
+          <Pressable
+            style={styles.accountItem}
+            onPress={async () => {
+              try {
+                await RevenueCatUI.presentCustomerCenter();
+              } catch {
+                Alert.alert(
+                  'Manage Subscription',
+                  'Go to Settings > Apple ID > Subscriptions to manage your subscription.'
+                );
+              }
+            }}
+          >
+            <Ionicons name="card-outline" size={20} color="#6B7280" />
+            <Text style={styles.accountText}>Manage Subscription</Text>
             <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
           </Pressable>
 
@@ -579,6 +631,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#374151',
+  },
+  upgradeItem: {
+    backgroundColor: '#ECFDF5',
+    borderRadius: 8,
+    borderBottomWidth: 0,
+    marginBottom: 4,
+    paddingHorizontal: 12,
+  },
+  upgradeText: {
+    color: '#10B981',
+    fontWeight: '700',
   },
   dangerItem: {
     borderBottomColor: '#FEE2E2',

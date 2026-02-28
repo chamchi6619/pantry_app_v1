@@ -475,6 +475,9 @@ export async function extractIngredientsWithGemini(
       maxOutputTokens: MAX_OUTPUT_TOKENS,
       topP: 0.95,
     },
+    thinkingConfig: {
+      thinkingBudget: 0,
+    },
   };
 
   // Make API call with retry logic
@@ -715,6 +718,9 @@ For ingredients:
       maxOutputTokens: 4000, // Increased from 2000 to prevent truncation
       topP: 0.95,
       responseMimeType: 'application/json', // Force JSON response
+    },
+    thinkingConfig: {
+      thinkingBudget: 0,
     },
   };
 

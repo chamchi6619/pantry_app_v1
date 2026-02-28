@@ -16,8 +16,6 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.21.0";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -158,11 +156,10 @@ Deno.serve(async (req) => {
       weekDays.push(day.toISOString().split("T")[0]);
     }
 
-    // 5. Call Gemini AI
-    const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY") || "");
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-    });
+    // 5. Call Gemini AI (REST API for thinkingConfig support)
+    const geminiApiKey = Deno.env.get("GEMINI_API_KEY") || "";
+    const geminiModel = "gemini-2.5-flash";
+    const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`;
 
     const prompt = `
 You are a meal planning assistant. Generate a weekly meal plan based on the user's pantry inventory and available recipes.
@@ -229,12 +226,41 @@ Return ONLY valid JSON, no additional text.
     console.log("🤖 Calling Gemini API...");
     const startTime = Date.now();
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const geminiResponse = await fetch(geminiEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.1,
+          responseMimeType: "application/json",
+        },
+        thinkingConfig: {
+          thinkingBudget: 0,
+        },
+      }),
+    });
+
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      throw new Error(`Gemini API error: ${geminiResponse.status} - ${errorText}`);
+    }
+
+    const geminiData = await geminiResponse.json();
+    const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    // Extract actual token counts for cost tracking
+    const actualInputTokens = geminiData.usageMetadata?.promptTokenCount || 0;
+    const actualOutputTokens = geminiData.usageMetadata?.candidatesTokenCount || 0;
 
     const generationTimeMs = Date.now() - startTime;
     console.log(`⏱️ Generation time: ${generationTimeMs}ms`);
+    console.log(`📊 Tokens: ${actualInputTokens} in, ${actualOutputTokens} out`);
+
+    // Calculate actual cost using Gemini 2.5 Flash pricing
+    const costCents = Math.ceil(
+      ((actualInputTokens / 1000000) * 0.30 + (actualOutputTokens / 1000000) * 2.50) * 100
+    );
 
     // Extract JSON from response (handle potential markdown wrapping)
     let jsonText = text.trim();
@@ -258,7 +284,7 @@ Return ONLY valid JSON, no additional text.
         suggested_meals: aiResponse.meals,
         rationale: aiResponse.overall_rationale,
         generation_time_ms: generationTimeMs,
-        cost_cents: Math.ceil(generationTimeMs / 1000), // Rough estimate: 1¢ per second
+        cost_cents: costCents,
         cache_hit: false,
         user_accepted: null,
       });

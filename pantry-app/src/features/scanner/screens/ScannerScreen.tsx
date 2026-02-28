@@ -17,6 +17,8 @@ import { useHousehold } from '../../../hooks/useHousehold';
 import { receiptService } from '../../../services/receiptServiceGemini';
 import { offlineQueueService } from '../../../services/offlineQueueService';
 import { FEATURE_FLAGS } from '../../../config/featureFlags';
+import { trackEvent } from '../../../services/analyticsService';
+import { useUsage } from '../../../hooks/useUsage';
 
 export function ScannerScreen() {
   const navigation = useNavigation();
@@ -26,6 +28,7 @@ export function ScannerScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedText, setExtractedText] = useState<string>('');
   const [processStage, setProcessStage] = useState<string>('');
+  const { checkCanScan, refreshUsage } = useUsage();
 
   // Reset scanner state when screen comes into focus
   useFocusEffect(
@@ -83,13 +86,39 @@ export function ScannerScreen() {
       return;
     }
 
+    // Check scan budget before processing
+    const canScan = await checkCanScan();
+    if (!canScan) return;
+
     try {
       setIsProcessing(true);
-      setProcessStage('Extracting text from image...');
+      setProcessStage(
+        FEATURE_FLAGS.OCR_METHOD === 'device'
+          ? 'Extracting text (on-device)...'
+          : 'Extracting text from image...'
+      );
 
-      // Use Cloud Vision API if available, otherwise mock OCR
-      const { CloudVisionService } = await import('../../../services/cloudVisionService');
-      const ocrText = await CloudVisionService.extractText(asset.uri);
+      // Use on-device OCR (ML Kit) if configured and available, otherwise cloud
+      let ocrText: string | null = null;
+      let ocrMethod: 'device' | 'cloud' = 'cloud';
+
+      if (FEATURE_FLAGS.OCR_METHOD === 'device') {
+        const { DeviceOcrService } = await import('../../../services/deviceOcrService');
+        if (DeviceOcrService.isAvailable()) {
+          ocrText = await DeviceOcrService.extractText(asset.uri);
+          ocrMethod = 'device';
+          console.log('📱 Used on-device OCR (ML Kit)');
+        } else {
+          console.log('📱 Device OCR unavailable, falling back to cloud');
+        }
+      }
+
+      if (ocrText === null) {
+        const { CloudVisionService } = await import('../../../services/cloudVisionService');
+        ocrText = await CloudVisionService.extractText(asset.uri);
+        ocrMethod = 'cloud';
+        console.log('☁️ Used Cloud Vision API');
+      }
 
       // If no text extracted, use mock
       let extractedOcrText = ocrText || generateMockOCR();
@@ -132,6 +161,7 @@ export function ScannerScreen() {
         }
 
         console.log(`✅ ${result.items.length} items parsed, navigating to Fix Queue`);
+        trackEvent('scan_completed', { item_count: result.items.length });
 
         // Reset scanner state before navigation
         setTimeout(() => {
@@ -355,6 +385,7 @@ THANK YOU FOR SHOPPING`;
           </View>
         )}
       </View>
+
     </SafeAreaView>
   );
 }

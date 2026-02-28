@@ -3,6 +3,8 @@ import { Alert } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { FEATURE_FLAGS } from '../config/featureFlags';
+import { trackEvent } from '../services/analyticsService';
+import { identifyUser, logOutPurchases } from '../services/purchaseService';
 import { syncService } from '../services/supabaseSync';
 import { useReceiptStore } from '../stores/receiptStore';
 import { useInventoryStore } from '../stores/inventoryStore';
@@ -110,6 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (session?.user) {
             await initializeUserData(session.user.id);
+            identifyUser(session.user.id);
           } else {
             // Clean up on logout
             setHasProfile(false);
@@ -295,6 +298,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
+      trackEvent('sign_up_completed', { method: 'email_password' });
+
       Alert.alert(
         'Success!',
         'Please check your email to confirm your account.',
@@ -310,6 +315,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       setLoading(true);
+
+      // Log out from RevenueCat
+      await logOutPurchases();
 
       // Clean up sync before signing out
       syncService.cleanup();

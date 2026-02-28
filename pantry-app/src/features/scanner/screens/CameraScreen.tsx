@@ -10,7 +10,7 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useHousehold } from '../../../hooks/useHousehold';
@@ -21,38 +21,36 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 export function CameraScreen() {
   const navigation = useNavigation();
   const { currentHousehold } = useHousehold();
-  const camera = useRef<Camera>(null);
+  const camera = useRef<CameraView>(null);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [ocrText, setOcrText] = useState<string>('');
   const [flashOn, setFlashOn] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
 
-  const device = useCameraDevice('back');
-  const { hasPermission, requestPermission } = useCameraPermission();
+  const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
-    if (!hasPermission) {
+    if (!permission?.granted) {
       requestPermission();
     }
-  }, [hasPermission]);
+  }, [permission]);
 
   const captureReceipt = async () => {
-    if (!camera.current || !device) return;
+    if (!camera.current || !isCameraReady) return;
 
     try {
       setIsProcessing(true);
 
-      // Take photo
-      const photo = await camera.current.takePhoto({
-        flash: flashOn ? 'on' : 'off',
-        qualityPrioritization: 'balanced',
+      const photo = await camera.current.takePictureAsync({
+        quality: 0.8,
       });
 
-      setCapturedPhoto(photo.path);
-
-      // Process with ML Kit
-      await processWithOCR(photo.path);
+      if (photo) {
+        setCapturedPhoto(photo.uri);
+        await processWithOCR(photo.uri);
+      }
     } catch (error) {
       console.error('Camera capture error:', error);
       Alert.alert('Error', 'Failed to capture photo');
@@ -124,7 +122,7 @@ export function CameraScreen() {
     setOcrText('');
   };
 
-  if (!hasPermission) {
+  if (!permission?.granted) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.permissionContainer}>
@@ -144,22 +142,11 @@ export function CameraScreen() {
     );
   }
 
-  if (!device) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading camera...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   if (capturedPhoto) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.previewContainer}>
-          <Image source={{ uri: `file://${capturedPhoto}` }} style={styles.previewImage} />
+          <Image source={{ uri: capturedPhoto }} style={styles.previewImage} />
 
           {isProcessing ? (
             <View style={styles.processingOverlay}>
@@ -189,12 +176,12 @@ export function CameraScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Camera
+      <CameraView
         ref={camera}
         style={StyleSheet.absoluteFill}
-        device={device}
-        isActive={true}
-        photo={true}
+        facing="back"
+        flash={flashOn ? 'on' : 'off'}
+        onCameraReady={() => setIsCameraReady(true)}
       />
 
       {/* Header */}
@@ -236,7 +223,7 @@ export function CameraScreen() {
         <TouchableOpacity
           style={styles.captureButton}
           onPress={captureReceipt}
-          disabled={isProcessing}
+          disabled={isProcessing || !isCameraReady}
         >
           <View style={styles.captureButtonInner} />
         </TouchableOpacity>

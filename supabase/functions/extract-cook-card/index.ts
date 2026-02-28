@@ -1081,7 +1081,7 @@ Deno.serve(async (req) => {
           });
 
         // Check budget before calling Gemini
-        const budgetCheck = await checkExtractionBudget(supabase, user_id);
+        const budgetCheck = await checkExtractionBudget(supabase, user_id, 'import');
         if (!budgetCheck.allowed) {
           console.warn(`⚠️  Budget exceeded: ${budgetCheck.reason}`);
 
@@ -1104,7 +1104,7 @@ Deno.serve(async (req) => {
               cook_card: cookCard,
               budget_info: budgetCheck,
             }),
-            { status: 200, headers: { "Content-Type": "application/json" } }
+            { status: 429, headers: { "Content-Type": "application/json" } }
           );
         }
 

@@ -1,6 +1,7 @@
 /**
- * On-device OCR service using Vision Camera
- * Platform-specific text recognition for receipts
+ * OCR service with image preprocessing and result formatting
+ * Vision Camera dependency removed (incompatible with RN 0.81)
+ * On-device OCR now handled by deviceOcrService.ts
  */
 
 import { Platform } from 'react-native';
@@ -32,78 +33,6 @@ export interface TextRecognitionResult {
 }
 
 export class VisionOCRService {
-  private isInitialized = false;
-  private textRecognizer: any = null;
-
-  /**
-   * Initialize the OCR service
-   */
-  async initialize(): Promise<boolean> {
-    if (this.isInitialized) return true;
-
-    try {
-      // Check if Vision Camera and text recognition are available
-      const VisionCamera = await this.loadVisionCamera();
-      if (!VisionCamera) {
-        console.log('Vision Camera not available - using fallback');
-        return false;
-      }
-
-      // Platform-specific initialization
-      if (Platform.OS === 'ios') {
-        await this.initializeIOS();
-      } else if (Platform.OS === 'android') {
-        await this.initializeAndroid();
-      }
-
-      this.isInitialized = true;
-      return true;
-    } catch (error) {
-      console.error('Failed to initialize OCR service:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Load Vision Camera dynamically
-   */
-  private async loadVisionCamera(): Promise<any> {
-    try {
-      // Dynamic import for development builds
-      const module = await import('react-native-vision-camera');
-      return module;
-    } catch {
-      return null;
-    }
-  }
-
-  /**
-   * Initialize iOS Vision framework
-   */
-  private async initializeIOS(): Promise<void> {
-    // In a real implementation, this would set up VNRecognizeTextRequest
-    // For now, we'll use the text recognition plugin
-    try {
-      const TextRecognition = await import('react-native-vision-camera-v3-text-recognition');
-      this.textRecognizer = TextRecognition;
-    } catch (error) {
-      console.error('iOS text recognition not available:', error);
-    }
-  }
-
-  /**
-   * Initialize Android ML Kit
-   */
-  private async initializeAndroid(): Promise<void> {
-    // In a real implementation, this would set up ML Kit Text Recognition v2
-    try {
-      const TextRecognition = await import('react-native-vision-camera-v3-text-recognition');
-      this.textRecognizer = TextRecognition;
-    } catch (error) {
-      console.error('Android text recognition not available:', error);
-    }
-  }
-
   /**
    * Preprocess image for better OCR results
    */
@@ -140,141 +69,9 @@ export class VisionOCRService {
   }
 
   /**
-   * Perform OCR on image
-   */
-  async performOCR(imageUri: string): Promise<OcrPayload> {
-    try {
-      // Preprocess the image
-      const processedUri = await this.preprocessImage(imageUri);
-
-      // Generate image hash for caching
-      const imageData = await fetch(processedUri).then(r => r.blob());
-      const arrayBuffer = await new Response(imageData).arrayBuffer();
-      const imageHash = await Crypto.digest(
-        Crypto.CryptoDigestAlgorithm.SHA256,
-        new Uint8Array(arrayBuffer)
-      );
-
-      // Perform text recognition
-      let result: TextRecognitionResult;
-
-      if (this.isInitialized && this.textRecognizer) {
-        // Use real OCR
-        result = await this.recognizeText(processedUri);
-      } else {
-        // Fallback to mock for Expo Go
-        result = await this.mockOCR(processedUri);
-      }
-
-      // Convert to OcrPayload format
-      const ocrPayload = this.formatOCRResult(result, imageHash);
-
-      return ocrPayload;
-    } catch (error) {
-      console.error('OCR failed:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Perform actual text recognition
-   */
-  private async recognizeText(uri: string): Promise<TextRecognitionResult> {
-    if (!this.textRecognizer) {
-      throw new Error('Text recognizer not initialized');
-    }
-
-    try {
-      // Use the text recognition plugin
-      const result = await this.textRecognizer.scanImage(uri);
-
-      // Format the result
-      const blocks = result.blocks || [];
-      const fullText = blocks.map((b: any) => b.text).join('\n');
-
-      return {
-        text: fullText,
-        blocks: blocks.map((block: any) => ({
-          text: block.text,
-          frame: block.frame || { x: 0, y: 0, width: 100, height: 20 },
-          confidence: block.confidence
-        }))
-      };
-    } catch (error) {
-      console.error('Text recognition failed:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Mock OCR for testing in Expo Go
-   */
-  private async mockOCR(uri: string): Promise<TextRecognitionResult> {
-    // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const mockReceipt = `
-WHOLE FOODS MARKET
-365 Main Street
-San Francisco, CA 94102
-(415) 555-0123
-
-09/25/2025 14:32
-
-GROCERY
-ORGANIC MILK GAL     5.99
-BANANAS 2.5 @ 0.69   1.73
-WHOLE WHEAT BREAD    3.99
-CHICKEN BREAST       12.50
-PASTA BARILLA 2X     5.98
-GREEK YOGURT         4.99
-LETTUCE HEAD         2.49
-TOMATOES 3LB @ 1.99  5.97
-OLIVE OIL EVOO       8.99
-EGGS DOZEN ORGANIC   5.99
-
-SUBTOTAL            58.61
-TAX 8.75%            5.13
-TOTAL              $63.74
-
-CASH                70.00
-CHANGE               6.26
-
-TOTAL POINTS EARNED  127
-REWARDS BALANCE    $5.00
-
-Thank you for shopping!
-`.trim();
-
-    // Create blocks with simulated bbox data
-    const lines = mockReceipt.split('\n');
-    const blocks = lines.map((line, index) => {
-      // Simulate different x positions for prices
-      const hasPrice = /\d+\.\d{2}$/.test(line);
-      const x = hasPrice ? 0.6 : 0.1;
-
-      return {
-        text: line,
-        frame: {
-          x: x,
-          y: index * 0.03,
-          width: hasPrice ? 0.3 : 0.5,
-          height: 0.025
-        },
-        confidence: 0.85 + Math.random() * 0.14
-      };
-    });
-
-    return {
-      text: mockReceipt,
-      blocks
-    };
-  }
-
-  /**
    * Format OCR result into OcrPayload
    */
-  private formatOCRResult(result: TextRecognitionResult, imageHash: string): OcrPayload {
+  formatOCRResult(result: TextRecognitionResult, imageHash: string): OcrPayload {
     // Convert blocks to normalized format
     const ocrBlocks: OcrBlock[] = result.blocks.map((block, index) => ({
       text: block.text.trim(),

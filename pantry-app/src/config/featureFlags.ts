@@ -19,7 +19,7 @@ export const FEATURE_FLAGS = {
   SAVE_RECEIPTS_TO_DB: true,       // Save receipt OCR results
 
   // OCR Configuration
-  OCR_METHOD: 'cloud' as 'cloud' | 'device',  // 'cloud' = Google Cloud Vision API, 'device' = On-device (iOS/ML Kit)
+  OCR_METHOD: 'device' as 'cloud' | 'device',  // 'cloud' = Google Cloud Vision API, 'device' = On-device (iOS/ML Kit)
   SHOW_OCR_METHOD_NOTICE: __DEV__,           // Show OCR method notice in dev mode
 
   // Sync Configuration
@@ -35,6 +35,10 @@ export const FEATURE_FLAGS = {
   SHOW_SYNC_STATUS: true,         // Show sync indicators in UI
   SHOW_ACTIVE_USERS: true,        // Show who's actively shopping
   SHOW_BACKUP_STATUS: true,       // Show last backup time
+
+  // Ads
+  ENABLE_ADS: true,                                   // Show ads for free-tier users
+  ADS_HIDDEN_TABS: ['Shopping', 'Scan'] as string[],  // Tabs where banner is hidden
 
   // Debug flags
   LOG_SYNC_OPERATIONS: false,     // Log sync operations (disable in production)
