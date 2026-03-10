@@ -21,7 +21,7 @@ import { trackEvent } from './analyticsService';
 export { PAYWALL_RESULT };
 
 const REVENUECAT_API_KEY = Platform.select({
-  ios: 'test_rusgSweOdjuzokWeuIxSWSanurF',
+  ios: 'appl_jlgCxReOLplfCUnCEmIiQwMZmgl',
   android: '',
 }) || '';
 

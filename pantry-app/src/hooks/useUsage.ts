@@ -8,7 +8,8 @@
  *   const allowed = await checkCanScan(); // returns false if limit reached
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Alert } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import { presentPaywallIfNeeded, PAYWALL_RESULT } from '../services/purchaseService';
@@ -36,43 +37,52 @@ const DEFAULT_USAGE: UsageInfo = {
 export function useUsage() {
   const { user } = useAuth();
   const [usage, setUsage] = useState<UsageInfo>(DEFAULT_USAGE);
+  const usageRef = useRef<UsageInfo>(DEFAULT_USAGE);
 
-  const refreshUsage = useCallback(async () => {
-    if (!user?.id) return;
+  // Keep ref in sync with state so we always have last-known good value
+  useEffect(() => {
+    usageRef.current = usage;
+  }, [usage]);
+
+  /**
+   * Fetch fresh usage data from the server.
+   * Returns the fresh data directly (avoids stale closure issues).
+   * On failure, returns last-known state (not DEFAULT_USAGE, which could
+   * misclassify paid users during outages).
+   */
+  const refreshUsage = useCallback(async (): Promise<UsageInfo> => {
+    if (!user?.id) return usageRef.current;
 
     try {
-      const { data, error } = await supabase.rpc('get_usage_info', {
-        p_user_id: user.id,
-      });
+      const { data, error } = await supabase.rpc('get_my_usage_info');
 
       if (!error && data) {
-        setUsage(data as UsageInfo);
+        const fresh = data as UsageInfo;
+        setUsage(fresh);
+        return fresh;
       }
     } catch {
-      // Silent - don't block UX on usage fetch failure
+      // Silent - return last-known state below
     }
+
+    return usageRef.current;
   }, [user?.id]);
 
   useEffect(() => {
     refreshUsage();
   }, [refreshUsage]);
 
+  /**
+   * Check if user can perform a scan. Shows paywall for free users at limit,
+   * or "limit reached" alert for premium users at cap.
+   * Returns true if allowed, false if blocked.
+   */
   const checkCanScan = useCallback(async (): Promise<boolean> => {
-    await refreshUsage();
-    if (usage.scans_remaining <= 0 && usage.tier === 'free') {
-      const result = await presentPaywallIfNeeded();
-      if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
-        await refreshUsage();
-        return true;
-      }
-      return false;
-    }
-    return true;
-  }, [refreshUsage, usage]);
+    const fresh = await refreshUsage();
 
-  const checkCanImport = useCallback(async (): Promise<boolean> => {
-    await refreshUsage();
-    if (usage.imports_remaining <= 0 && usage.tier === 'free') {
+    if (fresh.scans_remaining > 0) return true;
+
+    if (fresh.tier === 'free') {
       const result = await presentPaywallIfNeeded();
       if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
         await refreshUsage();
@@ -80,8 +90,41 @@ export function useUsage() {
       }
       return false;
     }
-    return true;
-  }, [refreshUsage, usage]);
+
+    // Premium user at cap
+    Alert.alert(
+      'Limit Reached',
+      `You've used all ${fresh.scan_limit} scans this month. Your limit resets next month.`
+    );
+    return false;
+  }, [refreshUsage]);
+
+  /**
+   * Check if user can perform a recipe import. Shows paywall for free users
+   * at limit, or "limit reached" alert for premium users at cap.
+   * Returns true if allowed, false if blocked.
+   */
+  const checkCanImport = useCallback(async (): Promise<boolean> => {
+    const fresh = await refreshUsage();
+
+    if (fresh.imports_remaining > 0) return true;
+
+    if (fresh.tier === 'free') {
+      const result = await presentPaywallIfNeeded();
+      if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
+        await refreshUsage();
+        return true;
+      }
+      return false;
+    }
+
+    // Premium user at cap
+    Alert.alert(
+      'Limit Reached',
+      `You've used all ${fresh.import_limit} recipe imports this month. Your limit resets next month.`
+    );
+    return false;
+  }, [refreshUsage]);
 
   return {
     usage,

@@ -10,6 +10,8 @@ import { useSharedURL, isSupportedRecipeURL, getPlatformFromURL } from '../hooks
 import { extractCookCard } from '../services/cookCardService';
 import { CookCard } from '../types/CookCard';
 import { CookCardScreen } from './CookCardScreen';
+import { useUsage } from '../hooks/useUsage';
+import { presentPaywallIfNeeded, PAYWALL_RESULT } from '../services/purchaseService';
 
 interface ShareHandlerScreenProps {
   userId: string;
@@ -40,6 +42,7 @@ export const ShareHandlerScreen: React.FC<ShareHandlerScreenProps> = ({
   const [cookCard, setCookCard] = useState<CookCard | null>(null);
   const [requiresConfirmation, setRequiresConfirmation] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { checkCanImport } = useUsage();
 
   useEffect(() => {
     if (sharedURL && !urlLoading) {
@@ -51,6 +54,10 @@ export const ShareHandlerScreen: React.FC<ShareHandlerScreenProps> = ({
    * Handle incoming shared URL
    */
   const handleSharedURL = async (url: string) => {
+    // Check import limit before starting extraction
+    const canImport = await checkCanImport();
+    if (!canImport) return;
+
     try {
       setExtracting(true);
       setError(null);
@@ -82,7 +89,18 @@ export const ShareHandlerScreen: React.FC<ShareHandlerScreenProps> = ({
           [{ text: 'OK' }]
         );
       }
-    } catch (err) {
+    } catch (err: any) {
+      // Handle 429 usage limit: show paywall, retry on purchase
+      if (err.code === 'usage_limit_reached') {
+        const result = await presentPaywallIfNeeded();
+        if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
+          await new Promise(r => setTimeout(r, 2000));
+          handleSharedURL(url);
+          return;
+        }
+        return;
+      }
+
       console.error('Extraction error:', err);
       setError(err instanceof Error ? err.message : 'Failed to extract recipe');
 

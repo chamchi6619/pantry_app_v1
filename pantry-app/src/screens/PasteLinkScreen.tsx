@@ -33,6 +33,8 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from '../core/constants/theme';
 import { validateRecipeURL, detectPlatform } from '../utils/urlUtils';
 import { extractCookCard } from '../services/cookCardService';
+import { useUsage } from '../hooks/useUsage';
+import { presentPaywallIfNeeded, PAYWALL_RESULT } from '../services/purchaseService';
 import {
   ingestTraditionalRecipe,
   loadTraditionalRecipeAsCookCard,
@@ -81,6 +83,7 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
   const [loadingMessage, setLoadingMessage] = useState('Extracting recipe...');
   const [error, setError] = useState<string | null>(null);
   const sessionId = route?.params?.sessionId || generateSessionId();
+  const { checkCanImport } = useUsage();
   const lastClipboardCheck = useRef<number>(0);
   const appState = useRef(AppState.currentState);
 
@@ -138,6 +141,10 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
       setError('Please paste a recipe link');
       return;
     }
+
+    // Check import limit before starting extraction
+    const canImport = await checkCanImport();
+    if (!canImport) return;
 
     setLoading(true);
     setError(null);
@@ -260,6 +267,20 @@ export default function PasteLinkScreen({ route }: PasteLinkScreenProps) {
         sessionId,
       });
     } catch (err: any) {
+      // Handle 429 usage limit: show paywall, retry on purchase
+      if (err.code === 'usage_limit_reached') {
+        const result = await presentPaywallIfNeeded();
+        if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
+          // Brief delay for webhook propagation, then retry
+          await new Promise(r => setTimeout(r, 2000));
+          setLoading(false);
+          handleExtract();
+          return;
+        }
+        setLoading(false);
+        return;
+      }
+
       const errorMessage = err.message || 'Failed to extract recipe';
       setError(errorMessage);
 

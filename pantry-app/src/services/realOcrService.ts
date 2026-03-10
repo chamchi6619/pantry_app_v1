@@ -29,14 +29,14 @@ export class RealOCRService {
     // this.baseUrl = `http://${YOUR_COMPUTER_IP}:8000`;
 
     // For ngrok/external access (update with your ngrok URL):
-    this.baseUrl = 'https://jamir-superdifficult-kymberly.ngrok-free.dev';
+    this.baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
     // For real OCR testing, get a Google Cloud Vision API key:
     // 1. Go to https://console.cloud.google.com/
     // 2. Enable Cloud Vision API
     // 3. Create credentials (API Key)
     // 4. Add key below (NEVER commit this!)
-    this.cloudVisionApiKey = 'AIzaSyDL6gsVXM-H7bwIiBV2EkrgXvsBO2OR2K4'; // REAL OCR ENABLED!
+    this.cloudVisionApiKey = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY || '';
 
     // Load usage tracking from storage
     this.loadUsageTracking();

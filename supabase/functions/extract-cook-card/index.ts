@@ -1202,6 +1202,10 @@ Deno.serve(async (req) => {
             // Increment monthly quota
             await incrementMonthlyQuota(supabase, user_id, extractionCost);
 
+            // Increment import count for paywall gating (non-blocking)
+            try { await incrementExtractionCount(supabase, user_id, 'import'); }
+            catch (e) { console.error('Failed to increment import count (non-blocking):', e); }
+
             // Log extraction completed
             await logEvent(supabase, {
               user_id,
@@ -1390,6 +1394,10 @@ ${instructionSteps.join('\n')}
 
                 // Increment monthly quota
                 await incrementMonthlyQuota(supabase, user_id, extractionCost);
+
+                // Increment import count for paywall gating (non-blocking)
+                try { await incrementExtractionCount(supabase, user_id, 'import'); }
+                catch (e) { console.error('Failed to increment import count (non-blocking):', e); }
 
                 // Log success
                 await logEvent(supabase, {
@@ -1745,6 +1753,10 @@ ${instructionSteps.join('\n')}
                 // Increment monthly quota
                 await incrementMonthlyQuota(supabase, user_id, extractionCost);
 
+                // Increment import count for paywall gating (non-blocking)
+                try { await incrementExtractionCount(supabase, user_id, 'import'); }
+                catch (e) { console.error('Failed to increment import count (non-blocking):', e); }
+
                 // Log extraction completed
                 await logEvent(supabase, {
                   user_id,
@@ -1990,6 +2002,10 @@ ${instructionSteps.join('\n')}
 
                   // Increment monthly quota
                   await incrementMonthlyQuota(supabase, user_id, extractionCost);
+
+                  // Increment import count for paywall gating (non-blocking)
+                  try { await incrementExtractionCount(supabase, user_id, 'import'); }
+                  catch (e) { console.error('Failed to increment import count (non-blocking):', e); }
 
                   // Log extraction completed
                   await logEvent(supabase, {
@@ -2439,6 +2455,10 @@ ${instructionSteps.join('\n')}
 
     // Step 6.5: Increment monthly quota for all successful extractions
     await incrementMonthlyQuota(supabase, user_id, extractionCost);
+
+    // Step 6.6: Increment import count for paywall gating (non-blocking)
+    try { await incrementExtractionCount(supabase, user_id, 'import'); }
+    catch (e) { console.error('Failed to increment import count (non-blocking):', e); }
 
     // Step 7: Log extraction completed event
     await logEvent(supabase, {

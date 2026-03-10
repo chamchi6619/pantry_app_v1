@@ -49,6 +49,12 @@ export async function extractCookCard(
 
     if (!response.ok) {
       const errorData = await response.json();
+      if (response.status === 429 && errorData.budget_info) {
+        const err = new Error(errorData.error || 'Extraction limit reached');
+        (err as any).code = 'usage_limit_reached';
+        (err as any).budgetInfo = errorData.budget_info;
+        throw err;
+      }
       throw new Error(errorData.error || 'Extraction failed');
     }
 

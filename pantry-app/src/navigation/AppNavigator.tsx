@@ -10,6 +10,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, StyleSheet, Dimensions, Pressable, ActivityIndicator, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { theme } from '../core/constants/theme';
 import { useAuth } from '../contexts/AuthContext';
@@ -144,8 +145,8 @@ const ProfileStack = () => (
 
 // Production ad unit IDs — replace with real IDs before release
 const PROD_AD_UNIT_ID = Platform.select({
-  ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
-  android: 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY',
+  ios: 'ca-app-pub-9273318679388213/4629999086',
+  android: 'ca-app-pub-9273318679388213/4629999086',
 }) ?? '';
 
 // AdBanner - shown below tab bar for free-tier users on allowed tabs
@@ -272,10 +273,21 @@ const TabNavigatorInner: React.FC<{ onTabChange?: (tab: string) => void }> = ({ 
 
 // TabNavigator with AdBanner below the tab bar
 const TabNavigator = () => {
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('Pantry');
+  const { usage } = useUsage();
+
+  // Ad shows when: ads enabled, free tier, and not on a hidden tab
+  const adVisible = FEATURE_FLAGS.ENABLE_ADS
+    && usage.tier === 'free'
+    && !FEATURE_FLAGS.ADS_HIDDEN_TABS.includes(activeTab);
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <View style={{
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      paddingBottom: adVisible ? 0 : insets.bottom,
+    }}>
       <TabNavigatorInner onTabChange={setActiveTab} />
       <AdBanner activeTab={activeTab} />
     </View>

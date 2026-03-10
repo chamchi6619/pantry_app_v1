@@ -19,6 +19,7 @@ import { offlineQueueService } from '../../../services/offlineQueueService';
 import { FEATURE_FLAGS } from '../../../config/featureFlags';
 import { trackEvent } from '../../../services/analyticsService';
 import { useUsage } from '../../../hooks/useUsage';
+import { supabase } from '../../../lib/supabase';
 
 export function ScannerScreen() {
   const navigation = useNavigation();
@@ -162,6 +163,10 @@ export function ScannerScreen() {
 
         console.log(`✅ ${result.items.length} items parsed, navigating to Fix Queue`);
         trackEvent('scan_completed', { item_count: result.items.length });
+
+        // Increment scan count for paywall gating (non-blocking)
+        try { await supabase.rpc('increment_my_extraction_count', { p_operation: 'scan' }); }
+        catch (e) { console.error('Failed to increment scan count (non-blocking):', e); }
 
         // Reset scanner state before navigation
         setTimeout(() => {

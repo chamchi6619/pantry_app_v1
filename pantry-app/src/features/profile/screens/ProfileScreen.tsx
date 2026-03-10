@@ -21,7 +21,7 @@ import { useUserPreferences } from '../../../hooks/useUserPreferences';
 import { supabase } from '../../../lib/supabase';
 import { useUsage } from '../../../hooks/useUsage';
 import RevenueCatUI from 'react-native-purchases-ui';
-import { presentPaywall } from '../../../services/purchaseService';
+import { presentPaywall, restorePurchases } from '../../../services/purchaseService';
 
 interface RecentReceipt {
   id: string;
@@ -423,6 +423,27 @@ export const ProfileScreen: React.FC = () => {
           >
             <Ionicons name="card-outline" size={20} color="#6B7280" />
             <Text style={styles.accountText}>Manage Subscription</Text>
+            <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+          </Pressable>
+
+          <Pressable
+            style={styles.accountItem}
+            onPress={async () => {
+              try {
+                const restored = await restorePurchases();
+                if (restored) {
+                  Alert.alert('Purchases Restored', 'Your Pro subscription has been restored.');
+                  refreshUsage();
+                } else {
+                  Alert.alert('No Purchases Found', 'No previous purchases were found for this account.');
+                }
+              } catch {
+                Alert.alert('Error', 'Failed to restore purchases. Please try again.');
+              }
+            }}
+          >
+            <Ionicons name="refresh-outline" size={20} color="#6B7280" />
+            <Text style={styles.accountText}>Restore Purchases</Text>
             <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
           </Pressable>
 

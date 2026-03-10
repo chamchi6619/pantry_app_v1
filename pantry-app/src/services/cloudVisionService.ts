@@ -4,7 +4,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { ImageEnhancementService, QUALITY_THRESHOLDS } from './imageEnhancementService';
 
 // Get API key from environment or use the configured key
-const GOOGLE_VISION_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY || 'AIzaSyDL6gsVXM-H7bwIiBV2EkrgXvsBO2OR2K4';
+const GOOGLE_VISION_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY || '';
 
 interface VisionResponse {
   responses: Array<{
